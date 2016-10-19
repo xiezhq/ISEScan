@@ -1,0 +1,10 @@
+##gff-version 3
+gi|228288719|ref|NC_012624.1|	ISEScan	insertion_sequence	8950	11399	.	+	.	ID=gi|228288719|ref|NC_012624.1|_IS_1;family=IS607;cluster=IS607_8
+gi|228288719|ref|NC_012624.1|	ISEScan	terminal_inverted_repeat	8950	9013	.	+	.	ID=gi|228288719|ref|NC_012624.1|_IS_1_TIR;parent=gi|228288719|ref|NC_012624.1|_IS_1
+gi|228288719|ref|NC_012624.1|	ISEScan	terminal_inverted_repeat	11338	11399	.	+	.	ID=gi|228288719|ref|NC_012624.1|_IS_1_TIR;parent=gi|228288719|ref|NC_012624.1|_IS_1
+gi|228288719|ref|NC_012624.1|	ISEScan	insertion_sequence	30355	31343	.	+	.	ID=gi|228288719|ref|NC_012624.1|_IS_2;family=IS5;cluster=IS5_25
+gi|228288719|ref|NC_012624.1|	ISEScan	terminal_inverted_repeat	30355	30382	.	+	.	ID=gi|228288719|ref|NC_012624.1|_IS_2_TIR;parent=gi|228288719|ref|NC_012624.1|_IS_2
+gi|228288719|ref|NC_012624.1|	ISEScan	terminal_inverted_repeat	31316	31343	.	+	.	ID=gi|228288719|ref|NC_012624.1|_IS_2_TIR;parent=gi|228288719|ref|NC_012624.1|_IS_2
+gi|228288719|ref|NC_012624.1|	ISEScan	insertion_sequence	32413	33650	.	-	.	ID=gi|228288719|ref|NC_012624.1|_IS_3;family=ISH3;cluster=ISH3_0
+gi|228288719|ref|NC_012624.1|	ISEScan	terminal_inverted_repeat	32413	32456	.	-	.	ID=gi|228288719|ref|NC_012624.1|_IS_3_TIR;parent=gi|228288719|ref|NC_012624.1|_IS_3
+gi|228288719|ref|NC_012624.1|	ISEScan	terminal_inverted_repeat	33607	33650	.	-	.	ID=gi|228288719|ref|NC_012624.1|_IS_3_TIR;parent=gi|228288719|ref|NC_012624.1|_IS_3
