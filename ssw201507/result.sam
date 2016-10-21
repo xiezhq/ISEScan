@@ -1,0 +1,6 @@
+@HD	VN:1.0	SO:unsorted
+@SQ	SN:ISAcma33_left32	LN:32
+@PG	ID:Striped-Smith-Waterman	PN:pyssw	VN:0.1
+@CO	Score_values = match 3, mismatch 3, gap_open 2, gap_extend 1
+@CO	Filter Options = min_score 0, min_len 0
+ISAcma33_right32	0	ISAcma33_left32	3	0	3S21M1I1M2I3M1S	*	0	0	GATTGTGCGTCAATAAAGTGTGGGATAGTTGA	*	AS:i:56

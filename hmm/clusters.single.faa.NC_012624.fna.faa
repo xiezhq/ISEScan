@@ -2922,6 +2922,6 @@ gi|228288719|ref|NC_012624.1|_553_954_-     -          ISNCY_29|ISNCY|-|ISPA2| -
 # Query file:      clusters.single.faa
 # Target file:     proteome/NC_012624.fna.faa
 # Option settings: /u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer --tblout hmm/clusters.single.faa.NC_012624.fna.faa --noali --max --cpu 8 clusters.single.faa proteome/NC_012624.fna.faa 
-# Current dir:     /home/data/insertion_sequence/github/isescan
-# Date:            Tue Oct 18 16:03:32 2016
+# Current dir:     /nfs/nfs4/home/zhiqxie/xie/is/isfinder/isescan-1.0
+# Date:            Fri Oct 21 14:43:15 2016
 # [ok]
