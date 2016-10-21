@@ -1,4 +1,5 @@
-# ISEScan is a python package to identify IS elements in genome sequences.
+Introduction
+ISEScan is a python package to identify IS elements in genome sequences.
 
 ## Input and output
 
@@ -34,9 +35,9 @@
 ### Before we start, please make sure you have done two things below.
 	# You have all required packages installed on your computer.
 	# Config pakcages. If you haven't done it, please follow the instructions below to finish it before we can run ISEScan.
-	## Open constants.py, and find two lines marked with 'Config packages';
-	## Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb).
-	#  Save and close constants.py.
+		## Open constants.py, and find two lines marked with 'Config packages';
+		## Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb).
+		## Save and close constants.py.
 
 ### Let's try an example, NC_012624.fna.
 	The command below scans NC_012624.fna (a genome sequence from genome Sulfolobus_islandicus_Y_N_15_51), and output all results in prediction directory:
