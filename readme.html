@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>ISEScan is a python package to identify IS elements in genome sequences.</h1>
+<h2>Input and output</h2>
+
+<ul>
+	It requires three input files:
+	<li>Genome sequence file in FASTA format, one sequence per file.</li>
+	<li>Profile hidden markov models which are shipped with ISEScan, clusters.faa.hmm and clusters.single.faa.</li>
+</ul>
+	<ul>
+	After the program running ends, it will produced a list of IS elements identified in the genome sequence and put all produced files into user-specified directory, for example, ./prediction. The produced files include:
+		<li>one *.sum file, which summarizes the number of the identified IS element copies for each family</li>
+		<li>one *.gff file, which list each identified IS element copy with family classification and its TIR (Terminal Inverted Repeat)</li>
+		<li>one *.out file, which list each identified IS element copy with all details, one IS element copies per line</li>
+		<li>one *.is.fna file, which is a FASTA sequence file and contains the nucleic sequence of each identified IS copies</li>
+	</ul>
+
+<h2>How to run it?</h2>
+
+<p>
+ISEScan can run on any platform when the required packages are pre-installed on your computer. However, we recommend running it on Linux platform. If you need help on usage, please run: 
+</p>
+<p>
+python3 isescan.py -h 
+</p>
+
+<ul>
+Running ISEScan requires some packages pre-installed on your computer. For your convenience, we list below each required package, the name, recommended version and the site where you can find: 
+<li>
+Python 3.3.3 or later, https://www.python.org/downloads/
+</li>
+<li>
+numpy-1.8.0 or later, https://sourceforge.net/projects/numpy/files/NumPy/1.8.0/
+</li>
+<li>
+scipy-0.13.1 or later, https://sourceforge.net/projects/scipy/files/scipy/0.13.1/
+</li>
+<li>
+fastcluster, latest version recommended, https://pypi.python.org/pypi/fastcluster
+</li>
+<li>
+FragGeneScan 1.19 or later, https://sourceforge.net/projects/fraggenescan/
+</li>
+<li>
+HMMER-3.1b2 or later, http://hmmer.org/download.html
+</li>
+<li>
+BLAST 2.2.31 or later, https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download
+</li>
+<li>
+SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory. To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:
+<p>
+gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
+</p>
+<p>
+And then copy sswlib.so to the directory of ISEScan and set the search path as:
+</p>
+<p>
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
+</p>
+The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
+</li>
+</ul>
+
+<ul>
+Before we start, please make sure you have done two things below.
+<li>
+You have all required packages installed on your computer.
+</li>
+<li>
+Config pakcages. If you haven't done it, please follow the instructions below to finish it before we can run ISEScan.
+</li>
+<li>
+	<ul>
+	<li>
+	Open constants.py, and find two lines marked with 'Config packages';
+	</li>
+	<li>
+	Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb).
+	</li>
+	<li>
+	Save and close constants.py.
+	</li>
+	</ul>
+</li>
+</ul>
+
+<p>
+Let's try an example, NC_012624.fna.<br>
+The command below scans NC_012624.fna (a genome sequence from genome Sulfolobus_islandicus_Y_N_15_51), and output all results in prediction directory.
+</P>
+<p>
+</b>python3 isescan.py NC_012624.fna proteome hmm</b>
+</p>
+
+<p>
+Wait for its finishing. It may take a while as ISEScan always use the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence translated from the genome sequence. 
+<p>
+<p>
+After ISEScan finish running, you can find three important files in prediction directory, NC_012624.fna.sum, NC_012624.fna.gff, NC_012624.fna.is.fna. The summarization of IS copies for each IS family is in NC_012624.fna.sum, NC_012624.fna.gff list each IS element copy and its TIR. NC_012624.fna.is.fna holds the nucleic acid sequence of each IS element copy.
+<p>
+Note: ISEScan will run faster if you repeat running on the same input files. The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline. If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it: 
+<p><b>
+python3 isescan.py NC_012624.fna proteome hmm
+</b></p>
+</p>
+
+October 21, 2016
