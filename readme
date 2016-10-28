@@ -14,8 +14,7 @@ ISEScan is a python package to identify IS elements in genome sequences.
 1.1.1 Genome sequence file in FASTA format, one sequence per file.
 1.1.2 Profile hidden markov models which are shipped with ISEScan, clusters.faa.hmm and clusters.single.faa.
 
-1.2 ISEScan will produced a list of IS elements identified in the genome sequence and put all produced files into the directory under the current directory, prediction. 
-	The produced files include:
+1.2 ISEScan will produced a list of IS elements identified in the genome sequence and put all produced files into the directory under the current directory, prediction. The produced files include:
 
 1.2.1 One *.sum file, which summarizes the number of the identified IS element copies for each family
 1.2.2 One *.gff file, which list each identified IS element copy with family classification and its TIR (Terminal Inverted Repeat)
