@@ -1,7 +1,7 @@
 ISEScan is a python package to identify IS elements in genome sequences.
 
 0 Install
-0.1 Download the latest ISEScan from https://github.com/xiezhq/ISEScan to your work directory, eg. /mydir, on your linux machine. The downloaded package is automatically saved as master.zip in your work directory.
+0.1 Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip in your current directory.
 0.2 Use unzip command to uncompress the zip file,
 	unzip master.zip
 0.3 The command will create a directory, ISEScan-master, and put all files into it.
@@ -44,9 +44,10 @@ ISEScan is a python package to identify IS elements in genome sequences.
 
 		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
 
-	The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
+The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
+2.2.9 You also need biopython 1.62 or later as SSW library requires it, http://biopython.org/.
 
-2.3 Before we start, please make sure you have done two things below.
+2.3 Before we continue, please make sure you have done two things below.
 
 2.3.1 You have all required packages installed on your computer.
 2.3.2 Configure ISEScan. If you haven't done it, please follow the instructions below to finish it before we can run ISEScan.
