@@ -23,7 +23,7 @@ ISEScan is a python package to identify IS elements in genome sequences.
 
 2. How to run it?
 
-2.1 ISEScan can run on any platform when the required packages are pre-installed on your computer. However, we recommend running it on Linux platform. If you need help on usage, please run: 
+2.1 ISEScan was only tested on Linux platform. If you need help on usage, please run: 
 
 	python3 isescan.py -h 
 
