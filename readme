@@ -19,7 +19,7 @@ Last revision: 10/31/2016
 
 1.1 It requires three input files:
 
-1.1.1 Genome sequence file in FASTA format, one sequence per file.
+1.1.1 Genome sequence file in FASTA format.
 1.1.2 Profile hidden markov models which are shipped with ISEScan, clusters.faa.hmm and clusters.single.faa.
 
 1.2 ISEScan will produced a list of IS elements identified in the genome sequence and put all produced files into the directory under the current directory, prediction. The produced files include:
