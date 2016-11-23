@@ -1446,7 +1446,7 @@ def rdDNAlist(dnaListFile):
 # Read and return the summarization in file written by outputIndividual() in pred.py
 # return: [] or [nis, %genome, bps4is, len4DNA, familySum, dnaType]
 # familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-def getSumByOrg(sumFileByOrg, org):
+def getSumByOrg_mask(sumFileByOrg, org):
 	if os.path.isfile(sumFileByOrg):
 		fp2sumByOrg = open(sumFileByOrg, 'r')
 	else:
@@ -1474,19 +1474,19 @@ def getSumByOrg(sumFileByOrg, org):
 		return []
 
 # Read and return the summarization in file written by outputIS4multipleSeqOneFile() in pred.py
-# return: [] or [nis, %genome, bps4is, seqLen4bps, familySum, seqLen]
+# return: [] or [nis, %genome, bps4is, len4DNA, familySum, dnaType]
 # familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-def getSumByOrg4hmp(sumFileByOrg, org):
+def getSumByOrg(sumFileByOrg, org):
 	if os.path.isfile(sumFileByOrg):
 		fp2sumByOrg = open(sumFileByOrg, 'r')
 	else:
-		print('In getSumByOrg4hmp() in tools.py: no such file to read', sumFileByOrg)
+		print('In getSumByOrg() in tools.py: no such file to read', sumFileByOrg)
 		return []
 
 	familySum = {}
 	sumByOrg = []
-	dnaLen4is = {}
-	# dnaLen4is: {seqid:seqlen, ...}
+	seqlen4bps = {}
+	# seqlen4bps: {seqid:seqlen, ...}
 	for line in fp2sumByOrg:
 		line = line.strip()
 		if line[0] == '#':
@@ -1499,110 +1499,19 @@ def getSumByOrg4hmp(sumFileByOrg, org):
 			sumByOrg = items
 			break
 		seqid = items[0]
-		family = items[1]
-		nis = int(items[2])
-		bps4is = int(items[4])
-		seqlen4is = int(items[5])
+		seqlen4bps = int(items[5])
 		#familySum[items[0]] = [int(items[1]), float(items[2]), int(items[3])]
 		#print('hello', sumFileByOrg, items[1:5])
-		if family not in familySum.keys():
-			familySum[family] = [0, 0.0, 0]
-		familySum[family] = [familySum[family][0]+nis, 0.0, familySum[family][2]+bps4is]
-		if seqid not in dnaLen4is.keys():
-			dnaLen4is[seqid] = seqlen4is
+		familySum[items[1]] = [int(items[2]), float(items[3]), int(items[4])]
+		if seqid not in seqlen4bps.keys():
+			seqlen4bps[seqid] = seqlen4bps
 	fp2sumByOrg.close()
 	if len(sumByOrg) > 0:
-		seqLen4is = sum(dnaLen4is.values())
+		dnaLen4bps = sum(seqlen4bps.values())
 		dnaLen = int(sumByOrg[5])
-		for family,value in familySum.items():
-			familySum[family][1] = 100 * familySum[family][2] / dnaLen # percentage
-		return [int(sumByOrg[2]), float(sumByOrg[3]), int(sumByOrg[4]), seqLen4is, familySum, dnaLen]
+		return [int(sumByOrg[2]), float(sumByOrg[3]), int(sumByOrg[4]), dnaLen4bps, familySum, dnaLen]
 	else:
 		return []
-
-# file4orgs: {org: files, ..., org: files}
-# files: [file4fileid, ..., file4fileid]
-def sum4org4hmp(file4orgs, dir4prediction=constants.dir4prediction):
-	for org in sorted(file4orgs.keys()):
-		# Get summarization from .sum file of each seqid
-		# sum4is: {fileid: sum4file, ..., fileid: sum4file}
-		# sum4file: [] or [nis, %genome, bps4is, len4DNA, familySum]
-		# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-		sum4is = {}
-		sum4is4genome = {}
-		sum4is4plasmid = {}
-		sum4is4phage = {}
-		path = os.path.join(dir4prediction, org)
-		makedir(path)
-		for file4fileid in file4orgs[org]:
-			fileid = os.path.basename(file4fileid)
-			file = os.path.join(path, '.'.join([fileid, 'sum']))
-			sum4is4all = getSumByOrg4hmp(file, fileid)
-			# sum4is4all: [] or [nis, %genome, bps4is, dnaLen4is, familySum, dnaLen]
-			# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-			if len(sum4is4all) == 0:
-				dnaLen = 0
-			else:
-				dnaLen = sum4is4all[5]
-			dnaType = 2 # chromosome DNA
-
-			genome = 0
-			genome4is = 0
-			plasmid = 0
-			plasmid4is = 0
-			phage = 0
-			phage4is = 0
-			dnaLen4phage, dnaLen4plasmid, dnaLen4genome = 0, 0, 0
-			if dnaType == 0:
-				phage = 1
-				dnaLen4phage = dnaLen
-			elif dnaType == 1:
-				plasmid = 1
-				dnaLen4plasmid = dnaLen
-			else:
-				genome = 1
-				dnaLen4genome = dnaLen
-			
-			# set values for DNA without IS element
-			if len(sum4is4all) == 0:
-				marker4is = 0
-				# nis, %genome, bps4is, dnaLen4is, familySum = 0, 0, 0, dnaLen4is, {}
-				sum4is4all = [0, 0, 0, 0, {}]
-			else:
-				marker4is = 1
-
-			sum4is4all2ext = [genome4is, genome, plasmid4is, plasmid, phage4is, phage]
-			sum4is4genome[fileid] = [0, 0, 0, 0, {}, dnaLen4genome] + sum4is4all2ext
-			sum4is4plasmid[fileid] = [0, 0, 0, 0, {}, dnaLen4plasmid] + sum4is4all2ext
-			sum4is4phage[fileid] = [0, 0, 0, 0, {}, dnaLen4phage] + sum4is4all2ext
-
-			if marker4is == 1:
-				if dnaType == 0:
-					phage4is = 1
-					sum4is4phage[fileid][:5] = sum4is4all
-					sum4is4phage[fileid][5+5] = phage4is
-				elif dnaType == 1:
-					plasmid4is = 1
-					sum4is4plasmid[fileid][:5] = sum4is4all
-					sum4is4plasmid[fileid][5+3] = plasmid4is
-				else:
-					genome4is = 1
-					sum4is4genome[fileid][:5] = sum4is4all
-					sum4is4genome[fileid][5+1] = genome4is
-			sum4is[fileid] = sum4is4all[:5] + [dnaLen, genome4is, genome, plasmid4is, plasmid, phage4is, phage]
-
-		# output summarization for all DNAs from organism even there is no IS element found 
-		# in the organism.
-		sumfile4org = os.path.join(path, 'organism.sum')
-		output4sumFull(sum4is, sumfile4org)
-		'''
-		sumfile4org = os.path.join(path, 'organism4genome.sum')
-		output4sumFull(sum4is4genome, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4plasmid.sum')
-		output4sumFull(sum4is4plasmid, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4phage.sum')
-		output4sumFull(sum4is4phage, sumfile4org)
-		'''
 
 familyNames = [
 		'IS1',
@@ -1769,7 +1678,6 @@ def output4sumFull(sum4is, outfile):
 		# get available data for each family
 		if len(sum4org) > 0:
 			nis4org, percent4org, bps4is, dnaLen4is = sum4org[:4]
-			#print('hello', org, sum4org[5:])
 			dnaLen, ngenome4is, ngenome, nplasmid4is, nplasmid, nphage4is, nphage = sum4org[5:]
 			for family, value in sum4org[4].items():
 				familySum[family] = value
@@ -1804,7 +1712,7 @@ def output4sumFull(sum4is, outfile):
 	if dnaLen4is2sum == 0:
 		percentByBps = 0
 	else:
-		percentByBps = (bps4is2sum/dnaLen2sum)*100
+		percentByBps = (bps4is2sum/dnaLen4is2sum)*100
 	fp.write(fmt.format('total', nis2sum, percentByBps, bps4is2sum, dnaLen4is2sum,
 		dnaLen2sum, ngenome4is2sum, ngenome2sum, nplasmid4is2sum, nplasmid2sum, nphage4is2sum, nphage2sum))
 	for family in sorted(familySum.keys()):

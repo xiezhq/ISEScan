@@ -600,7 +600,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 		fp4gff.close()
 		fp.close()
 
-		print('{:<11} {:>6} {:>7} {:>10}'.format('family', 'nIS', '%Genome', 'bps4IS'), file=fp4sum)
+		print('{:<11} {:>6} {:>7} {:>15}'.format('family', 'nIS', '%Genome', 'bps4IS'), file=fp4sum)
 		#print('-' * 18, file=fp4sum)
 		nis4seq = 0
 		bps4seq = 0
@@ -608,12 +608,12 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 		for family in sorted(familySumBySeq.keys()):
 			nis = familySumBySeq[family]
 			bps4family = bpsBySeq[family]
-			print('{:<11} {:>6} {:>7.2g} {:>10}'.format(family, nis, 
+			print('{:<11} {:>6} {:>7.2g} {:>15}'.format(family, nis, 
 				(bps4family/len4DNA)*100, bps4family), file=fp4sum)
 			nis4seq += nis
 			bps4seq += bps4family
 
-		print('{:<11} {:>6} {:>7.2g} {:>10} {:>10}'.format('total', nis4seq, 
+		print('{:<11} {:>6} {:>7.2g} {:>15} {:>15}'.format('total', nis4seq, 
 			(bps4seq/len4DNA)*100, bps4seq, len4DNA), file=fp4sum)
 		fp4sum.close()
 		if nis4seq == 0:
@@ -663,6 +663,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2}'
 	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2}'
 
+	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
+	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
 
 	common4output = os.path.join(constants.dir4prediction, orgfileid)
 	outFile = '.'.join([common4output, 'out'])
@@ -687,7 +689,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	print('#', '-' * 139, file = fp)
 
 	fp4sum = open(sumFile, 'w')
-	print('{:<60} {:<11} {:>6} {:>7} {:>10} {:>10}'.format(
+	print(fmtStrTitleSum.format(
 		'# seqid', 'family', 'nIS', '%Genome', 'bps4IS', 'dnaLen'), file=fp4sum)
 	nis4seqTotal = 0
 	bps4seqTotal = 0
@@ -900,7 +902,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 		for family in sorted(familySumBySeq.keys()):
 			nis = familySumBySeq[family]
 			bps4family = bpsBySeq[family]
-			print('{:<60} {:<11} {:>6} {:>7.2f} {:>10} {:>10}'.format(
+			print(fmtStrSum.format(
 				seqid, family, nis, 
 				(bps4family/len4DNA)*100, bps4family, len4DNA), file=fp4sum)
 			nis4seq += nis
@@ -912,7 +914,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	len4DNATotal = sum([len(v[2]) for v in mDNA.values()])
 	
 	#fileid = os.path.basename(sumFile).rsplit('.',1)[0]
-	print('{:<60} {:<11} {:>6} {:>7.2f} {:>10} {:>10}'.format(
+	print(fmtStrSum.format(
 		fileid, 'total', 
 		nis4seqTotal, (bps4seqTotal/len4DNATotal)*100, bps4seqTotal, len4DNATotal), file=fp4sum)
 	if nis4seq == 0:
@@ -2019,7 +2021,10 @@ def pred(args):
 		outputIndividual(mHits, mDNA, proteomes, morfsMerged)
 	elif norgfiles == 1:
 		# output ISs in all sequences into one file
-		outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop())
+		if len(mHits) > 0:
+			outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop())
+		else:
+			print('No IS element was found for {}'.format(mHits.keys()))
 	else:
 		e = 'Error: cannot get organism name (directory name holding genome sequence FASTA file) and FASTA sequence file name!'
 		raise RuntimeError(e)
