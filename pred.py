@@ -1539,14 +1539,18 @@ def refineHits(mHits):
 				print('remove short hit (partial IS element)', isLen, hit['bd'], hit['orf'])
 				continue
 
-			if hit['hmmhit'][2] > evalue_cutoff:
-				continue
+			#if hit['hmmhit'][2] > evalue_cutoff:
+			#	continue
 
+			# test evalue and number of Tpase copies (IS copies)
 			if hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
+				# filter out hits without TIR
 				if len(hit['tirs']) == 0:
 					continue
+				# filter out hits with gaps in TIR (alignment of left hand rigth hand TIR sequences)
 				elif hit['tirs'][0][3] > 0:
 					continue
+				# filter out hits with irId/irLen < irSim4singleCopy (default 0.85)
 				elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
 					continue
 

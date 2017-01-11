@@ -6,6 +6,10 @@ Zhiqun Xie
 Contact: 
 Zhiqun Xie, zhiqxie@iu.edu
 
+Version 1.1.1
+- add option switch in constants.py to report partial IS elements as well as full-length IS elements
+- bugs fix
+
 
 0 Install
 0.1 Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip in your current directory.
