@@ -73,7 +73,7 @@ def batch(args):
 if __name__ == "__main__":
 	descriptionStr = 'Summarize prediction results of IS elements in each organism and all organisms'
 	parser = argparse.ArgumentParser(description = descriptionStr)
-	helpStr = 'input file containing NCBI genome fasta files, one file per line, e.g. bacteria.fna.list'
+	helpStr = 'input file containing NCBI genome fasta files, one file per line'
 	parser.add_argument('fileList', help = helpStr)
 	helpStr = 'directory holding the results of IS prediction, one organism per sub-directory, e.g. /home/data/insertion_sequence/results4MGEScan-IS/prediction'
 	parser.add_argument('dir2prediction', help = helpStr)
