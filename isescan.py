@@ -4,11 +4,38 @@
 # ISEScan version
 version = '1.1'
 
-import argparse
+from sys import argv
 import os
+from sys import platform as _platform
 
 import isPredict
+######## OPERATIONAL SYSTEM IMPROVEMENTS & CORRECTIONS     #
+#if _platform == "linux" or _platform == "linux2":	   #
+#	## if they was using this on linux		   #
+#elif _platform == "darwin":				   #
+#	## MAC OS X					   #
+#elif _platform == "win32":				   #
+#	## WINDOWS					   #
+#							   #
+############################################################
 
+
+#def main():
+#	print ("Welcome! Here an args list:\n")
+#	print ("--version shows the version.\n")
+#	print ("seqfile Sequence file in fasta format.\n")
+#	print ("path2proteome directory where proteome (each line corresponds to a protein sequence database translated from a genome) files will be placed.\n")
+#	print ("path2hmm directory where the results of hmm search will be placed")
+
+#	if sys.argv[1] == "--version": ##action here
+	
+#	if sys.argv[1] == "seqfile": ## action here
+		
+#	if sys.argv[1] == "path2proteome": ## action here
+		
+#	if sys.argv[1] == "path2hmm": ## action here
+	
+	
 def isPredictSingle(args):
 	seqfile = args['seqfile']
 	path2proteome = args['path2proteome']
@@ -24,21 +51,7 @@ if __name__ == "__main__":
 	# Parse command line arguments
 	descriptStr = 'Search IS Profile HMMs against gene database. A typical invocation would be:\n\
 			python3 isPredictSingle.py seqfile proteome hmm'
-	parser = argparse.ArgumentParser(prog='isescan', description = descriptStr)
 
-	parser.add_argument('--version', action='version', version='%(prog)s' + ' ' + version)
-
-
-	helpStr = 'sequence file in fasta format'
-	parser.add_argument('seqfile', help = helpStr)
-
-	helpStr = 'directory where proteome (each line corresponds to a protein sequence database translated from a genome) files will be placed'
-	parser.add_argument('path2proteome', help = helpStr)
-
-	helpStr = 'directory where the results of hmmsearch will be placed'
-	parser.add_argument('path2hmm', help = helpStr)
-
-	args = parser.parse_args()
 
 	args4isPredictSingle = {
 					'seqfile': args.seqfile,
