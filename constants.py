@@ -30,8 +30,8 @@ makeblastdb = 'makeblastdb'
 # IS element with length < 400 or single copy IS element without perfect TIR.
 # If removeShortIS is False, ISEScan will only report partial IS element as well as full-length IS element.
 # The default is True.
-#removeShortIS = True
-removeShortIS = False
+removeShortIS = True
+#removeShortIS = False
 #
 # Option switch to report partial IS element
 
@@ -144,11 +144,14 @@ minMax4tpase =	{
 		'ISNCY': (573, 1815, 123),
 		}
 
+#-------------------------
+# Paramters for TIR search
+
 # allowed minimal and maximal and optimal values of the length of TIR sequence for each family
 # Here, the optimal values are the empirical parameter based on the observations on ISfinder database.
 # The 4th collumn is marker indicating whether the family always has TIR or not, 1 for yes and 0 for no 
 # and -1 for either (in the family, some members have tir but others have no tir).
-minMax4tir = {
+minRealMax4tir = {
 		'IS1': (8, 67, 14, 1),
 		'IS110': (2, 31, 14, -1), 
 		'IS1182': (8, 44, 10, 1),
@@ -179,6 +182,43 @@ minMax4tir = {
 		'ISL3': (6, 50, 11, 1),
 		'ISNCY': (4, 52, 13, -1),
 	}
+
+# Same as minRealMax4tir except that the minimal value of TIR length for all families are set a common value, 
+# namely, 10, because IS elements usually have a length between 10 and 50.
+min10Max4tir = {
+		'IS1': (10, 67, 14, 1),
+		'IS110': (10, 31, 14, -1), 
+		'IS1182': (10, 44, 10, 1),
+		'IS1380': (10, 39, 10, 1),
+		'IS1595': (10, 43, 15, 1),
+		'IS1634': (10, 32, 12, 1),
+		'IS200/IS605': (10000, 0, 10000, 0), # prevent program from finding any tir with irLen > 0
+		'IS200/IS605_8': (10, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
+		#'IS200/IS605': (10, 11, 11, -1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
+		'IS21': (10, 76, 10, 1),
+		'IS256': (10, 48, 15, 1),
+		'IS3': (10, 54, 10, -1),
+		'IS30': (10, 50, 12, 1),
+		'IS4': (10, 67, 12, 1),
+		'IS481': (10, 52, 10, 1),
+		'IS5': (10, 45, 14, 1),
+		'IS6': (10, 36, 14, 1),
+		'IS607': (10, 46, 12, -1),
+		'IS630': (10, 92, 11, 1),
+		'IS66': (10, 144, 11, 1),
+		'IS701': (10, 38, 12, 1),
+		'IS91': (10, 21, 11, -1),
+		'IS982': (10, 35, 11, 1),
+		'ISAS1': (10, 34, 12, 1),
+		'ISAZO13': (10, 48, 18, 1),
+		'ISH3': (10, 31, 15, 1),
+		'ISKRA4': (10, 40, 18, 1),
+		'ISL3': (10, 50, 11, 1),
+		'ISNCY': (10, 52, 13, -1),
+	}
+
+minMax4tir = min10Max4tir
+
 # ssw will use minMax4tir[2] as minimal length of the alignement of two tir sequences 
 # if useOPTtir == True else minMax[0] as minimal length of the alignment of two tir sequences.
 #useOPTtir = True
@@ -190,6 +230,9 @@ minIrIdentity = 0.4
 optIrIdentity = 0.6
 # stringent irId/irLen, which is usually required when irLen < 5(stringentShortestIR) or irLen > 55(stringentLongestIR)
 stringentIrIdentity = 0.7
+
+# Paramters for TIR search
+#-------------------------
 
 # maximum distance (bp) between two neighboring orfs (including +/- strand) within one IS element
 # Statistics from isfinder:

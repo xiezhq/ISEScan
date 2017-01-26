@@ -1512,7 +1512,6 @@ def chooseHits(mHitsByNear, mHitsByFar):
 					reverse=True)[0]
 
 			hits.append(hit)
-			#print('hello choose hit', hit)
 		hits.sort(key = lambda x: x['bd'][0])
 		mhits[accid] = hits
 	return mhits
@@ -1536,7 +1535,8 @@ def refineHits(mHits):
 			begin, end = hit['bd']
 			isLen = end - begin + 1
 			if isLen < minLen4is:
-				print('remove short hit (partial IS element)', isLen, hit['bd'], hit['orf'])
+				print('remove partial IS element with isLen < {}: isLen={} {} bd={} orf{}'.format(
+					minLen4is, isLen, family, hit['bd'], hit['orf']))
 				continue
 
 			#if hit['hmmhit'][2] > evalue_cutoff:
@@ -1546,12 +1546,18 @@ def refineHits(mHits):
 			if hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
 				# filter out hits without TIR
 				if len(hit['tirs']) == 0:
+					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{}'.format(
+						isLen, hit['bd'], hit['orf']))
 					continue
 				# filter out hits with gaps in TIR (alignment of left hand rigth hand TIR sequences)
 				elif hit['tirs'][0][3] > 0:
+					print('remove single-copy partial IS element with gap in tir: nGaps={} bd={} orf{}'.format(
+						hit['tirs'][0][3], hit['bd'], hit['orf']))
 					continue
 				# filter out hits with irId/irLen < irSim4singleCopy (default 0.85)
 				elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
+					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{}'.format(
+						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['tirs'][0][3], hit['bd'], hit['orf']))
 					continue
 
 			hitsCopy.append(hit)
@@ -1966,7 +1972,9 @@ def pred(args):
 
 	# remove hits that are partial IS elements identified by length, evalue and irId/irLen
 	if constants.removeShortIS == True:
+		print('Start removing partial IS elements')
 		mHits = refineHits(mHits)
+		print('Finish removing partial IS elements')
 
 	# remove redundant IS elements with same boundary and same TIR
 	mHits = removeRedundantIS(mHits)

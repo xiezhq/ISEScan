@@ -1023,6 +1023,7 @@ def findIR4elementBySSW(args):
 				match = match, mismatch = mismatch, 
 				gap_open = gapopen, gap_extend = gapextend, 
 				report_secondary = False, report_cigar = True)
+	minLen = 10
 	align = ssw.align(seq2, min_score = minScore, min_len = minLen)
 
 	if align:
@@ -1030,13 +1031,13 @@ def findIR4elementBySSW(args):
 		alignment = tools.buildAlignment(seq1, seq2, align, align.cigar_string)
 		#ir = getIRbySSWnoGap(seq1, seq2, align, cigarPair)
 		ir = getIRbySSW(alignment)
-		'''
+
+		
 		header = alignment[0]
 		if header['conflict'] == True:
 			line1, line2, line3 = alignment[1:]
 			print('Alignment conflict: {} {} {}\n {}\n {}\n {}'.format(
 				familyName, isName, filter, line1, line2, line3))
-		'''
 	else:
 		ir = []
 		#print('Warning: {} {} {} no alignment returned by SSW!'.format(familyName, isName, filter))
