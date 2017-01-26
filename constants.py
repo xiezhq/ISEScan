@@ -217,6 +217,7 @@ min10Max4tir = {
 		'ISNCY': (10, 52, 13, -1),
 	}
 
+# Switch to the different parameter sets of TIR, either minRealMax4tir or min10Max4tir
 minMax4tir = min10Max4tir
 
 # ssw will use minMax4tir[2] as minimal length of the alignement of two tir sequences 
