@@ -19,7 +19,8 @@ python3 = '/usr/local/bin/python3'
 #cmd = '/u/zhiqxie/xie/is/isfinder/isPredict.py'
 #cmd = '/u/zhiqxie/xie/is/isfinder/pred.py'
 #cmd = 'isPredict.py'
-cmd = 'pred.py'
+#cmd = 'pred.py'
+cmd = 'isescan.py'
 
 def batch(args):
 	dnaListFile4orgs = args['fileList']
@@ -43,23 +44,24 @@ def batch(args):
 		dir2proteome4org = '/home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5_benchmark'
 		dir2hmmsearchResults = '/home/data/insertion_sequence/output4hmmsearch_illumina_5_benchmark_cdhit30'
 		'''
+		'''
 		dir2proteome4org = '/home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5'
 		dir2hmmsearchResults = '/home/data/insertion_sequence/output4hmmsearch_illumina_5_cdhit30'
+		'''
+		dir2proteome4org = '/data2/zhiqxie/insertion_sequence/output4FragGeneScan1.19_illumina_5'
+		dir2hmmsearchResults = '/data2/zhiqxie/insertion_sequence/output4hmmsearch_illumina_5_cdhit30'
 		cmdargs = [python3, cmd, '', dir2proteome4org, dir2hmmsearchResults]
 		# summarize IS elements in each genome DNA and each organism 
 		for org in file4orgs.keys():
 			files = file4orgs[org]
-			fp = tempfile.NamedTemporaryFile(delete=False)
-			fp.write(('\n'.join(files)+'\n').encode())
-			fp.close()
-			cmdargs[2] = fp.name
-			cmdline = ' '.join(cmdargs)
-			callcmd = shlex.split(cmdline)
-			#subprocess.check_call(callcmd, shell=False, universal_newlines=False, stdout=subprocess.DEVNULL)
-			#subprocess.check_call(callcmd, shell=False, universal_newlines=False)
-			subprocess.check_output(callcmd, shell=False, universal_newlines=False, stderr=subprocess.STDOUT)
-			os.remove(fp.name)
-			print(org, 'was processed')
+			for file in files:
+				cmdargs[2] = file
+				cmdline = ' '.join(cmdargs)
+				callcmd = shlex.split(cmdline)
+				#subprocess.check_call(callcmd, shell=False, universal_newlines=False, stdout=subprocess.DEVNULL)
+				#subprocess.check_call(callcmd, shell=False, universal_newlines=False)
+				subprocess.check_output(callcmd, shell=False, universal_newlines=False, stderr=subprocess.STDOUT)
+				print(org, file, 'was processed')
 
 	# get summarization of IS elements for each organism and write summarization 
 	# for all organisms into file 'is.sum'.

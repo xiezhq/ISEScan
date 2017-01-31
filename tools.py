@@ -2119,7 +2119,7 @@ def tirwindowIntersectORF(start1, end1, start2, end2, orf, orfhitsNeighbors, min
 	before = orfhitsNeighbors[orf][0]
 	after = orfhitsNeighbors[orf][1]
 	if before != None and start1 <= before[0][2]:
-		#print('hello, before', before)
+		print('hello, before', before)
 		print('shrink the boundary of tir search region around ORF {}, start1 ({}) to {}'.format(
 			orf, start1,  before[0][2] + 1))
 		start1 = before[0][2] + 1
@@ -2128,7 +2128,7 @@ def tirwindowIntersectORF(start1, end1, start2, end2, orf, orfhitsNeighbors, min
 			end1 = start1
 
 	if after != None and end2 >= after[0][1]:
-		#print('hello, after', after)
+		print('hello, after', after)
 		print('shrink the boundary of tir search region around ORF {}, end2 ({}) to {}'.format(
 			orf, end2,  after[0][1] - 1))
 		end2 = after[0][1] - 1

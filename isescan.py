@@ -23,7 +23,7 @@ def isPredictSingle(args):
 if __name__ == "__main__":
 	# Parse command line arguments
 	descriptStr = 'Search IS Profile HMMs against gene database. A typical invocation would be:\n\
-			python3 isPredictSingle.py seqfile proteome hmm'
+			python3 isescan.py seqfile proteome hmm'
 	parser = argparse.ArgumentParser(prog='isescan', description = descriptStr)
 
 	parser.add_argument('--version', action='version', version='%(prog)s' + ' ' + version)
