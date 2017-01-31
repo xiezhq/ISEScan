@@ -218,7 +218,8 @@ min10Max4tir = {
 	}
 
 # Switch to the different parameter sets of TIR, either minRealMax4tir or min10Max4tir
-minMax4tir = min10Max4tir
+#minMax4tir = min10Max4tir
+minMax4tir = minRealMax4tir
 
 # ssw will use minMax4tir[2] as minimal length of the alignement of two tir sequences 
 # if useOPTtir == True else minMax[0] as minimal length of the alignment of two tir sequences.
