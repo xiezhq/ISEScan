@@ -1784,7 +1784,7 @@ def pred(args):
 		tblout_list = prepare4tblout_list(hmm_path, fileids)
 	if len(tblout_list) == 0:
 		print('No results returned by HMM search was found for sequences in', args['dna_list'])
-		return 0
+		return None
 
 	#print('Processing tblout files at', datetime.datetime.now().ctime())	
 	mtblout_hits_sorted = []
@@ -1907,7 +1907,7 @@ def pred(args):
 		if hits_sorted == None or len(hits_sorted) == 0:
 			e = 'No hit was found for {} {}'.format(seqid, seqid_hits)
 			print(e)
-			return
+			return 0
 
 		hits_sorted_refined = refine_hmm_hits_evalue(hits_sorted, e_value)
 		if len(hits_sorted_refined) == 0:
@@ -1916,6 +1916,8 @@ def pred(args):
 			continue
 		mtblout_hits_sorted_refined.append((seqid, hits_sorted_refined))
 	#print('Finish refining hits for each DNA sequence', datetime.datetime.now().ctime())
+	if len(mtblout_hits_sorted_refined) == 0:
+		return None
 
 	mtblout_hits_sorted = mtblout_hits_sorted_refined
 

@@ -49,31 +49,24 @@ def write2file(filePath = None, content = None):
 	with open(filePath, 'w') as fp:
 		fp.write(content)
 
-# To split a huge file containing many fasta sequences into many individual fasta files
-# with the file names as NC_xxxxx.x which must already exist in each >gi line in original
-# huge fasta file.
+# Split an multiple-sequence fasta file containing multiple fasta sequences into multiple individual fasta files
+# with the file names with sequence id included.
 def split_tandem_fasta(huge_fasta_file, output_path):
-	fp = open(huge_fasta_file, "r")
+	mfastaFileName = os.path.basename(huge_fasta_file)
 	fp_fasta = open("/dev/null", "r")
-	for line in fp:
-		if line.isspace():
-			continue
-		if line[0] == '>':
-			fp_fasta.close()
-			if "|NC_" in line or ">NC_" in line:
-				nc_start = line.find("NC_")
-				nc_end = line.find('|', nc_start+3)
-				if nc_end == -1:
-					nc_end = line.find(' ', nc_start+3)
-				fasta_file_name = line[nc_start:nc_end]
-			else:
-				fasta_file_name = line[1:-1]
-			fasta_file_name = output_path + '/' + fasta_file_name
-			fasta_file_name += ".fna" 
-			fp_fasta= open(fasta_file_name, "w")
-		fp_fasta.write(line)
+	with open(huge_fasta_file, "r") as fp:
+		for line in fp:
+			line = line.strip()
+			if len(line) == 0:
+				continue
+			if line[0] == '>':
+				fp_fasta.close()
+				seqid = line[1:].split(maxsplit=1)[0]
+				fasta_file_name = '.'.join([mfastaFileName, seqid])
+				fasta_file = os.path.join(output_path, fasta_file_name)
+				fp_fasta= open(fasta_file, "w")
+			fp_fasta.write(line+'\n')
 	fp_fasta.close()
-	fp.close()
 
 
 # This function returns a generator, using a generator comprehension. The generator returns the string sliced, 

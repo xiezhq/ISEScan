@@ -12,8 +12,8 @@ import tools
 
 # To do IS element prediction before summarizing prediction if PREDICT = 1
 # To summarize prediction based on the previous prediction to save time if PREDICT = 0
-#PREDICT = 1
-PREDICT = 0
+PREDICT = 1
+#PREDICT = 0
 
 python3 = '/usr/local/bin/python3'
 #cmd = '/u/zhiqxie/xie/is/isfinder/isPredict.py'
@@ -48,8 +48,10 @@ def batch(args):
 		dir2proteome4org = '/home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5'
 		dir2hmmsearchResults = '/home/data/insertion_sequence/output4hmmsearch_illumina_5_cdhit30'
 		'''
-		dir2proteome4org = '/data2/zhiqxie/insertion_sequence/output4FragGeneScan1.19_illumina_5'
-		dir2hmmsearchResults = '/data2/zhiqxie/insertion_sequence/output4hmmsearch_illumina_5_cdhit30'
+		#dir2proteome4org = '/data2/zhiqxie/insertion_sequence/output4FragGeneScan1.19_illumina_5'
+		#dir2hmmsearchResults = '/data2/zhiqxie/insertion_sequence/output4hmmsearch_illumina_5_cdhit30'
+		dir2proteome4org = 'proteome'
+		dir2hmmsearchResults = 'hmm'
 		cmdargs = [python3, cmd, '', dir2proteome4org, dir2hmmsearchResults]
 		# summarize IS elements in each genome DNA and each organism 
 		for org in file4orgs.keys():
@@ -58,9 +60,9 @@ def batch(args):
 				cmdargs[2] = file
 				cmdline = ' '.join(cmdargs)
 				callcmd = shlex.split(cmdline)
-				#subprocess.check_call(callcmd, shell=False, universal_newlines=False, stdout=subprocess.DEVNULL)
+				subprocess.check_call(callcmd, shell=False, universal_newlines=False)
 				#subprocess.check_call(callcmd, shell=False, universal_newlines=False)
-				subprocess.check_output(callcmd, shell=False, universal_newlines=False, stderr=subprocess.STDOUT)
+				#subprocess.check_output(callcmd, shell=False, universal_newlines=False, stderr=subprocess.STDOUT)
 				print(org, file, 'was processed')
 
 	# get summarization of IS elements for each organism and write summarization 

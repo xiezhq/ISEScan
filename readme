@@ -69,7 +69,7 @@ Version 1.1.1
 2.3.2.3 Save and close constants.py.
 
 2.4 Let's try an example, NC_012624.fna.
-	The command below scans NC_012624.fna (a genome sequence from genome Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:
+	The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:
 
 		python3 isescan.py NC_012624.fna proteome hmm
 
