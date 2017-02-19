@@ -13,9 +13,27 @@ hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
 # Blast 
 blastn = '/l/ncbi-blast/bin/blastn'
 makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
+'''
+FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+phmmer = '/N/u/zhiqxie/Mason/informatics/inst/hmmer-3.1b2/bin/phmmer'
+hmmsearch = '/N/u/zhiqxie/Mason/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
+blastn = 'blastn'
+makeblastdb = 'makeblastdb'
+'''
 #
 # Config packages
 
+
+# Option switch to report partial IS element
+#
+# If removeShortIS is True, ISEScan will remove partial IS elements which include 
+# IS element with length < 400 or single copy IS element without perfect TIR.
+# If removeShortIS is False, ISEScan will only report partial IS element as well as full-length IS element.
+# The default is True.
+removeShortIS = True
+#removeShortIS = False
+#
+# Option switch to report partial IS element
 
 # When translateGenome is True, pipepline will predict and translate genes 
 # from genome sequence into protein database (file in fasta format) 
@@ -26,18 +44,22 @@ translateGenome = True
 # are required to map proteins to genome locations.
 #translateGenome = False
 
-# remove ISs with length < isMin if True
-# isMin is defined in this file, it is 400. The full-length IS element is usually longer than 400 bp.
-removeShortIS = True
-#removeShortIS = False
+# set temporary directory used by ISEScan
+#tmpdir = 'tmpdir'
+#tmpdir = '/N/u/zhiqxie/Karst/is/isescan/tmpdir'
+#tmpdir = '/N/dc2/scratch/zhiqxie/insertion_sequence/tmpdir'
 
 path2results = ''
+#path2results = '/N/u/zhiqxie/Karst/is/isescan/results'
+#path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 dir4prediction = os.path.join(path2results, 'prediction')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
+#file4clusterSeqFile4phmmer = '/N/u/zhiqxie/Karst/is/isescan/clusters.single.faa'
 # profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
 file4clusterHMM = 'clusters.faa.hmm'
+#file4clusterHMM = '/N/u/zhiqxie/Karst/is/isescan/clusters.faa.hmm'
 
 # blast database will be put here
 dir4blastout = os.path.join(path2results, 'blastout')
@@ -50,6 +72,8 @@ filters4ssw4isMax = [(1, 10, 4, 5)] # giving the greatest number of matched IS e
 				# the greatest number of matched best IS elements
 filters4ssw4trial = [(2, 6, 2, 2)] # trial filter to stop alignment from creating the consecutive gaps
 
+# minimal and maximal values of length of full-length IS element in each family
+# The value is collected from ISfinder database.
 minMaxLen4is =	{
 		'IS1': (732, 4601),
 		'IS110': (969, 4105),
@@ -315,6 +339,7 @@ gene2pepTable = {'11': table11}
 
 # default number of processes to use in calculation if it is not given
 nproc = 16
+#nproc = 1
 # default number of threads to use in calculation if it is not given
-#nthread = 128
-nthread = 8
+#nthread = 2
+nthread = 16

@@ -49,31 +49,24 @@ def write2file(filePath = None, content = None):
 	with open(filePath, 'w') as fp:
 		fp.write(content)
 
-# To split a huge file containing many fasta sequences into many individual fasta files
-# with the file names as NC_xxxxx.x which must already exist in each >gi line in original
-# huge fasta file.
+# Split an multiple-sequence fasta file containing multiple fasta sequences into multiple individual fasta files
+# with the file names with sequence id included.
 def split_tandem_fasta(huge_fasta_file, output_path):
-	fp = open(huge_fasta_file, "r")
+	mfastaFileName = os.path.basename(huge_fasta_file)
 	fp_fasta = open("/dev/null", "r")
-	for line in fp:
-		if line.isspace():
-			continue
-		if line[0] == '>':
-			fp_fasta.close()
-			if "|NC_" in line or ">NC_" in line:
-				nc_start = line.find("NC_")
-				nc_end = line.find('|', nc_start+3)
-				if nc_end == -1:
-					nc_end = line.find(' ', nc_start+3)
-				fasta_file_name = line[nc_start:nc_end]
-			else:
-				fasta_file_name = line[1:-1]
-			fasta_file_name = output_path + '/' + fasta_file_name
-			fasta_file_name += ".fna" 
-			fp_fasta= open(fasta_file_name, "w")
-		fp_fasta.write(line)
+	with open(huge_fasta_file, "r") as fp:
+		for line in fp:
+			line = line.strip()
+			if len(line) == 0:
+				continue
+			if line[0] == '>':
+				fp_fasta.close()
+				seqid = line[1:].split(maxsplit=1)[0]
+				fasta_file_name = '.'.join([mfastaFileName, seqid])
+				fasta_file = os.path.join(output_path, fasta_file_name)
+				fp_fasta= open(fasta_file, "w")
+			fp_fasta.write(line+'\n')
 	fp_fasta.close()
-	fp.close()
 
 
 # This function returns a generator, using a generator comprehension. The generator returns the string sliced, 
@@ -1450,11 +1443,43 @@ def getSumByOrg(sumFileByOrg, org):
 	if os.path.isfile(sumFileByOrg):
 		fp2sumByOrg = open(sumFileByOrg, 'r')
 	else:
-		print('No such file to read', sumFileByOrg)
+		print('In getSumByOrg() in tools.py: no such file to read', sumFileByOrg)
 		return []
 
 	familySum = {}
 	sumByOrg = []
+	for line in fp2sumByOrg:
+		if line[0] == '#':
+			continue
+		if line[:5] == 'total':
+			sumByOrg = line.split()
+			break
+		if line[:6] == 'family' or line[:6] == '------':
+			continue # head line
+		if line.replace('\b','').strip() == '':
+			continue # remove blank line
+		items = line.split()
+		familySum[items[0]] = [int(items[1]), float(items[2]), int(items[3])]
+	fp2sumByOrg.close()
+	if len(sumByOrg) > 0:
+		return [int(sumByOrg[1]), float(sumByOrg[2]), int(sumByOrg[3]), int(sumByOrg[4]), familySum]
+	else:
+		return []
+
+# Read and return the summarization in file written by outputIS4multipleSeqOneFile() in pred.py
+# return: [] or [nis, %genome, bps4is, seqLen4bps, familySum, seqLen]
+# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
+def getSumByOrg4hmp(sumFileByOrg, org):
+	if os.path.isfile(sumFileByOrg):
+		fp2sumByOrg = open(sumFileByOrg, 'r')
+	else:
+		print('In getSumByOrg4hmp() in tools.py: no such file to read', sumFileByOrg)
+		return []
+
+	familySum = {}
+	sumByOrg = []
+	dnaLen4is = {}
+	# dnaLen4is: {seqid:seqlen, ...}
 	for line in fp2sumByOrg:
 		line = line.strip()
 		if line[0] == '#':
@@ -1466,16 +1491,111 @@ def getSumByOrg(sumFileByOrg, org):
 			#sumByOrg = line.split()
 			sumByOrg = items
 			break
-		if line[1] == 'family':
-			continue # head line
+		seqid = items[0]
+		family = items[1]
+		nis = int(items[2])
+		bps4is = int(items[4])
+		seqlen4is = int(items[5])
 		#familySum[items[0]] = [int(items[1]), float(items[2]), int(items[3])]
-		print('hello', sumFileByOrg, items[1:5])
-		familySum[items[1]] = [int(items[2]), float(items[3]), int(items[4])]
+		#print('hello', sumFileByOrg, items[1:5])
+		if family not in familySum.keys():
+			familySum[family] = [0, 0.0, 0]
+		familySum[family] = [familySum[family][0]+nis, 0.0, familySum[family][2]+bps4is]
+		if seqid not in dnaLen4is.keys():
+			dnaLen4is[seqid] = seqlen4is
 	fp2sumByOrg.close()
 	if len(sumByOrg) > 0:
-		return [int(sumByOrg[2]), float(sumByOrg[3]), int(sumByOrg[4]), int(sumByOrg[5]), familySum]
+		seqLen4is = sum(dnaLen4is.values())
+		dnaLen = int(sumByOrg[5])
+		for family,value in familySum.items():
+			familySum[family][1] = 100 * familySum[family][2] / dnaLen # percentage
+		return [int(sumByOrg[2]), float(sumByOrg[3]), int(sumByOrg[4]), seqLen4is, familySum, dnaLen]
 	else:
 		return []
+
+# file4orgs: {org: files, ..., org: files}
+# files: [file4fileid, ..., file4fileid]
+def sum4org4hmp(file4orgs, dir4prediction=constants.dir4prediction):
+	for org in sorted(file4orgs.keys()):
+		# Get summarization from .sum file of each seqid
+		# sum4is: {fileid: sum4file, ..., fileid: sum4file}
+		# sum4file: [] or [nis, %genome, bps4is, len4DNA, familySum]
+		# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
+		sum4is = {}
+		sum4is4genome = {}
+		sum4is4plasmid = {}
+		sum4is4phage = {}
+		path = os.path.join(dir4prediction, org)
+		makedir(path)
+		for file4fileid in file4orgs[org]:
+			fileid = os.path.basename(file4fileid)
+			file = os.path.join(path, '.'.join([fileid, 'sum']))
+			sum4is4all = getSumByOrg4hmp(file, fileid)
+			# sum4is4all: [] or [nis, %genome, bps4is, dnaLen4is, familySum, dnaLen]
+			# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
+			if len(sum4is4all) == 0:
+				dnaLen = 0
+			else:
+				dnaLen = sum4is4all[5]
+			dnaType = 2 # chromosome DNA
+
+			genome = 0
+			genome4is = 0
+			plasmid = 0
+			plasmid4is = 0
+			phage = 0
+			phage4is = 0
+			dnaLen4phage, dnaLen4plasmid, dnaLen4genome = 0, 0, 0
+			if dnaType == 0:
+				phage = 1
+				dnaLen4phage = dnaLen
+			elif dnaType == 1:
+				plasmid = 1
+				dnaLen4plasmid = dnaLen
+			else:
+				genome = 1
+				dnaLen4genome = dnaLen
+			
+			# set values for DNA without IS element
+			if len(sum4is4all) == 0:
+				marker4is = 0
+				# nis, %genome, bps4is, dnaLen4is, familySum = 0, 0, 0, dnaLen4is, {}
+				sum4is4all = [0, 0, 0, 0, {}]
+			else:
+				marker4is = 1
+
+			sum4is4all2ext = [genome4is, genome, plasmid4is, plasmid, phage4is, phage]
+			sum4is4genome[fileid] = [0, 0, 0, 0, {}, dnaLen4genome] + sum4is4all2ext
+			sum4is4plasmid[fileid] = [0, 0, 0, 0, {}, dnaLen4plasmid] + sum4is4all2ext
+			sum4is4phage[fileid] = [0, 0, 0, 0, {}, dnaLen4phage] + sum4is4all2ext
+
+			if marker4is == 1:
+				if dnaType == 0:
+					phage4is = 1
+					sum4is4phage[fileid][:5] = sum4is4all
+					sum4is4phage[fileid][5+5] = phage4is
+				elif dnaType == 1:
+					plasmid4is = 1
+					sum4is4plasmid[fileid][:5] = sum4is4all
+					sum4is4plasmid[fileid][5+3] = plasmid4is
+				else:
+					genome4is = 1
+					sum4is4genome[fileid][:5] = sum4is4all
+					sum4is4genome[fileid][5+1] = genome4is
+			sum4is[fileid] = sum4is4all[:5] + [dnaLen, genome4is, genome, plasmid4is, plasmid, phage4is, phage]
+
+		# output summarization for all DNAs from organism even there is no IS element found 
+		# in the organism.
+		sumfile4org = os.path.join(path, 'organism.sum')
+		output4sumFull(sum4is, sumfile4org)
+		'''
+		sumfile4org = os.path.join(path, 'organism4genome.sum')
+		output4sumFull(sum4is4genome, sumfile4org)
+		sumfile4org = os.path.join(path, 'organism4plasmid.sum')
+		output4sumFull(sum4is4plasmid, sumfile4org)
+		sumfile4org = os.path.join(path, 'organism4phage.sum')
+		output4sumFull(sum4is4phage, sumfile4org)
+		'''
 
 familyNames = [
 		'IS1',
@@ -1585,8 +1705,8 @@ def output4sumFull(sum4is, outfile):
 	fmt4title4families = ' {:>11} {:>13} {:>15} {:>13}'
 	fmt4families = ' {:>11} {:>13.2g} {:>15} {:>13}'
 	fp = open(outfile, 'w')
-	fmt4title = '{:<90} {:>6} {:>7} {:>10} {:>10} {:>10} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}'
-	fmt = '{:<90} {:>6} {:>7.2g} {:>10} {:>10} {:>10} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}' 
+	fmt4title = '{:<90} {:>6} {:>7} {:>15} {:>15} {:>15} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}'
+	fmt = '{:<90} {:>6} {:>7.2g} {:>15} {:>15} {:>15} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}' 
 
 	# print headline in table
 	fp.write(fmt4title.format(
@@ -1642,6 +1762,7 @@ def output4sumFull(sum4is, outfile):
 		# get available data for each family
 		if len(sum4org) > 0:
 			nis4org, percent4org, bps4is, dnaLen4is = sum4org[:4]
+			#print('hello', org, sum4org[5:])
 			dnaLen, ngenome4is, ngenome, nplasmid4is, nplasmid, nphage4is, nphage = sum4org[5:]
 			for family, value in sum4org[4].items():
 				familySum[family] = value
@@ -1676,7 +1797,7 @@ def output4sumFull(sum4is, outfile):
 	if dnaLen4is2sum == 0:
 		percentByBps = 0
 	else:
-		percentByBps = (bps4is2sum/dnaLen4is2sum)*100
+		percentByBps = (bps4is2sum/dnaLen2sum)*100
 	fp.write(fmt.format('total', nis2sum, percentByBps, bps4is2sum, dnaLen4is2sum,
 		dnaLen2sum, ngenome4is2sum, ngenome2sum, nplasmid4is2sum, nplasmid2sum, nphage4is2sum, nphage2sum))
 	for family in sorted(familySum.keys()):
@@ -1731,7 +1852,7 @@ def getSumFull(sumFileByOrg, org):
 	if os.path.isfile(sumFileByOrg):
 		fp = open(sumFileByOrg, 'r')
 	else:
-		print('No valid IS element was found for', org)
+		print('In getSumFull() in tools.py: no valid IS element was found for', org)
 		return []
 
 	familySum = {}
@@ -1830,7 +1951,7 @@ def checkTax(org, sum4is4genome, tax):
 		print('Warning: one organism has more than one taxid', org, acc2tax)
 		
 
-def sum4org(mDNA, dir4data, tax):
+def sum4org(mDNA, dir4data, tax, dir4prediction=constants.dir4prediction):
 	orgid = {}
 	for seqid in sorted(mDNA.keys()):
 		org, fileid, seq = mDNA[seqid]
@@ -1853,7 +1974,7 @@ def sum4org(mDNA, dir4data, tax):
 		sum4is4genome = {}
 		sum4is4plasmid = {}
 		sum4is4phage = {}
-		path = os.path.join(constants.dir4prediction, org)
+		path = os.path.join(dir4prediction, org)
 		makedir(path)
 		for item in orgid[org]:
 			fileid, seqid, dnaType, dnaLen = item
@@ -1991,7 +2112,7 @@ def tirwindowIntersectORF(start1, end1, start2, end2, orf, orfhitsNeighbors, min
 	before = orfhitsNeighbors[orf][0]
 	after = orfhitsNeighbors[orf][1]
 	if before != None and start1 <= before[0][2]:
-		#print('hello, before', before)
+		print('hello, before', before)
 		print('shrink the boundary of tir search region around ORF {}, start1 ({}) to {}'.format(
 			orf, start1,  before[0][2] + 1))
 		start1 = before[0][2] + 1
@@ -2000,7 +2121,7 @@ def tirwindowIntersectORF(start1, end1, start2, end2, orf, orfhitsNeighbors, min
 			end1 = start1
 
 	if after != None and end2 >= after[0][1]:
-		#print('hello, after', after)
+		print('hello, after', after)
 		print('shrink the boundary of tir search region around ORF {}, end2 ({}) to {}'.format(
 			orf, end2,  after[0][1] - 1))
 		end2 = after[0][1] - 1

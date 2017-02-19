@@ -82,6 +82,7 @@ def prepare4ssw2findIRbyDNAbyFar(mOrfHits, mDna):
 		#mInput4ssw.append(input4orfHits)
 	return (mInput4ssw, mboundary)
 
+# mDNA: {accid: (org, fileid, sequence), ..., accid: (org, fileid, sequence)}
 # mispairs: {seqid: ispairs, ..., seqid: ispairs}
 # ispairs: {qseqid: g, ..., qseqid: g}, alignment pairs in blast.out
 # g: [ispair, ..., ispair]
@@ -98,6 +99,8 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 			continue
 		orfhitsNeighbors = morfhitsNeighbors[seqid]
 		DNAlen = len(mDna[seqid][-1])
+		if 'contig-100_' in seqid:
+			print('hello', seqid, ispairs)
 		for qseqid, g in ispairs.items():
 			orfHit = g[0]['orfhit']
 			familyName = orfHit[1]
@@ -176,8 +179,8 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 					start2 = DNAlen
 
 			if not (start1 <= end1 < start2 <= end2):
-				e = 'Error, invalid tir search window: {}-{} {}-{} around ORF {}'.format(
-						start1, end1, start2, end2, orf)
+				e = 'Error, invalid tir search window (org={} fastafile={} seq={}): {}-{} {}-{} around ORF {}'.format(
+						mDna[seqid][0], mDna[seqid][1], seqid, start1, end1, start2, end2, orf)
 				#print('hello1', DNAlen, ncopy4is, orfBegin, orfEnd, maxDist4ter2orf, minDist4ter2orf)
 				raise RuntimeError(e)
 			#print('hello tir search window', start1, end1, start2, end2, orf)

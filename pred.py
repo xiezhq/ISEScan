@@ -600,7 +600,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 		fp4gff.close()
 		fp.close()
 
-		print('{:<11} {:>6} {:>7} {:>10}'.format('family', 'nIS', '%Genome', 'bps4IS'), file=fp4sum)
+		print('{:<11} {:>6} {:>7} {:>15}'.format('family', 'nIS', '%Genome', 'bps4IS'), file=fp4sum)
 		#print('-' * 18, file=fp4sum)
 		nis4seq = 0
 		bps4seq = 0
@@ -608,12 +608,12 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 		for family in sorted(familySumBySeq.keys()):
 			nis = familySumBySeq[family]
 			bps4family = bpsBySeq[family]
-			print('{:<11} {:>6} {:>7.2g} {:>10}'.format(family, nis, 
+			print('{:<11} {:>6} {:>7.2g} {:>15}'.format(family, nis, 
 				(bps4family/len4DNA)*100, bps4family), file=fp4sum)
 			nis4seq += nis
 			bps4seq += bps4family
 
-		print('{:<11} {:>6} {:>7.2g} {:>10} {:>10}'.format('total', nis4seq, 
+		print('{:<11} {:>6} {:>7.2g} {:>15} {:>15}'.format('total', nis4seq, 
 			(bps4seq/len4DNA)*100, bps4seq, len4DNA), file=fp4sum)
 		fp4sum.close()
 		if nis4seq == 0:
@@ -663,6 +663,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2}'
 	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2}'
 
+	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
+	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
 
 	common4output = os.path.join(constants.dir4prediction, orgfileid)
 	outFile = '.'.join([common4output, 'out'])
@@ -687,7 +689,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	print('#', '-' * 139, file = fp)
 
 	fp4sum = open(sumFile, 'w')
-	print('{:<60} {:<11} {:>6} {:>7} {:>10} {:>10}'.format(
+	print(fmtStrTitleSum.format(
 		'# seqid', 'family', 'nIS', '%Genome', 'bps4IS', 'dnaLen'), file=fp4sum)
 	nis4seqTotal = 0
 	bps4seqTotal = 0
@@ -900,7 +902,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 		for family in sorted(familySumBySeq.keys()):
 			nis = familySumBySeq[family]
 			bps4family = bpsBySeq[family]
-			print('{:<60} {:<11} {:>6} {:>7.2f} {:>10} {:>10}'.format(
+			print(fmtStrSum.format(
 				seqid, family, nis, 
 				(bps4family/len4DNA)*100, bps4family, len4DNA), file=fp4sum)
 			nis4seq += nis
@@ -912,7 +914,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	len4DNATotal = sum([len(v[2]) for v in mDNA.values()])
 	
 	#fileid = os.path.basename(sumFile).rsplit('.',1)[0]
-	print('{:<60} {:<11} {:>6} {:>7.2f} {:>10} {:>10}'.format(
+	print(fmtStrSum.format(
 		fileid, 'total', 
 		nis4seqTotal, (bps4seqTotal/len4DNATotal)*100, bps4seqTotal, len4DNATotal), file=fp4sum)
 	if nis4seq == 0:
@@ -1510,7 +1512,6 @@ def chooseHits(mHitsByNear, mHitsByFar):
 					reverse=True)[0]
 
 			hits.append(hit)
-			#print('hello choose hit', hit)
 		hits.sort(key = lambda x: x['bd'][0])
 		mhits[accid] = hits
 	return mhits
@@ -1534,18 +1535,29 @@ def refineHits(mHits):
 			begin, end = hit['bd']
 			isLen = end - begin + 1
 			if isLen < minLen4is:
-				print('remove short hit (partial IS element)', isLen, hit['bd'], hit['orf'])
+				print('remove partial IS element with isLen < {}: isLen={} {} bd={} orf{}'.format(
+					minLen4is, isLen, family, hit['bd'], hit['orf']))
 				continue
 
-			if hit['hmmhit'][2] > evalue_cutoff:
-				continue
+			#if hit['hmmhit'][2] > evalue_cutoff:
+			#	continue
 
+			# test evalue and number of Tpase copies (IS copies)
 			if hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
+				# filter out hits without TIR
 				if len(hit['tirs']) == 0:
+					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{}'.format(
+						isLen, hit['bd'], hit['orf']))
 					continue
+				# filter out hits with gaps in TIR (alignment of left hand rigth hand TIR sequences)
 				elif hit['tirs'][0][3] > 0:
+					print('remove single-copy partial IS element with gap in tir: nGaps={} bd={} orf{}'.format(
+						hit['tirs'][0][3], hit['bd'], hit['orf']))
 					continue
+				# filter out hits with irId/irLen < irSim4singleCopy (default 0.85)
 				elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
+					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{}'.format(
+						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['tirs'][0][3], hit['bd'], hit['orf']))
 					continue
 
 			hitsCopy.append(hit)
@@ -1772,7 +1784,7 @@ def pred(args):
 		tblout_list = prepare4tblout_list(hmm_path, fileids)
 	if len(tblout_list) == 0:
 		print('No results returned by HMM search was found for sequences in', args['dna_list'])
-		return 0
+		return None
 
 	#print('Processing tblout files at', datetime.datetime.now().ctime())	
 	mtblout_hits_sorted = []
@@ -1895,7 +1907,7 @@ def pred(args):
 		if hits_sorted == None or len(hits_sorted) == 0:
 			e = 'No hit was found for {} {}'.format(seqid, seqid_hits)
 			print(e)
-			return
+			return 0
 
 		hits_sorted_refined = refine_hmm_hits_evalue(hits_sorted, e_value)
 		if len(hits_sorted_refined) == 0:
@@ -1904,6 +1916,8 @@ def pred(args):
 			continue
 		mtblout_hits_sorted_refined.append((seqid, hits_sorted_refined))
 	#print('Finish refining hits for each DNA sequence', datetime.datetime.now().ctime())
+	if len(mtblout_hits_sorted_refined) == 0:
+		return None
 
 	mtblout_hits_sorted = mtblout_hits_sorted_refined
 
@@ -1960,7 +1974,9 @@ def pred(args):
 
 	# remove hits that are partial IS elements identified by length, evalue and irId/irLen
 	if constants.removeShortIS == True:
+		print('Start removing partial IS elements')
 		mHits = refineHits(mHits)
+		print('Finish removing partial IS elements')
 
 	# remove redundant IS elements with same boundary and same TIR
 	mHits = removeRedundantIS(mHits)
@@ -2019,7 +2035,10 @@ def pred(args):
 		outputIndividual(mHits, mDNA, proteomes, morfsMerged)
 	elif norgfiles == 1:
 		# output ISs in all sequences into one file
-		outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop())
+		if len(mHits) > 0:
+			outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop())
+		else:
+			print('No IS element was found for {}'.format(mHits.keys()))
 	else:
 		e = 'Error: cannot get organism name (directory name holding genome sequence FASTA file) and FASTA sequence file name!'
 		raise RuntimeError(e)
