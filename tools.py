@@ -132,7 +132,7 @@ def gene2pep(table='11', geneSeq=''):
 
 # Format sequence into FASTA format and return it with header
 # header: messeage for header line in fasta format
-# seq: sequence to format into FASTA with 50 single-letter codes per line
+# seq: sequence to format into FASTA with lineWidth single-letter codes per line
 def fasta_format(header, seq):
 	header = '>' + header
 	fasta_seq = ''
@@ -206,22 +206,21 @@ def getFasta_idseq(fastaFile):
 # seqs: [(header, seq), ..., (header, seq)]
 # seq: character string
 def getFastaFull(file):
-	fp = open(file, 'r')
 	seqs = []
-	seq = []
-	for line in fp:
-		line = line.replace('\b', '').strip()
-		if line == '':
-			continue # remove blank line
-		if line[0] == '>':
-			if len(seq) > 0:
-				seqs.append((header, ''.join(seq)))
-				seq = []
-			header = line[1:] # header
-			continue
-		seq.append(line)
-	seqs.append((header, ''.join(seq)))
-	fp.close()
+	with open(file, 'r') as fp:
+		seq = []
+		for line in fp:
+			line = line.replace('\b', '').strip()
+			if line == '':
+				continue # remove blank line
+			if line[0] == '>':
+				if len(seq) > 0:
+					seqs.append((header, ''.join(seq)))
+					seq = []
+				header = line[1:] # header
+				continue
+			seq.append(line)
+		seqs.append((header, ''.join(seq)))
 	return seqs
 
 # write IS elements in a genome into a csv file
@@ -935,6 +934,25 @@ def doBlastnOnStream(query, db, strand='both', task='megablast', perc_ident=100,
 	out, err = blastn.communicate(input=query)
 	return (out, err)
 
+# Search protein sequence against protein database.
+# command: blastp -db db -evalue 1e-10 -task task -num_threads nthreads \
+#		-outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore nident qlen slen'
+# Note1: query and outfile are stdin and stdou by default, respectively
+def doBlastpOnStream(query, db, task='blastp', e_value=1e-10, nthreads=1):
+	blast = constants.blastp
+	outfmt = shlex.quote('6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore nident qlen slen')
+	evalue = str(e_value)
+	num_threads = str(nthreads)
+	cmd = [blast,
+		'-db', db, '-evalue', evalue, '-task', task, '-num_threads', num_threads,
+		'-outfmt', outfmt
+		]
+	do_cmd = shlex.split(' '.join(cmd))
+	blastn = subprocess.Popen(do_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+			universal_newlines=True)
+	out, err = blastn.communicate(input=query)
+	return (out, err)
+
 # blastn -query query -subject subject ....
 def doBlastn2seqOnStream(query, subject, strand='both', task='megablast', perc_ident=100):
 	blast = constants.blastn
@@ -1051,6 +1069,38 @@ def getBlastResult(file, min4coverage):
 		hit['slen'] = slen
 		hits.append(hit)
 
+	return hits
+
+# get results produced by blastp
+def getBlastpResultOnStream(filec):
+	fp = io.StringIO(filec)
+	hits = []
+	ids4query = set()
+	for line in fp:
+		line = line.strip()
+		words = line.split()
+		# -outfmt '6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore nident qlen slen'
+		qseqid,sseqid,pident,length,mismatch,gapopen,qstart,qend,sstart,send,evalue,bitscore,nident,qlen,slen = words
+		# Only get the first hit for each query sequence as the hits related the same query are ordered by evalue and we just need the IS family name from the subject hit
+		# with the smallest evalue.
+		if qseqid in ids4query:
+			continue
+		else:
+			ids4query.add(qseqid)
+		hit = {}
+		hit['qseqid'] = qseqid
+		hit['sseqid'] = sseqid
+		hit['length'] = length
+		hit['qstart'] = qstart
+		hit['qend'] = qend
+		hit['sstart'] = int(sstart)
+		hit['send'] = int(send)
+		hit['evalue'] = float(evalue)
+		hit['nident'] = int(nident)
+		hit['qlen'] = qlen
+		hit['slen'] = int(slen)
+		hit['pident'] = float(pident)
+		hits.append(hit)
 	return hits
 
 def getBlastResult4dnaOnStream(filec):

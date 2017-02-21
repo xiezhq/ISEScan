@@ -12,6 +12,7 @@ phmmer = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer'
 hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
 # Blast 
 blastn = '/l/ncbi-blast/bin/blastn'
+blastp = '/l/ncbi-blast/bin/blastp'
 makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
 '''
 FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
@@ -109,9 +110,10 @@ minMaxLen4is =	{
 		'ISNCY': (786, 3989),
 		}
 
-# peptide and ORF lengths of tpases in ISfinder
-# shortest tpase ORF (bp), longest tpase ORF (bp)
-# shortest peptide ORF (bp) among all peptides in IS_PEP record for each IS element in ISfinder,
+# peptide and ORF lengths of tpases in ISfinder:
+# The first collumn: shortest tpase ORF (bp)
+# The second collumn: longest tpase ORF (bp)
+# The third collumn: shortest peptide ORF (bp) among all peptides in IS_PEP record for each IS element in ISfinder
 # To be added: shortest tpase (aa), longest tpase (aa), 
 # ORF = tpase + stopcodon
 minMax4tpase =	{
