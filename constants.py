@@ -12,6 +12,7 @@ phmmer = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer'
 hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
 # Blast 
 blastn = '/l/ncbi-blast/bin/blastn'
+blastp = '/l/ncbi-blast/bin/blastp'
 makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
 '''
 FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
@@ -49,8 +50,9 @@ translateGenome = True
 #tmpdir = '/N/u/zhiqxie/Karst/is/isescan/tmpdir'
 #tmpdir = '/N/dc2/scratch/zhiqxie/insertion_sequence/tmpdir'
 
+# for local linux machine
 path2results = ''
-#path2results = '/N/u/zhiqxie/Karst/is/isescan/results'
+# for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 dir4prediction = os.path.join(path2results, 'prediction')
 
@@ -107,11 +109,13 @@ minMaxLen4is =	{
 		'ISKRA4': (1164, 3746),
 		'ISL3': (536, 9109),
 		'ISNCY': (786, 3989),
+		'new': (400, 10000), # for the novel IS families in database other than ISfinder
 		}
 
-# peptide and ORF lengths of tpases in ISfinder
-# shortest tpase ORF (bp), longest tpase ORF (bp)
-# shortest peptide ORF (bp) among all peptides in IS_PEP record for each IS element in ISfinder,
+# peptide and ORF lengths of tpases in ISfinder:
+# The first collumn: shortest tpase ORF (bp)
+# The second collumn: longest tpase ORF (bp)
+# The third collumn: shortest peptide ORF (bp) among all peptides in IS_PEP record for each IS element in ISfinder
 # To be added: shortest tpase (aa), longest tpase (aa), 
 # ORF = tpase + stopcodon
 minMax4tpase =	{
@@ -142,12 +146,13 @@ minMax4tpase =	{
 		'ISKRA4': (1047, 1719, 114),
 		'ISL3': (414, 1716, 408),
 		'ISNCY': (573, 1815, 123),
+		'new': (300, 2100, 50), # for the novel IS families in database other than ISfinder
 		}
 
 # allowed minimal and maximal and optimal values of the length of TIR sequence for each family
 # Here, the optimal values are the empirical parameter based on the observations on ISfinder database.
-# The 4th collumn is marker indicating whether the family always has TIR or not, 1 for yes and 0 for no 
-# and -1 for either (in the family, some members have tir but others have no tir).
+# The 4th collumn is marker indicating whether the family always has TIR (1) or no TIR (0),  
+# and -1 for not determined (in the family, some members have tir but others have no tir).
 minMax4tir = {
 		'IS1': (8, 67, 14, 1),
 		'IS110': (2, 31, 14, -1), 
@@ -178,6 +183,7 @@ minMax4tir = {
 		'ISKRA4': (15, 40, 18, 1),
 		'ISL3': (6, 50, 11, 1),
 		'ISNCY': (4, 52, 13, -1),
+		'new': (10, 50, 20, -1), # use the popular values for the novel IS families in database other than ISfinder
 	}
 # ssw will use minMax4tir[2] as minimal length of the alignement of two tir sequences 
 # if useOPTtir == True else minMax[0] as minimal length of the alignment of two tir sequences.

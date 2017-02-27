@@ -1414,18 +1414,17 @@ def getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbor
 			continue
 		args = (seqid, orfHits, mDNA[seqid])
 		margs.append(args)
+
 	'''
 	for args in margs:
 		mispairs[seqid] = getFullIS4seqOnStream(args)
 	'''
 
 	nseq = len(margs)
-	'''
-	if nseq > constants.nproc:
-		nproc = constants.nproc
-	else:
-		nproc = nseq
-	'''
+	#if nseq > constants.nproc:
+	#	nproc = constants.nproc
+	#else:
+	#	nproc = nseq
 	if nseq > constants.nthread:
 		nthread = constants.nthread
 	else:
@@ -1953,7 +1952,7 @@ def pred(args):
 	minDist4ter2orf = constants.minDist4ter2orf
 	morfhitsNeighbors = hitNeighors(mOrfHits)
 
-	#print('getFullIS() begins at', datetime.datetime.now().ctime())
+	print('getFullIS() begins at', datetime.datetime.now().ctime())
 	# look for tir in the neighboring region of Tpase ORF in case of single-copy IS
 	maxDist4ter2orf = constants.outerDist4ter2tpase[0]
 	mHitsByNear = getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
@@ -1990,7 +1989,7 @@ def pred(args):
 	#--------------------------
 	# Output predictions, mHits
 
-	#print('Begin reading protein database at', datetime.datetime.now().ctime())
+	print('Begin reading protein database at', datetime.datetime.now().ctime())
 	# Get full lists of genes for each genome sequence
 	# proteomes: {seqid: (filename, genes), ...}
 	# genes: {cdsid: seq, ...}
@@ -2017,7 +2016,7 @@ def pred(args):
 		for seqid,cdsgroup in itertools.groupby(cdss, key=operator.itemgetter(0)):
 			genes = {seqid_cdsid_seq[1]:seqid_cdsid_seq[2] for seqid_cdsid_seq in cdsgroup}
 			proteomes[seqid] = (filename, genes)
-	#print('Finish reading protein database at', datetime.datetime.now().ctime())
+	print('Finish reading protein database at', datetime.datetime.now().ctime())
 
 	# Output IS element list and sequence for each DNA sequence into .out, .gff and .fna files, respectively.
 	#
