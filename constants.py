@@ -52,12 +52,7 @@ translateGenome = True
 
 path2results = ''
 #path2results = '/N/u/zhiqxie/Karst/is/isescan/results'
-#path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
-#dir4prediction = os.path.join(path2results, 'prediction')
-#dir4prediction = os.path.join(path2results, 'prediction.v2')
-#dir4prediction = os.path.join(path2results, 'prediction.v3')
-#dir4prediction = os.path.join(path2results, 'prediction.pfam')
-dir4prediction = os.path.join(path2results, 'prediction.v4')
+dir4prediction = os.path.join(path2results, 'prediction')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
