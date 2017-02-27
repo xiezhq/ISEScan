@@ -253,11 +253,19 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 
 	# HMM searches against protein database
 	#
-	args2concurrent4phmmer, outFiles4phmmer = prepare4phmmer(clusterSeqFile4phmmer, proteome_files, path_to_hmmsearch_results)
+	if os.path.isfile(clusterSeqFile4phmmer) and os.stat(clusterSeqFile4phmmer).st_size > 0:
+		args2concurrent4phmmer, outFiles4phmmer = prepare4phmmer(clusterSeqFile4phmmer, 
+				proteome_files, path_to_hmmsearch_results)
+	else: # no valid clusters.single.faa available
+		args2concurrent4phmmer,outFiles4phmmer = [], []
 	if len(args2concurrent4phmmer) > 0:
 		phmmerSearch(args2concurrent4phmmer)
 
-	args2concurrent4hmmsearch, outFiles4hmmsearch = prepare4hmmsearch(hmms_file, proteome_files, path_to_hmmsearch_results)
+	if os.path.isfile(hmms_file) and os.stat(hmms_file).st_size > 0:
+		args2concurrent4hmmsearch, outFiles4hmmsearch = prepare4hmmsearch(hmms_file, 
+				proteome_files, path_to_hmmsearch_results)
+	else: # no valid clusters.faa.hmm available
+		args2concurrent4hmmsearch, outFiles4hmmsearch = [], []
 	if len(args2concurrent4hmmsearch) > 0:
 		hmmSearch(args2concurrent4hmmsearch)
 

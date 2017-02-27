@@ -53,7 +53,11 @@ translateGenome = True
 path2results = ''
 #path2results = '/N/u/zhiqxie/Karst/is/isescan/results'
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
-dir4prediction = os.path.join(path2results, 'prediction')
+#dir4prediction = os.path.join(path2results, 'prediction')
+#dir4prediction = os.path.join(path2results, 'prediction.v2')
+#dir4prediction = os.path.join(path2results, 'prediction.v3')
+#dir4prediction = os.path.join(path2results, 'prediction.pfam')
+dir4prediction = os.path.join(path2results, 'prediction.v4')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
@@ -108,6 +112,7 @@ minMaxLen4is =	{
 		'ISKRA4': (1164, 3746),
 		'ISL3': (536, 9109),
 		'ISNCY': (786, 3989),
+		'new': (400, 10000), # for the novel IS families in database other than ISfinder
 		}
 
 # peptide and ORF lengths of tpases in ISfinder:
@@ -144,12 +149,13 @@ minMax4tpase =	{
 		'ISKRA4': (1047, 1719, 114),
 		'ISL3': (414, 1716, 408),
 		'ISNCY': (573, 1815, 123),
+		'new': (300, 2100, 50), # for the novel IS families in database other than ISfinder
 		}
 
 # allowed minimal and maximal and optimal values of the length of TIR sequence for each family
 # Here, the optimal values are the empirical parameter based on the observations on ISfinder database.
-# The 4th collumn is marker indicating whether the family always has TIR or not, 1 for yes and 0 for no 
-# and -1 for either (in the family, some members have tir but others have no tir).
+# The 4th collumn is marker indicating whether the family always has TIR (1) or no TIR (0),  
+# and -1 for not determined (in the family, some members have tir but others have no tir).
 minMax4tir = {
 		'IS1': (8, 67, 14, 1),
 		'IS110': (2, 31, 14, -1), 
@@ -180,6 +186,7 @@ minMax4tir = {
 		'ISKRA4': (15, 40, 18, 1),
 		'ISL3': (6, 50, 11, 1),
 		'ISNCY': (4, 52, 13, -1),
+		'new': (10, 50, 20, -1), # use the popular values for the novel IS families in database other than ISfinder
 	}
 # ssw will use minMax4tir[2] as minimal length of the alignement of two tir sequences 
 # if useOPTtir == True else minMax[0] as minimal length of the alignment of two tir sequences.

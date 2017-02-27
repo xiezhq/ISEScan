@@ -99,8 +99,6 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 			continue
 		orfhitsNeighbors = morfhitsNeighbors[seqid]
 		DNAlen = len(mDna[seqid][-1])
-		if 'contig-100_' in seqid:
-			print('hello', seqid, ispairs)
 		for qseqid, g in ispairs.items():
 			orfHit = g[0]['orfhit']
 			familyName = orfHit[1]
