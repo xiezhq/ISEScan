@@ -13,7 +13,7 @@ import tools
 import constants
 
 # HMM files will be placed in rootpath.
-rootpath = '/data2/zhiqxie/aclame/buildhmm'
+#rootpath = '/data2/zhiqxie/aclame/buildhmm'
 
 # for classifyTpase()
 BLASTDB = ''
@@ -552,6 +552,7 @@ def refineTpaseData(seqfile):
 
 def buildTpaseHMM(args):
 	tpaseSeqFile = args['tpaseSeqFile']
+	rootpath = os.path.join(os.path.dirname(tpaseSeqFile), 'buildhmm')
 
 	# for pre-processing aclame fasta dat to retrieve the real tpase sequences from aclame data set
 	#refineTpaseData(tpaseSeqFile)
