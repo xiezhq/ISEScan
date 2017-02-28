@@ -6,6 +6,10 @@ Zhiqun Xie
 Contact: 
 Zhiqun Xie, zhiqxie@iu.edu
 
+Version 1.2
+- add program (buildHMM.py) for building a profile HMM from a tpase dataset (multiple protein sequences in a fasta file)
+- update the profile HMM model files shipped with ISEScan pipeline, clusters.faa.hmm and clusters.single.faa, which was built upon a manually curated transposase (tpase) data set which combined a curated ACLAME dataset (ACLAME database, http://aclame.ulb.ac.be/) with 66 curated tpases collected from NCBI protein database.
+
 Version 1.1.1
 - add option switch in constants.py to report partial IS elements as well as full-length IS elements
 - bugs fix
