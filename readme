@@ -1,4 +1,4 @@
-ISEScan is a python package to identify IS (Insertion Sequence) elements in genome sequences.
+ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome.
 
 Developer:
 Zhiqun Xie
