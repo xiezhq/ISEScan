@@ -13,11 +13,10 @@ import tools
 import constants
 
 # HMM files will be placed in rootpath.
-rootpath = '/data2/zhiqxie/aclame/buildhmm'
+#rootpath = '/data2/zhiqxie/aclame/buildhmm'
 
 # for classifyTpase()
-#BLASTDB = '/u/zhiqxie/xie/is/isfinder/isfinder.tpase.faa'
-BLASTDB = '/data2/zhiqxie/isfinder/isfinder.tpase.faa'
+BLASTDB = ''
 
 # clustal-omega
 clustalo_cmd = "/u/zhiqxie/informatics/inst/clustal-omega-1.2.1/bin/clustalo"
@@ -48,60 +47,6 @@ CLSTR_REV = '/u/zhiqxie/informatics/inst/cd-hit-v4.6.4-2015-0603/clstr_rev.pl'
 #LOW_IDENT = False
 # switch to nr100, nr90, nr60, nr30 hierachical clustering
 LOW_IDENT = True
-
-# IS elements in ISfinder database, which have multiple IS_PEP records and the longest IS_PEP is not
-# the Transposase.
-# Note: family IS200/IS605 has 3 groups, IS200 which usually has one short tpase ORF, 
-#	IS1341 which usually has one long accessory gene ORF, 
-#	IS606 which usually has one short tpase ORF and one long accessory gene ORF.
-#	The next version of profile HMM should pick the shortest tpase ORF (or both tpase and accessory gene ORFs)
-#	for each member	of IS606 group when we choose tpase peptide to build profile hidden markov models.
-shortTpases = {
-		'ISKPN25': 4, # ISL3. The tpase is IS_PEP4 among four IS_PEP records.
-		'ISSM4': 5, # ISL3. The tpase is IS_PEP5 among five IS_PEP records.
-		'IS5564': 2, # IS481. The tpase is IS_PEP2 among two IS_PEP records.
-		'ISCGL1': 2, # IS481. The tpase is IS_PEP2 among two IS_PEP records.
-		#'IS606': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		#'IS1253A': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		#'IS1253B': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		#'IS605': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		#'ISHP608': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		#'ISCLTE2': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		#'ISTAC1': 1, # IS200/IS605. The tpase is IS_PEP among two IS_PEP records.
-		}
-
-prokaryote_family_list = [
-			'IS1',
-			'IS1595',
-			'IS3',
-			'IS481',
-			'IS4',
-			'IS701',
-			'ISH3',
-			'IS1634',
-			'IS5',
-			'IS1182',
-			'IS6',
-			'IS21',
-			'IS30',
-			'IS66',
-			'IS91',
-			'IS110',
-			'IS200/IS605',
-			'IS607',
-			'IS256',
-			'IS630',
-			'IS982',
-			'IS1380',
-			'ISAs1',
-			'ISL3',
-			'ISAzo13',
-			'ISKra4',
-			'ISNCY',
-			#'ISH6', # new family found by xie on 1/4/2016
-			#'Tn3', # composite transposon
-			#'Tn554',
-			]
 
 
 def build_msa(seqfilename, msafilename):
@@ -457,13 +402,15 @@ def writeTpaseSeq2fileOnStream(member):
 	headline = '>' + isName
 	return [headline, fastaSeq]
 
-# Add classification info such as ISfinder family name into each transposase in mCluster
+# Add classification info such as family/group name into each transposase in mCluster
 # Return mClusterNew
 # mClusterNew: [cluster, ...]
 # cluster: [clusterName, members]
 # members: [member, ...]
 # member: {'familyName':familyName, 'isName': isName, ..., 'tpase': pepSeq}
-def classifyTpase(mCluster):
+#
+# blastdb: blast database created by makeblastdb
+def classifyTpase(mCluster, blastdb=''):
 	# Get the representative tpase of each cluster and combine all representative tapses into one fasta file/string
 	tpaseFasta = []
 	for cluster in mCluster:
@@ -479,9 +426,8 @@ def classifyTpase(mCluster):
 		tpaseFasta.extend([headline, fastaSeq])
 	tpaseFile = '\n'.join(tpaseFasta)
 
-	blastdb = BLASTDB
 	query = tpaseFile
-	evalue = 1e-10
+	evalue = constants.min4evalue 
 	print('Start blastping {} against {} at {}'.format('representative_tpases', blastdb, 
 		datetime.datetime.now().ctime()))
 	blastOut, err = tools.doBlastpOnStream(query, blastdb, task='blastp', e_value=evalue, 
@@ -494,14 +440,17 @@ def classifyTpase(mCluster):
 		clusterName, datetime.datetime.now().ctime()))
 	# Read blast result
 	# hits: [hit, ...]
-	# hit: {'qseqid':qseqid, 'sseqid':sseqid, 'pident':pident, 'length':length, ..., 'evalue':evalue, 'nident':nident, 'qlen':qlen, 'slen':slen}
+	# hit: {'qseqid':qseqid, 'sseqid':sseqid, 'pident':pident, 'length':length, ..., 
+	#		'evalue':evalue, 'nident':nident, 'qlen':qlen, 'slen':slen}
 	# qseqid: e.g. 'protein:vir:93615'
 	# sseqid: e.g. 'IS3|IS51|ISEC25|'
 	hits = tools.getBlastpResultOnStream(blastOut)
 	print('Finish reading output of blastp at {}'.format(datetime.datetime.now().ctime()))
 	print('Number of clusters with IS family assignment:', len(hits))
 	print('Number of clusters without IS family assignment:', len(mCluster)-len(hits))
+	return hits
 
+def addClassification2cluster(mCluster, hits):
 	# Assign family information to each cluster
 	mClusterNew = []
 	for cluster in mCluster:
@@ -603,6 +552,7 @@ def refineTpaseData(seqfile):
 
 def buildTpaseHMM(args):
 	tpaseSeqFile = args['tpaseSeqFile']
+	rootpath = os.path.join(os.path.dirname(tpaseSeqFile), 'buildhmm')
 
 	# for pre-processing aclame fasta dat to retrieve the real tpase sequences from aclame data set
 	#refineTpaseData(tpaseSeqFile)
@@ -643,14 +593,19 @@ def buildTpaseHMM(args):
 	print('Finish clustering transposases in {} into {} clusters at {}'.format(
 		tpaseSeqFile, len(mCluster), datetime.datetime.now().ctime()))
 
-	# Query the representative member (transposase) of each cluster against ISfinder database to 
-	# assign ISfinder classification to each cluster of the transposases in original data set 
+	# Query the representative member (transposase) of each cluster against IS faimly/group name database to 
+	# assign IS classification to each cluster of the transposases in original data set 
 	# (transposase sequences).
 	# mCluster: [cluster, ..., cluster]
 	# cluster: (clusterName, members)
 	# members: [member, ...]
 	# member: {'isName': isName, ..., 'tpase': pepSeq}
-	mClusterNew = classifyTpase(mCluster)
+	blastdb = BLASTDB
+	if len(blastdb) > 0:
+		hits = classifyTpase(mCluster, blastdb)
+	else: # no classification database is available
+		hits = []
+	mClusterNew = addClassification2cluster(mCluster, hits)
 	# mClusterNew: [cluster, ...]
 	# cluster: (clusterName, members)
 	# members: [member, ...]
@@ -690,7 +645,7 @@ def buildTpaseHMM(args):
 				continue
 
 			familyname = element['familyName']
-			groupname = '' # we do not have subgroup name like isfinder database
+			groupname = '' # we do not have subgroup name
 			elementname = element['isName']
 			header = '|'.join((clusterName, familyname, groupname, elementname))
 			element_fasta = tools.fasta_format(header, pepSeq)
