@@ -271,8 +271,7 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 
 	print('isPredict ends at', datetime.datetime.now().ctime())
 
-	# Select significant ones (predictions) from hits returned by HMM search, and 
-	# do optional benchmark which comparing predictions with ISfinder genome annotations.
+	# Select significant ones (predictions) from hits returned by HMM search
 	hitsFile = outFiles4phmmer + outFiles4hmmsearch
 	if len(hitsFile) > 0:
 		args4pred = {'dna_list': dna_list,

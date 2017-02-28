@@ -16,8 +16,6 @@ import tools
 PREDICT = 0
 
 python3 = '/usr/local/bin/python3'
-#cmd = '/u/zhiqxie/xie/is/isfinder/isPredict.py'
-#cmd = '/u/zhiqxie/xie/is/isfinder/pred.py'
 #cmd = 'isPredict.py'
 cmd = 'pred.py'
 

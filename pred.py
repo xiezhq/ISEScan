@@ -59,7 +59,7 @@ def process_tblout(tblout):
 		# item[13]: overlap number, how many of envelopes overlap other envelopes; 
 		#	be careful when ov > 0
 
-		# remove short ORF with length < length of shortest peptide in ISfinder
+		# remove short ORF with length < length of shortest peptide 
 		'''
 		if '.faa' in item[2]:
 			familyCluster = item[2].rsplit('.faa', maxsplit=1)[0]
@@ -429,7 +429,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 
 		print(fmtStrTitlePredictionNoSeq.format(
 			'seqID', # NCBI sequence ID
-			'family', # family name from ISfinder
+			'family', # family name
 			'cluster', # cluster ID created by CD-hit clustering
 			'isBegin', 'isEnd', 'len4is', # boundary and length of IS element
 			'ncopy4is', # copy number of IS element
@@ -676,7 +676,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fp = open(outFile, 'w')
 	print(fmtStrTitlePredictionNoSeq.format(
 		'seqID', # sequence ID
-		'family', # family name from ISfinder
+		'family', # family name
 		'cluster', # cluster ID created by CD-hit clustering
 		'isBegin', 'isEnd', 'len4is', # boundary and length of IS element
 		'ncopy4is', # copy number of IS element

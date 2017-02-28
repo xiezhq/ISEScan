@@ -729,7 +729,7 @@ def getPerformanceByFilterBySSW(mfamilyFeatures, mInput4ssw, filter):
 	"""
 	IRs = bestIRs
 
-	# compare IRs found by SSW with IRs found in isfinder
+	# compare IRs found by SSW with IRs found in IS dataset
 	#perf, TIRs = compareIRbyISfinder(IRs, mfamilyFeatures)
 	#
 	# Compare the predicted IRs with IRs from isfinder, and return the IRs matched by records in ISfinder

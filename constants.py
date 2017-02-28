@@ -66,7 +66,7 @@ file4clusterHMM = 'clusters.faa.hmm'
 # blast database will be put here
 dir4blastout = os.path.join(path2results, 'blastout')
 
-# Optimal values for SSW to find TIR in ISfinder database
+# Optimal values for SSW to find TIR in database
 # (gapopen, gapextend, match, mismatch)
 #
 # Optimal filter when aligning two sequences with length = maxLenIR
@@ -75,7 +75,6 @@ filters4ssw4isMax = [(1, 10, 4, 5)] # giving the greatest number of matched IS e
 filters4ssw4trial = [(2, 6, 2, 2)] # trial filter to stop alignment from creating the consecutive gaps
 
 # minimal and maximal values of length of full-length IS element in each family
-# The value is collected from ISfinder database.
 minMaxLen4is =	{
 		'IS1': (732, 4601),
 		'IS110': (969, 4105),
@@ -109,13 +108,13 @@ minMaxLen4is =	{
 		'ISKRA4': (1164, 3746),
 		'ISL3': (536, 9109),
 		'ISNCY': (786, 3989),
-		'new': (400, 10000), # for the novel IS families in database other than ISfinder
+		'new': (400, 10000), # for the novel IS families in database
 		}
 
-# peptide and ORF lengths of tpases in ISfinder:
+# peptide and ORF lengths of tpases:
 # The first collumn: shortest tpase ORF (bp)
 # The second collumn: longest tpase ORF (bp)
-# The third collumn: shortest peptide ORF (bp) among all peptides in IS_PEP record for each IS element in ISfinder
+# The third collumn: shortest peptide ORF (bp) among all peptides in IS_PEP record for each IS element
 # To be added: shortest tpase (aa), longest tpase (aa), 
 # ORF = tpase + stopcodon
 minMax4tpase =	{
@@ -146,11 +145,11 @@ minMax4tpase =	{
 		'ISKRA4': (1047, 1719, 114),
 		'ISL3': (414, 1716, 408),
 		'ISNCY': (573, 1815, 123),
-		'new': (300, 2100, 50), # for the novel IS families in database other than ISfinder
+		'new': (300, 2100, 50), # for the novel IS families in database
 		}
 
 # allowed minimal and maximal and optimal values of the length of TIR sequence for each family
-# Here, the optimal values are the empirical parameter based on the observations on ISfinder database.
+# Here, the optimal values are the empirical parameter based on the observations.
 # The 4th collumn is marker indicating whether the family always has TIR (1) or no TIR (0),  
 # and -1 for not determined (in the family, some members have tir but others have no tir).
 minMax4tir = {
@@ -183,7 +182,7 @@ minMax4tir = {
 		'ISKRA4': (15, 40, 18, 1),
 		'ISL3': (6, 50, 11, 1),
 		'ISNCY': (4, 52, 13, -1),
-		'new': (10, 50, 20, -1), # use the popular values for the novel IS families in database other than ISfinder
+		'new': (10, 50, 20, -1), # use the popular values for the novel IS families in database
 	}
 # ssw will use minMax4tir[2] as minimal length of the alignement of two tir sequences 
 # if useOPTtir == True else minMax[0] as minimal length of the alignment of two tir sequences.
@@ -198,7 +197,6 @@ optIrIdentity = 0.6
 stringentIrIdentity = 0.7
 
 # maximum distance (bp) between two neighboring orfs (including +/- strand) within one IS element
-# Statistics from isfinder:
 # 764 IS elements with multiple ORFs with clear coordinates in ORF records,
 # 405 with distBetweenORFs >=0, 
 # 1/405 with dist >= 1000, 6/405(1%) with dist >= 500, 14/405(3%) with dist >= 400, 
@@ -212,11 +210,11 @@ stringentIrIdentity = 0.7
 # merge ORFs with gap <= 100 bps
 maxDistBetweenOrfs = 100
 
-# In isfinder, 3891 IS elements with both lORF2TER and rORF2TER >= 0, 
+# In a dataset, 3891 IS elements with both lORF2TER and rORF2TER >= 0, 
 # 36/3891(1%) with lORF2TER >= 500, 177/3891(5%) with lORF2TER >= 250,
 # 51/3891 with rORF2TER >= 500, 232/3891 with rORF2TER >= 250
-# ~99% IS elements in ISfinder has lORF2TER/rORF2TER less than 500 bps
-# ~95% IS elements in ISfinder has lORF2TER/rORF2TER less than 250 bps
+# ~99% IS elements in dataset has lORF2TER/rORF2TER less than 500 bps
+# ~95% IS elements in dataset has lORF2TER/rORF2TER less than 250 bps
 #
 # switch maxDist4ter2orf between 500 and 250
 #maxDist4ter2orf = 250
@@ -237,7 +235,6 @@ minDist4ter2orf = -150
 splitAlign2orf = False
 
 # IS elements with identicalBases/lengthOfAlignment > sim4iso are regarded as the same IS element (isoform)
-# ISO records in ISfinder: 
 # Isoforms have been defined as elements which share in the first instance more than 95% identity 
 # at the level of their transposase protein sequence or otherwise 90% at the DNA level.
 #sim4iso = 0.85

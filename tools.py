@@ -488,7 +488,7 @@ def buildMatchLine(seq1, seq2):
 	return matchLine
 
 	
-# Shorten ir to the reasonable length which is estimated from statistics of ISfinder database.
+# Shorten ir to the reasonable length
 # Rules to shorten:
 # Discard the aligned blocks when irId/irLen < 0.7 with irLen < constants.stringenShortestIR 
 #							or irLen > constants.stringentLongestIR
@@ -1158,7 +1158,7 @@ def getBlastResult4dnaOnStream(filec):
 		minLen4orf4pep = constants.minMax4tpase[family][2]
 		#
 		# Note: it means gene prediction may be not accuracy when predicted ORF is longer 
-		#	than the longest tpase ORF in IS family in ISfinder.
+		#	than the longest tpase ORF in IS family.
 		#if intersect < orfLen*constants.minOverlap4orf2aligned:
 		# 
 		# alignment overlapped with whole orf or part of orf
