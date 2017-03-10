@@ -7,9 +7,9 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 
 ### Linux:
 
-* Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip.
+1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip.
 
-* Use unzip command to uncompress the zip file:
+2. Use unzip command to uncompress the zip file:
 
 ```sh
 unzip master.zip
@@ -38,9 +38,9 @@ unzip master.zip
 
 ## Configure ISEScan
 
-* Open constants.py, and find two lines marked with 'Config packages'
-* Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb)
-* Save and close constants.py
+1. Open constants.py, and find two lines marked with 'Config packages'
+2. Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb)
+3. Save and close constants.py
 
 ## Usage example
 
