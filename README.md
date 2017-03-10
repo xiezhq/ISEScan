@@ -11,9 +11,7 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 
 2. Use unzip command to uncompress the zip file:
 
-```sh
-unzip master.zip
-```
+`unzip master.zip`
 
 ## Pre-required packages and libraries
 
