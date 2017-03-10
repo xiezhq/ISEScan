@@ -10,7 +10,6 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip.
 
 2. Use unzip command to uncompress the zip file:
-
 `unzip master.zip`
 
 ## Pre-required packages and libraries
