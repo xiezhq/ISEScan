@@ -1,32 +1,25 @@
 ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome.
 
-Developer:
-Zhiqun Xie
-
 Contact: 
-Zhiqun Xie, zhiqxie@iu.edu
-
-Version 1.2
-===========
-- add program (buildHMM.py) for building a profile HMM from a tpase dataset (multiple protein sequences in a fasta file)
-- update the profile HMM model files shipped with ISEScan pipeline, clusters.faa.hmm and clusters.single.faa, which were built upon the curated transposase (tpase) data set combining a curated ACLAME dataset (ACLAME database, http://aclame.ulb.ac.be/) with 66 curated tpases collected from NCBI protein database.
-
-Version 1.1.1
-=============
-- add option switch in constants.py to report partial IS elements as well as full-length IS elements
-- bugs fix
+Zhiqun Xie
+zhiqxie@iu.edu
+----------------------------------------------------------------------------------------
 
 
 0 Install
-=========
+====================================================================
 0.1 Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip in your current directory.
+
 0.2 Use unzip command to uncompress the zip file,
-	unzip master.zip
+unzip master.zip
+
 0.3 The command will create a directory, ISEScan-master, and put all files into it.
+
 0.4 Go to ISEScan-master and follow the instructions in '2. How to run it' in this readme to configure ISEScan for your environment.
 
+
 1. Input and output
-===================
+====================================================================
 
 1.1 It requires three input files:
 
@@ -40,15 +33,16 @@ Version 1.1.1
 1.2.3 One *.out file, which list each identified IS element copy with all details, one IS element copies per line
 1.2.4 One *.is.fna file, which is a FASTA sequence file and contains the nucleic sequence of each identified IS copies
 
+
 2. How to run it?
-=================
+====================================================================
 
 2.1 ISEScan was only tested on Linux platform. If you need help on usage, please run: 
 
 	python3 isescan.py -h 
 
 2.2 Running ISEScan requires some packages pre-installed on your computer. 
-	For your convenience, we list below each required package, the name, recommended version and the site where you can find: 
+For your convenience, we list below each required package, the name, recommended version and the site where you can find: 
 
 2.2.1 Python 3.3.3 or later, https://www.python.org/downloads/
 2.2.2 numpy-1.8.0 or later, https://sourceforge.net/projects/numpy/files/NumPy/1.8.0/
@@ -58,33 +52,43 @@ Version 1.1.1
 2.2.6 HMMER-3.1b2 or later, http://hmmer.org/download.html
 2.2.7 BLAST 2.2.31 or later, https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download
 2.2.8 SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory. 
-	To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:
 
-		gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
+To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:
 
-	And then copy sswlib.so to the directory of ISEScan and set the search path as:
+gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
 
-		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
+And then copy sswlib.so to the directory of ISEScan and set the search path as:
 
-	The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
+
+The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
+
 2.2.9 You also need biopython 1.62 or later as SSW library requires it, http://biopython.org/.
 
 2.3 Before we continue, please make sure you have done two things below.
 
 2.3.1 You have all required packages installed on your computer.
+
 2.3.2 Configure ISEScan. If you haven't done it, please follow the instructions below to finish it before we can run ISEScan.
 2.3.2.1 Open constants.py, and find two lines marked with 'Config packages';
 2.3.2.2 Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb);
 2.3.2.3 Save and close constants.py.
 
 2.4 Let's try an example, NC_012624.fna.
-	The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:
 
-		python3 isescan.py NC_012624.fna proteome hmm
+The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:
 
-	Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
+python3 isescan.py NC_012624.fna proteome hmm
 
-	After ISEScan finish running, you can find three important files in prediction directory, NC_012624.fna.sum, NC_012624.fna.gff, NC_012624.fna.is.fna. The summarization of IS copies for each IS family is in NC_012624.fna.sum, NC_012624.fna.gff list each IS element copy and its TIR. NC_012624.fna.is.fna holds the nucleic acid sequence of each IS element copy.
-	Note: ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline. If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it: 
+Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
 
-		python3 isescan.py NC_012624.fna proteome hmm
+After ISEScan finish running, you can find three important files in prediction directory, NC_012624.fna.sum, NC_012624.fna.gff, NC_012624.fna.is.fna. The summarization of IS copies for each IS family is in NC_012624.fna.sum, NC_012624.fna.gff list each IS element copy and its TIR. NC_012624.fna.is.fna holds the nucleic acid sequence of each IS element copy.
+
+Tips:
+
+ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline. 
+
+If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it: 
+
+python3 isescan.py NC_012624.fna proteome hmm
+
