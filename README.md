@@ -22,7 +22,7 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 * HMMER-3.1b2 or later, http://hmmer.org/download.html
 * BLAST 2.2.31 or later
 * SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
-  * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc: 
+  * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:	 
   `
   cc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
   `
