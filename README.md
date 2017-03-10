@@ -44,18 +44,18 @@ unzip master.zip
 
 ## Usage example
 
-Let's try an example, NC_012624.fna.
+### Let's try an example, NC_012624.fna.
 
-The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:
+* The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:
 ```sh
 python3 isescan.py NC_012624.fna proteome hmm
 ```
 
-Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
+* Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
 
-After ISEScan finish running, you can find three important files in prediction directory, NC_012624.fna.sum, NC_012624.fna.gff, NC_012624.fna.is.fna. The summarization of IS copies for each IS family is in NC_012624.fna.sum, NC_012624.fna.gff list each IS element copy and its TIR. NC_012624.fna.is.fna holds the nucleic acid sequence of each IS element copy.
+* After ISEScan finish running, you can find three important files in prediction directory, NC_012624.fna.sum, NC_012624.fna.gff, NC_012624.fna.is.fna. The summarization of IS copies for each IS family is in NC_012624.fna.sum, NC_012624.fna.gff list each IS element copy and its TIR. NC_012624.fna.is.fna holds the nucleic acid sequence of each IS element copy.
 
-Tips:
+### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
 * If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:
 ```sh
