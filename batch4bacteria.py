@@ -11,8 +11,8 @@ import datetime
 import tools
 
 # To do IS element prediction before summarizing prediction if PREDICT = 1
-# To summarize prediction based on the previous prediction to save time if PREDICT = 0
 #PREDICT = 1
+# To summarize prediction based on the previous prediction to save time if PREDICT = 0
 PREDICT = 0
 
 python3 = '/usr/local/bin/python3'
@@ -36,7 +36,7 @@ def batch(args):
 			file4orgs[org] = []
 		file4orgs[org].append(file)
 	
-	print('number of organisms to process:', len(file4orgs))
+	print('number of organisms to process:', len(file4orgs), datetime.datetime.now().ctime())
 
 	if PREDICT == 1:
 		'''
@@ -89,6 +89,7 @@ def batch(args):
 	if len(sum4is) > 0:
 		tools.output4sumFull(sum4is, 'is.sum')
 
+	'''
 	# summarize genome DNAs
 	sum4is4genome = {}
 	for org in file4orgs.keys():
@@ -121,6 +122,7 @@ def batch(args):
 		#	print(org, 'will be integrated into total summarization for phage DNAs')
 	if len(sum4is4phage) > 0:
 		tools.output4sumFull(sum4is4phage, 'is4phage.sum')
+	'''
 	print('Batch running finishes at', datetime.datetime.now().ctime())
 	
 if __name__ == "__main__":

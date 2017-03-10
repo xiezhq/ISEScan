@@ -7,15 +7,18 @@ Contact:
 Zhiqun Xie, zhiqxie@iu.edu
 
 Version 1.2
+===========
 - add program (buildHMM.py) for building a profile HMM from a tpase dataset (multiple protein sequences in a fasta file)
 - update the profile HMM model files shipped with ISEScan pipeline, clusters.faa.hmm and clusters.single.faa, which were built upon the curated transposase (tpase) data set combining a curated ACLAME dataset (ACLAME database, http://aclame.ulb.ac.be/) with 66 curated tpases collected from NCBI protein database.
 
 Version 1.1.1
+=============
 - add option switch in constants.py to report partial IS elements as well as full-length IS elements
 - bugs fix
 
 
 0 Install
+=========
 0.1 Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip in your current directory.
 0.2 Use unzip command to uncompress the zip file,
 	unzip master.zip
@@ -23,6 +26,7 @@ Version 1.1.1
 0.4 Go to ISEScan-master and follow the instructions in '2. How to run it' in this readme to configure ISEScan for your environment.
 
 1. Input and output
+===================
 
 1.1 It requires three input files:
 
@@ -37,6 +41,7 @@ Version 1.1.1
 1.2.4 One *.is.fna file, which is a FASTA sequence file and contains the nucleic sequence of each identified IS copies
 
 2. How to run it?
+=================
 
 2.1 ISEScan was only tested on Linux platform. If you need help on usage, please run: 
 

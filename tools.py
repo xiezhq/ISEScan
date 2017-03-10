@@ -1676,6 +1676,7 @@ familyNames = [
 		'ISKRA4',
 		'ISL3',
 		'ISNCY',
+		'new',
 		]
 
 # output summarization for IS elements for an organism or multiple organisms
