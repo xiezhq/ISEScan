@@ -21,17 +21,16 @@ unzip master.zip
 1. Input and output
 ====================================================================
 
-1.1 It requires three input files:
-
-1.1.1 Genome sequence file in FASTA format.
-1.1.2 Profile hidden markov models which are shipped with ISEScan, clusters.faa.hmm and clusters.single.faa.
+1.1 It requires three input files: 
+1) Genome sequence file in FASTA format; 
+2) clusters.faa.hmm and clusters.single.faa, namely, profile hidden markov models.
 
 1.2 ISEScan will produced a list of IS elements identified in the genome sequence and put all produced files into the directory under the current directory, prediction. The produced files include:
 
-1.2.1 One *.sum file, which summarizes the number of the identified IS element copies for each family
-1.2.2 One *.gff file, which list each identified IS element copy with family classification and its TIR (Terminal Inverted Repeat)
-1.2.3 One *.out file, which list each identified IS element copy with all details, one IS element copies per line
-1.2.4 One *.is.fna file, which is a FASTA sequence file and contains the nucleic sequence of each identified IS copies
+> One *.sum file, which summarizes the number of the identified IS element copies for each family
+> One *.gff file, which list each identified IS element copy with family classification and its TIR (Terminal Inverted Repeat)
+> One *.out file, which list each identified IS element copy with all details, one IS element copies per line
+> One *.is.fna file, which is a FASTA sequence file and contains the nucleic sequence of each identified IS copies
 
 
 2. How to run it?
@@ -39,7 +38,7 @@ unzip master.zip
 
 2.1 ISEScan was only tested on Linux platform. If you need help on usage, please run: 
 
-	python3 isescan.py -h 
+python3 isescan.py -h 
 
 2.2 Running ISEScan requires some packages pre-installed on your computer. 
 For your convenience, we list below each required package, the name, recommended version and the site where you can find: 
