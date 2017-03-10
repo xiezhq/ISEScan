@@ -26,7 +26,7 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
   `
   cc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
   `
-  * And then copy sswlib.so to the directory of ISEScan and set the search path as:  
+  * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
   `
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
   `
