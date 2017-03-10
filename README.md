@@ -1,22 +1,13 @@
 # ISEScan
 >ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome.
 
-[![NPM Version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Downloads Stats][npm-downloads]][npm-url]
-
-
-
-ISEScan was developed in Python3. It 1) readin genome (or metagenome) in fasta format; 2) predict/translate (using FragGeneScan) genome into proteome; 3) search the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identify the transposase gene in genome; 4) then extend the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (a list of IS elements, sequences of IS elements in fasta format, annotation file in GFF3 format).
-
-![](ISEScan.png)
-
+ISEScan was developed in Python3. It 1) scanes genome (or metagenome) in fasta format; 2) predicts/translates (using FragGeneScan) genome into proteome; 3) searches the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identifies the transposase gene in genome; 4) then extends the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (a list of IS elements, sequences of IS elements in fasta format, annotation file in GFF3 format).
 
 ## Installation
 
-Linux:
+>>Linux:
 
-Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip in your current directory.
+Download the latest ISEScan from https://github.com/xiezhq/ISEScan. The downloaded package is automatically saved as master.zip.
 
 Use unzip command to uncompress the zip file:
 
@@ -39,9 +30,9 @@ unzip master.zip
   cc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
   ```
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:
-    ```sh
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
-    ```
+  ```sh
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
+  ```
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
 
