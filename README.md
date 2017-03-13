@@ -41,7 +41,7 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 
 ## Usage example
 
-### Let's try an example, NC_012624.fna.
+> Let's try an example, NC_012624.fna.
 
 * The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:   
 `
