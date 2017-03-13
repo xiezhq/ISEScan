@@ -21,10 +21,16 @@ def isPredictSingle(args):
 	os.remove(filelist)
 
 if __name__ == "__main__":
+	import textwrap
+
 	# Parse command line arguments
-	descriptStr = 'Search IS Profile HMMs against gene database. A typical invocation would be:\n\
-			python3 isescan.py seqfile proteome hmm'
-	parser = argparse.ArgumentParser(prog='isescan', description = descriptStr)
+	descriptStr = '''\
+			Search IS Profile HMMs against gene database. A typical invocation would be:
+			python3 isescan.py seqfile proteome hmm
+
+			- If you want isescan to report both complete and incomplete (partial) IS elements, you can change the output options (section "Option switch to report partial IS element") in constants.py.'''
+	parser = argparse.ArgumentParser(prog='isescan', description = textwrap.dedent(descriptStr), 
+			formatter_class=argparse.RawDescriptionHelpFormatter)
 
 	parser.add_argument('--version', action='version', version='%(prog)s' + ' ' + version)
 
