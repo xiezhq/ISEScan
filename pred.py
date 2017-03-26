@@ -1299,7 +1299,11 @@ def getFullIS4seqOnStream(args):
 		e = 'Blastn ISs in {} against {}: {}'.format(seqid, seqid, err)
 		raise RuntimeError(e)
 
-	# get copy number of ORF extended sequence
+	# get copy number of ORF extended sequence and copies (the Tpases of some IS copies might not be predicted/annotated by 
+	#	gene prediction tools, e.g., IS1I (257908, 258675, -) which is annotated by NCBI but no CDS is annotated by NCBI) 
+	#	missed by querying pHMM against proteome
+	# PLEASE DO ADD ALL COPIES INTO THE HITS BECAUSE THERE MIGHT BE SOME IS COPIES WITHOUT THE CORRECT TPASE ORF PREDICTED BY GENE PREDICTION
+	# TOOL SUCH AS FRAGGENESCAN AND NCBI GENE ANNOTATION.
 	ispairs = {}
 	# ispairs: {qseqid:[hit, ...]}
 	# hit: {'qseqid':qseqid, 'sseqid':sseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'length':length, ...}
@@ -1534,29 +1538,34 @@ def refineHits(mHits):
 			begin, end = hit['bd']
 			isLen = end - begin + 1
 			if isLen < minLen4is:
-				print('remove partial IS element with isLen < {}: isLen={} {} bd={} orf{}'.format(
-					minLen4is, isLen, family, hit['bd'], hit['orf']))
+				print('remove partial IS element with isLen < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+					minLen4is, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 				continue
 
 			#if hit['hmmhit'][2] > evalue_cutoff:
 			#	continue
 
 			# test evalue and number of Tpase copies (IS copies)
-			if hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
+			# filter out hits with non-significant e-value and without TIR
+			if hit['hmmhit'][2] > evalue4singleCopy and len(hit['tirs']) == 0:
+				print('remove partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
+					isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+				continue
+			elif hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
 				# filter out hits without TIR
 				if len(hit['tirs']) == 0:
-					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{}'.format(
-						isLen, hit['bd'], hit['orf']))
+					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
+						isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 					continue
 				# filter out hits with gaps in TIR (alignment of left hand rigth hand TIR sequences)
 				elif hit['tirs'][0][3] > 0:
-					print('remove single-copy partial IS element with gap in tir: nGaps={} bd={} orf{}'.format(
-						hit['tirs'][0][3], hit['bd'], hit['orf']))
+					print('remove single-copy partial IS element with gap in tir: nGaps={} bd={} orf{} evalue={}'.format(
+						hit['tirs'][0][3], hit['bd'], hit['orf'], hit['hmmhit'][2]))
 					continue
 				# filter out hits with irId/irLen < irSim4singleCopy (default 0.85)
 				elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
-					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{}'.format(
-						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['tirs'][0][3], hit['bd'], hit['orf']))
+					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{} evalue={}'.format(
+						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['bd'], hit['orf'], hit['hmmhit'][2]))
 					continue
 
 			hitsCopy.append(hit)

@@ -54,7 +54,7 @@ translateGenome = True
 path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
-dir4prediction = os.path.join(path2results, 'prediction')
+dir4prediction = os.path.join(path2results, 'prediction.ncbi')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
