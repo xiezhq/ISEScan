@@ -1,7 +1,6 @@
 import sys
 import argparse
 import operator
-import csv
 import time
 import random
 import os
