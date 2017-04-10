@@ -61,7 +61,7 @@ python3 isescan.py NC_012624.fna proteome hmm
 * 1.4
   * Change: recruit the IS copies without predicted Tpase when search for multi-copy IS elements
 * 1.3
-  * Move buildHMM.py out of ISEScan package
+  * Remove buildHMM.py from ISEScan
 * 1.2
   * CHANGE: pHMMs `clusters.faa.hmm` and `clusters.single.faa`, both files are now built upon the curated ACLAME dataset (ACLAME is a mobile genetic element database.)
 * 1.1.1
