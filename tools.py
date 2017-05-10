@@ -389,7 +389,8 @@ def parseCigarString(cigarString):
 	return [(int(pair[:-1]), pair[-1]) for pair in re.findall(r'\d+[MIDNSHP=X]', cigarString)]
 
 
-# print a alignment into a string
+# Print a alignment into a string and return the string then.
+#
 # seq1, seq2: sequences of two aligned DNA strand segment
 # cigarStr: '4M2I8M1D10M6S'
 # cigarPair: [(4, 'M'), (2, 'I'), (8, 'M'), (1, 'D'), (10, 'M'), (6, 'S')]
@@ -605,7 +606,7 @@ def irScore(ir):
 		# set a very negative value as the score of no TIR
 		score = -9999.9
 	else:
-		irIdCore = getIrIdCore(ir[-2], ir[-1])
+		irIdCore = getIrIdCore(ir[8], ir[9])
 
 		# mismatch = irLen - nGaps - irId
 		# irIdNonCore = irId - irIdCore
@@ -2143,6 +2144,17 @@ def distFunction(u, v):
 		d = 10 - intersect
 	return d
 
+def distFunctionByoverlap_min(p1, p2):
+	a, b = p1
+	c, d = p2
+	# a <=b and c <= d are satisfied
+	intersect = min(b, d) - max(a, c) + 1
+	if intersect > 0:
+		overlap = float(intersect) / (min(b-a,d-c)+1)
+	else:
+		overlap = 0.0
+	return 1 - overlap
+
 # based on the bool value of constants.intersected2remove, choose the measure and threshold for 
 # clustering and removing intersected IS elements in the same genome sequence
 # bd1, bd2: [start, end], boundary of IS element
@@ -2156,31 +2168,6 @@ def chooseMeasure(bd1, bd2):
 		threshold = constants.overlap2removeRedundancy
 	return (measure, threshold)
 
-# check the intersection between the current upsteam and downstream tir search windows
-# and the neighboring tpase ORFs, and then probably shrink the tir search windows to
-# avoid the insersection with the neighboring tpase ORFs.
-def tirwindowIntersectORF(start1, end1, start2, end2, orf, orfhitsNeighbors, minDist4ter2orf):
-	orfBegin, orfEnd = orf[1:3]
-	before = orfhitsNeighbors[orf][0]
-	after = orfhitsNeighbors[orf][1]
-	if before != None and start1 <= before[0][2]:
-		print('hello, before', before)
-		print('shrink the boundary of tir search region around ORF {}, start1 ({}) to {}'.format(
-			orf, start1,  before[0][2] + 1))
-		start1 = before[0][2] + 1
-		end1 = orfBegin - minDist4ter2orf
-		if start1 > end1:
-			end1 = start1
-
-	if after != None and end2 >= after[0][1]:
-		print('hello, after', after)
-		print('shrink the boundary of tir search region around ORF {}, end2 ({}) to {}'.format(
-			orf, end2,  after[0][1] - 1))
-		end2 = after[0][1] - 1
-		start2 = orfEnd + minDist4ter2orf
-		if start2 > end2:
-			start2 = end2
-	return (start1, end1, start2, end2)
 
 def getNewick(node, newick, parentDist, leafNames):
 	if node.is_leaf():

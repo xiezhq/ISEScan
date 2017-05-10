@@ -67,10 +67,7 @@ def prepare4ssw2findIRbyDNAbyFar(mOrfHits, mDna):
 			else:
 				familyCluster = familyName
 			family, cluster = familyCluster.rsplit('_', 1)
-			if familyCluster == 'IS200/IS605_8':
-				minLen = min4tir[familyCluster]
-			else:
-				minLen = min4tir[family]
+			minLen = min4tir[family]
 
 			# transformat orf to a string, for example,
 			# orf == ('gi|256374160|ref|NC_013093.1|', 20, 303, '+') 
@@ -82,29 +79,60 @@ def prepare4ssw2findIRbyDNAbyFar(mOrfHits, mDna):
 		#mInput4ssw.append(input4orfHits)
 	return (mInput4ssw, mboundary)
 
-# mDNA: {accid: (org, fileid, sequence), ..., accid: (org, fileid, sequence)}
-# mispairs: {seqid: ispairs, ..., seqid: ispairs}
-# ispairs: {qseqid: g, ..., qseqid: g}, alignment pairs in blast.out
-# g: [ispair, ..., ispair]
-# ispair: {'orfhit': orfhit, 'qseqid':qseqid, 'sseqid':sseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 
-#		'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send, ..., 'length':length}
+# check the intersection between the current upsteam and downstream tir search windows
+# and the neighboring tpase ORFs, and then probably shrink the tir search windows to
+# avoid the insersection with the neighboring tpase ORFs.
+#
 # orfhitsNeighbors: {orf: orfhitneighbors, ..., orfhitneighbors}
 # orfhitneighbors: [before, orfhit, after], before/after is None or orfhit
-def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist4ter2orf,
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orf: (seqid, begin, end, strand)
+def tirwindowIntersectORF(start1, end1, start2, end2, 
+		orfhit,
+		orfhitsNeighbors, minDist4ter2orf):
+	orf = orfhit[0]
+	orfBegin, orfEnd = orf[1:3]
+	before = orfhitsNeighbors[orf][0]
+	after = orfhitsNeighbors[orf][1]
+	start1New, end1New, start2New, end2New = start1, end1, start2, end2
+	if before != None and orf[3] == before[0][3] and start1 <= before[0][2]:
+		start1New = before[0][2] + 1
+		end1New = end1 - (start1-start1New)
+		print('hello, before', before)
+		print('shrink the boundary of tir search region around orfhit {}, start1 ({}) to {}'.format(
+			orfhit, start1,  start1New))
+
+	if after != None and orf[3] == after[0][3] and end2 >= after[0][1]:
+		end2New = after[0][1] - 1
+		start2New = start2 - (end2-end2New)
+		print('hello, after', after)
+		print('shrink the boundary of tir search region around orfhit {}, end2 ({}) to {}'.format(
+			orfhit, end2,  end2New))
+	#return (start1, end1, start2, end2)
+	return (start1New, end1New, start2New, end2New)
+
+# mDNA: {accid: (org, fileid, sequence), ..., accid: (org, fileid, sequence)}
+#
+# morfhits: {seqid: orfhits, ...}
+# orfhits: [orfhit, ...]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orf: (seqid, begin, end, strand)
+#
+# orfhitsNeighbors: {orf: orfhitneighbors, ..., orfhitneighbors}
+# orfhitneighbors: [before, orfhit, after], before/after is None or orfhit
+def prepare4ssw2findIRbyDNAbyFar4orfhits(morfhits, mDna, maxDist4ter2orf, minDist4ter2orf,
 		morfhitsNeighbors):
 	mInput4ssw = []
 	mboundary = {}
-	for seqid, ispairs in misapirs.items():
-		if len(ispairs) == 0:
+	for seqid, orfhits in morfhits.items():
+		if len(orfhits) == 0:
 			continue
 		orfhitsNeighbors = morfhitsNeighbors[seqid]
 		DNAlen = len(mDna[seqid][-1])
-		if 'contig-100_' in seqid:
-			print('hello', seqid, ispairs)
-		for qseqid, g in ispairs.items():
-			orfHit = g[0]['orfhit']
+		for orfhit in orfhits:
+			orfHit = orfhit
 			familyName = orfHit[1]
-			orf = g[0]['orfhit'][0]
+			orf = orfHit[0]
 			orfBegin, orfEnd = orf[1:3]
 			orfLen = orfEnd - orfBegin + 1
 
@@ -116,10 +144,8 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 				familyCluster = familyName
 			family, cluster = familyCluster.rsplit('_', 1)
 
-			if familyCluster == 'IS200/IS605_8':
-				minMax4tir = constants.minMax4tir[familyCluster]
-			else:
-				minMax4tir = constants.minMax4tir[family]
+			minMax4tir = constants.minMax4tir[family]
+
 			#minMax4dr = constants.minMax4dr[family]
 
 			if constants.useOPTtir == True:
@@ -127,21 +153,20 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 			else:
 				minLen = minMax4tir[0]
 
-			ncopy4is = len(g)
+			ncopy4tpase = orfHit[4]
 			virtualORF = False
-			if ncopy4is > 1:
+			if ncopy4tpase > 1:
 				virtualORF = True
 				# consider the identified aligned-region as a virtual ORF
-				# g is sorted by alignment length.
-				qstart, qend = g[1]['qstart'], g[1]['qend']
+				qstart, qend = orfBegin, orfEnd
 
 				# if aligned region spans two or more Tpases, eg. composite transposon,
 				# the current hit in the aligned region is trimmed to the tpase ORF.
 				if constants.splitAlign2orf == True:
 					if ((before != None and qstart <= before[0][2]) or 
 							(after != None and qend >= after[0][1])):
-						print('split ncopy4is={} qstart={} qend={} orf={} before={} after={}'.format(
-							ncopy4is, qstart, qend, orf, before, after))
+						print('split ncopy4tpase={} qstart={} qend={} orf={} before={} after={}'.format(
+							ncopy4tpase, qstart, qend, orf, before, after))
 						virtualORF = False
 			if virtualORF == True:
 				dist = minMax4tir[1]
@@ -150,7 +175,7 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 				maxDist = 0
 				minDist = -dist
 				start1, end1, start2, end2 = pseudoSeqBoundary_v4(qstart, qend, maxDist, minDist)
-				#print('hello ncopy4is', ncopy4is, g[1]['qseqid'], qstart, qend, maxDist, minDist, orf, familyCluster)
+				print('hello ncopy4tpase', ncopy4tpase, seqid, qstart, qend, maxDist, minDist, orf, familyCluster)
 			else:
 				start1, end1, start2, end2 = pseudoSeqBoundary_v4(orfBegin, orfEnd, 
 									maxDist4ter2orf, minDist4ter2orf)
@@ -159,16 +184,19 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 				#if maxDist4ter2orf < 500:
 				#	minLen = minMax4tir[0]
 
-			if ncopy4is < 2:
-				start1, end1, start2, end2 = tools.tirwindowIntersectORF(
+			if ncopy4tpase < 2:
+				start1, end1, start2, end2 = tirwindowIntersectORF(
 						start1, end1, start2, end2, 
-						orf, orfhitsNeighbors, minDist4ter2orf)
+						orfhit,
+						orfhitsNeighbors, minDist4ter2orf)
 
-			# check DNA termini to assure that tir is within DNA termini
+			# Deal with the overlapped TIR search windows
+			'''
 			if end1 >= start2:
-				#end1, start2 = start2, end1
 				end1 = int((end1+start2)/2)
 				start2 = end1 + 1
+			'''
+			# check DNA termini to assure that tir is within DNA termini
 			if start1 < 1:
 				start1 = 1
 				if start1 > end1:
@@ -178,12 +206,19 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 				if start2 > end2:
 					start2 = DNAlen
 
-			if not (start1 <= end1 < start2 <= end2):
-				e = 'Error, invalid tir search window (org={} fastafile={} seq={}): {}-{} {}-{} around ORF {}'.format(
-						mDna[seqid][0], mDna[seqid][1], seqid, start1, end1, start2, end2, orf)
-				#print('hello1', DNAlen, ncopy4is, orfBegin, orfEnd, maxDist4ter2orf, minDist4ter2orf)
-				raise RuntimeError(e)
-			#print('hello tir search window', start1, end1, start2, end2, orf)
+			if not (start1 < end1 < start2 < end2):
+
+				#e = 'Error, invalid tir search window (org={} fastafile={} seq={}): {}-{} {}-{} around ORF {}'.format(
+				#		mDna[seqid][0], mDna[seqid][1], seqid, start1, end1, start2, end2, orf)
+				#raise RuntimeError(e)
+				e = 'No tir will be found in the invalid tir search window (org={} fastafile={}): {}-{} {}-{} around ORF {}'.format(
+						mDna[seqid][0], mDna[seqid][1], start1, end1, start2, end2, orfhit)
+				print(e)
+
+				# Set a tir search windows the 1-bp-long termini of ORF, 
+				# which will later prevent alignment algorithm from returning any tir.
+				start1 = end1 = orf[1]
+				start2 = end2 = orf[2]
 
 			# The strand does not matter when extracting two terminal sequences to align, namely,
 			# which sequence is the first sequence in pairwise alignement does not make sense.
@@ -197,8 +232,9 @@ def prepare4ssw2findIRbyDNAbyFar4ispair(misapirs, mDna, maxDist4ter2orf, minDist
 			# orf == ('gi|256374160|ref|NC_013093.1|', 20, 303, '+') 
 			#	-> orfStr == 'gi|256374160|ref|NC_013093.1|_20_303_+'
 			# So, orfStr can be used an ID like isName in other called sub-functions
+			print('hello orfhit', orfhit)
 			orfStr = '_'.join((orf[0], str(orf[1]), str(orf[2]), orf[3]))
-			mInput4ssw.append((familyName, orfStr, lSeq, rSeq, minScore, minLen))
+			mInput4ssw.append((familyName, orfStr, lSeq, rSeq, minScore, minLen, ncopy4tpase))
 			mboundary[orfStr] = (start1, end1, start2, end2)
 		#mInput4ssw.append(input4orfHits)
 	return (mInput4ssw, mboundary)
@@ -499,11 +535,13 @@ def keepBestTIR(elementTIR):
 # if there is any other matched TIR
 # Note: the bestTIR may be found under multiple filter conditions
 # 
-# TIRfilters: [(TIR_1, filter_1), ..., (TIR_i, filter_j), ...]
+# TIRfilters: [TIR4filter, ...]
+# TIRfilter: (TIR, filter)
 # TIR: [familyName, isName, ir]
 #
-# TIRs: [element1TIR, ..., elementnTIR]
-# elementTIR: [(TIR1, filter1), ..., (TIRn, filtern)]
+# TIRs: [elementTIR, ...]
+# elementTIR: [TIR4filter, ...]
+# TIRfilter: (TIR, filter)
 # TIR: [familyName, isName, ir]
 # ir: [score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2]
 #
@@ -521,7 +559,14 @@ def checkTIRseq(TIRfilters):
 
 		# keep the best TIRs which have same irScore but might have different alignments under different filters
 		#
+		print('hello all tirs:')
+		for tirfilter in elementTIR:
+			tir, filter = tirfilter
+			print(filter, tools.irScore(tir[2]), tir)
+
 		elementTIR = keepBestTIR_v3(elementTIR)
+
+		print('hello best tirs', elementTIR)
 
 		# elementTIR: [(TIR1, filter1), ..., (TIRn, filtern)]
 		# Note:
@@ -710,32 +755,6 @@ def combineBestTIRfilters(bestMatchedTIRfilters, bestTIRfilters):
 			TIRfilters.append(item)
 	return bestMatchedTIRfilters + TIRfilters
 
-
-# Calculate TIRs in all IS elements under the specific filter condition
-#
-#def getPerformanceByFilterBySSW(args2concurrent):
-#	mfamilyFeatures, mInput4ssw, filter = args2concurrent
-def getPerformanceByFilterBySSW(mfamilyFeatures, mInput4ssw, filter):
-	bestIRs = findIRbySSW(mInput4ssw, filter)
-
-	"""
-	# Shorten each ir to the reasonable length based on constants.maxLenIR 
-	IRs = []
-	# bestIRs: [IR, ..., IR]
-	# IR: [familyName, isName, ir]
-	for IR in bestIRs:
-		ir = tools.shortenIR(IR[2])
-		IRs.append([IR[0], IR[1], ir])
-	"""
-	IRs = bestIRs
-
-	# compare IRs found by SSW with IRs found in IS dataset
-	#perf, TIRs = compareIRbyISfinder(IRs, mfamilyFeatures)
-	#
-	# Compare the predicted IRs with IRs from isfinder, and return the IRs matched by records in ISfinder
-	perf, matchedTIRs = compareIRbyISfinder_v2(IRs, mfamilyFeatures)
-
-	return (perf, matchedTIRs, IRs)
 
 # Calculate performance for each filter
 # Return perf: {filter: [nIS, {isNames, ..., isNames}]}
@@ -992,13 +1011,14 @@ def  getIRbySSW(alignment):
 # Return ir
 # ir: [score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2]
 # args: (input4IS, filter)
-# input4IS: (familyName, isName, seq1, seq2, minScore, minLen)
+# input4IS: (familyName, isName, seq1, seq2, minScore, minLen, ncopy4tpase)
 # filter: (gapopen, gapextend, match, mismatch)
 # 
 #def findIR4elementBySSW(input4IS, filter):
 def findIR4elementBySSW(args):
 	input4IS, filter = args
-	familyName, isName, seq1, seq2, minScore, minLen = input4IS 
+	#familyName, isName, seq1, seq2, minScore, minLen = input4IS 
+	familyName, isName, seq1, seq2, minScore, minLen, ncopy4tpase = input4IS 
 	gapopen, gapextend, match, mismatch = filter
 	# set minScore based on such rule that an IR must have at least two consecutive matches 
 	minScore = match * 2
@@ -1006,6 +1026,7 @@ def findIR4elementBySSW(args):
 	#minScore = match * 10
 	#minScore = match * 15
 	#minScore = match * 20
+
 
 	# If sequence is an empty string, then no alignment is done.
 	if len(seq1) < 1 or len(seq2) < 1:
@@ -1048,10 +1069,16 @@ def findIR4elementBySSW(args):
 
 
 # Find best IR for each element, and return all best IRs with one IR per element
-# mInput4ssw: [input4IS1, .., input4ISn]
-# input4ISn: (familyName, isName, seq1, seq2, minScore, minLen)
+# mInput4ssw: [input4IS, ...]
+# input4IS: (familyName, isName, seq1, seq2, minScore, minLen, ncopy4tpase)
 # minScore, minLen: the minimal score and length for the alignment to be reported
 # filter: (gapopen, gapextend, match, mismatch)
+#
+# Return mBestIR
+# mBestIR: [TIR, ...]
+# TIR: [familyName, orfStr, ir], both familyName and orfStr are from pHMM hit.
+# orfStr: string, e.g., 'gi|256374160|ref|NC_013093.1|_20_303_+' which is the orfStr of
+#       orf('gi|256374160|ref|NC_013093.1|', 20, 303, '+')
 # ir: [] or [score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2]
 # seq1, seq2: inverted repeat sequences
 def findIRbySSW(mInput4ssw, filter):
@@ -1069,17 +1096,14 @@ def findIRbySSW(mInput4ssw, filter):
 	with concurrent.futures.ProcessPoolExecutor(max_workers = nprocess) as executor:
 		for args, ir in zip(args2concurrent, executor.map(findIR4elementBySSW, args2concurrent)):
 		# args: (input4IS, filter)
-		# input4IS: (familyName, isName, seq1, seq2, minScore, minLen)
-			#familyName, isName = args[0][:2]
-			#mBestIR.append([familyName, isName, ir])
+		# input4IS: (familyName, orfStr, seq1, seq2, minScore, minLen)
+			#familyName, orfStr = args[0][:2]
+			#mBestIR.append([familyName, orfStr, ir])
 			mBestIR.append([args[0][0], args[0][1], ir])
 	'''
 	for input4IS in mInput4ssw:
-		# familyName, isName, seq1, seq2, minScore, minLen = input4IS
+		# familyName, isName, seq1, seq2, minScore, minLen, ncopy4tpase = input4IS
 		ir = findIR4elementBySSW((input4IS, filter))
-
-		#if len(ir) > 0 and (ir[3] > 0 or ir[1]/ir[2] < constants.irSim4singleCopy):
-		#	ir = []
 
 		mBestIR.append([input4IS[0], input4IS[1], ir])
 

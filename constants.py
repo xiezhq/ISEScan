@@ -55,7 +55,8 @@ path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 #dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.4')
-dir4prediction = os.path.join(path2results, 'prediction.ncbi')
+dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.4.test')
+#dir4prediction = os.path.join(path2results, 'prediction.ncbi')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
@@ -71,9 +72,20 @@ dir4blastout = os.path.join(path2results, 'blastout')
 # (gapopen, gapextend, match, mismatch)
 #
 # Optimal filter when aligning two sequences with length = maxLenIR
-filters4ssw4isMax = [(1, 10, 4, 5)] # giving the greatest number of matched IS elements and 
-				# the greatest number of matched best IS elements
-filters4ssw4trial = [(2, 6, 2, 2)] # trial filter to stop alignment from creating the consecutive gaps
+#filters4ssw4trial = [(1, 10, 4, 5)]
+# giving the greatest number of matched IS elements and the greatest number of matched best IS elements
+#
+#filters4ssw4trial = [(1, 10, 5, 4)]
+# It usually gives the imperfect but long IR
+#
+# Optimal filter when aligning two TIR sequences with flanking noise sequences
+#filters4ssw4trial = [(13, 12, 3, 7)] 
+# giving the greatest number of matched IS elements, it usually gives the perfect but short IR
+#
+filters4ssw4trial = [(2, 6, 2, 2)] # trial filter to prevent alignment from creating the consecutive gaps
+#filters4ssw4trial = [(2, 6, 2, 2), (1, 10, 4, 5), (13, 12, 3, 7), (13, 12, 3, 2), (1, 10, 5, 4)]
+#filters4ssw4trial = [(2, 6, 2, 2), (13, 12, 3, 7), (1, 10, 5, 4)]
+
 
 # minimal and maximal values of length of full-length IS element in each family
 minMaxLen4is =	{
@@ -161,7 +173,7 @@ minMax4tir = {
 		'IS1595': (10, 43, 15, 1),
 		'IS1634': (11, 32, 12, 1),
 		'IS200/IS605': (10000, 0, 10000, 0), # prevent program from finding any tir with irLen > 0
-		'IS200/IS605_8': (11, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
+		#'IS200/IS605_8': (11, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
 		#'IS200/IS605': (11, 11, 11, -1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
 		'IS21': (8, 76, 10, 1),
 		'IS256': (8, 48, 15, 1),
@@ -342,8 +354,10 @@ table11 = {
 gene2pepTable = {'11': table11}
 
 # default number of processes to use in calculation if it is not given
-nproc = 16
 #nproc = 1
+#nproc = 16
+nproc = 32
 # default number of threads to use in calculation if it is not given
 #nthread = 2
-nthread = 16
+#nthread = 16
+nthread = 32

@@ -20,6 +20,14 @@ import is_analysis
 import constants
 
 
+# cutoff for boundary window when searching for the optimal consensus boundaries of the multi-copy IS element
+# boundary window: (boundary-cutoff, boundary+cutoff)
+# In our calculations, we require boundary-cutoff >= 1.
+#CUTOFF4WINDOW = 0
+CUTOFF4WINDOW = 1
+#CUTOFF4WINDOW = 3
+#CUTOFF4WINDOW = 5
+
 # re-rank hmmsearch hits by 4 (full sequence E-value, default ranking of hmmsearch results) or 0 (best 1 domain E-value)
 SORT_BY = 4
 
@@ -292,6 +300,8 @@ def clusterIntersect(hits, ids):
 
 	# determine the representative hit for each cluster and append the representative hits to hitsNew
 	for cluster in clustersDic.values():
+		#''' sort by ncopy and then by e-value
+		#
 		# sort and group hits into two groups, multiple-copy and single-copy, where multiple-copy hits with 
 		# different copy number are grouped into same group, multiple-copy group.
 		cluster.sort(key = lambda x: 2 if hits[idsList[x]]['occurence']['ncopy4is']>1 else 1, reverse=True)
@@ -305,6 +315,16 @@ def clusterIntersect(hits, ids):
 		g.sort(key = lambda x: hits[idsList[x]]['hmmhit'][1])
 		# id of the representative hit with the least e-value, where hit == hits[idsList[id]]
 		repid = g[0]
+		#
+		#''' sort by ncopy and then by e-value
+
+		'''# sort by e-value
+		#
+		cluster.sort(key = lambda x: hits[idsList[x]]['hmmhit'][1])
+		repid = cluster[0]
+		#
+		'''# sort by e-value
+
 		hit = hits[idsList[repid]]
 		hitsNew.append(hit)
 		print('representative hit: repid={} hitid={} hitbd={} cluster={}'.format(
@@ -312,7 +332,7 @@ def clusterIntersect(hits, ids):
 	hitsNew.sort(key = lambda x: x['bd'][0])
 	return hitsNew
 
-def removeOverlappedHits(mhits):
+def removeOverlappedIS(mhits):
 	mhitsNew = {}
 	for accid, hits in mhits.items():
 		ids = set()
@@ -328,7 +348,7 @@ def removeOverlappedHits(mhits):
 
 			ids.update(pair)
 		if len(ids) > 0:
-			print('{}: {} intersected hits found, clustering them to pick the representative for each cluster'.format(accid, len(ids)))
+			print('{}: {} intersected ISs found, clustering them to pick the representative for each cluster'.format(accid, len(ids)))
 			hitsNew = clusterIntersect(hits, ids)
 		else:
 			hitsNew = hits[:]
@@ -374,10 +394,11 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 	#		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 	#		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 	#		'E-value', 'ov', # hmmhit: evalue4best1domain, overlap number output by hmmer
+	#		'tir', # tir
 	#		
 	#
-	fmtStrTitlePredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2}'
-	fmtStrPredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2}'
+	fmtStrTitlePredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
+	fmtStrPredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
 
 	#print(fmtStrTitlePrediction.format(
 	# sort keys of dictionary
@@ -436,6 +457,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 			'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 			'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 			'E-value', 'ov', # hmmhit: best1domain e-value and overlap number output by hmmer
+			'tir', # tir, seq1:seq2
 			), 
 			file = fp)
 		print('#', '-' * 139, file = fp)
@@ -519,6 +541,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 				score, irId, irLen, nGaps, # characteristics of tir 
 				orfBegin, orfEnd, strand, len4orf, # orf, probably virtual ORF
 				best1domE, ov, # hmmhit
+				':'.join([seq1,seq2]), # tir
 				),
 				file = fp)
 
@@ -659,10 +682,11 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	#		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 	#		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 	#		'E-value', 'ov', # hmmhit: evalue4best1domain, overlap number output by hmmer
+	#		'tir', # tir, seq1:seq2
 	#		
 	#
-	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2}'
-	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2}'
+	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
+	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
 
 	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
 	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
@@ -685,6 +709,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 		'E-value', 'ov', # hmmhit: best1domain e-value and overlap number output by hmmer
+		'tir', # tir: seq1 and seq2 in tir, including gaps
 		), 
 		file = fp)
 	print('#', '-' * 139, file = fp)
@@ -821,6 +846,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 				score, irId, irLen, nGaps, # characteristics of tir 
 				orfBegin, orfEnd, strand, len4orf, # orf, probably virtual ORF
 				best1domE, ov, # hmmhit
+				':'.join([seq1,seq2]), # tir
 				),
 				file = fp)
 
@@ -974,6 +1000,11 @@ def convertHit2orfHit(hit):
 
 
 # Merge the neighboring significant ORFs with distance <= maxDistBetweenOrfs, return mOrfHits
+# Note: in current version,
+# we only merge: 
+# 1) the orfs in family IS200/IS605
+# 2) the overlapped orfs in other families
+#
 # morfHits: {accid: orfHits, ..., accid: orfHits}
 # orfHits: [orfhit, ..., orfhit]
 # orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
@@ -1002,19 +1033,35 @@ def mergeOrfs(mOrfHits, maxDistBetweenOrfs):
 		#	untouched.
 		orfs = []
 		orfHitsMerged = []
+		mergeFlag = False
 		for x in hitPairs:
-			# only merge ORFs of family IS200/IS605 as it has two ORFs(tpase gene and accessory gene)
+			# Do not merge ORFs on the different strands.
+			if x[0][0][3] != x[1][0][3]:
+				continue
+
+			# Merge ORFs of family IS200/IS605 as it has two ORFs(tpase gene and accessory gene)
 			# and the accessory gene is usually longer than two times of the length of tpase gene.
-			#if 'IS200/IS605' not in x[0][1] or 'IS200/IS605' not in x[1][1] or x[0][0][3] == x[1][0][3]:
-			if 'IS200/IS605' not in x[0][1] or 'IS200/IS605' not in x[1][1]:
-				continue
-			orfLen1 = x[0][0][2] - x[0][0][1] + 1
-			orfLen2 = x[1][0][2] - x[1][0][1] + 1
-			if max(orfLen1, orfLen2) < 2 * min(orfLen1, orfLen2):
-				continue
+			# Two ORFs in an IS element can be on either the same or different strands.
+			if 'IS200/IS605' in x[0][1] and 'IS200/IS605' in x[1][1]:
+				orfLen1 = x[0][0][2] - x[0][0][1] + 1
+				orfLen2 = x[1][0][2] - x[1][0][1] + 1
+				if max(orfLen1, orfLen2) >= 2 * min(orfLen1, orfLen2):
+					mergeFlag = True
 
 			p1 = (x[0][0][1], x[0][0][2])
 			p2 = (x[1][0][1], x[1][0][2])
+			'''
+			# Merge the overlapped orfs with common Tpase
+			if mergeFlag == False and x[0][1] == x[1][1] and tools.intersection(p1, p2) > 0:
+				mergeFlag = True
+			'''
+			# Merge the overlapped orfs
+			if mergeFlag == False and tools.intersection(p1, p2) > 0:
+				mergeFlag = True
+
+			if mergeFlag == False:
+				continue
+
 			if tools.intergap(p1, p2) > maxDistBetweenOrfs:
 				break
 			if x[0][0] in orfs:
@@ -1025,13 +1072,16 @@ def mergeOrfs(mOrfHits, maxDistBetweenOrfs):
 			beginMerged, endMerged = min(p1[0], p2[0]), max(p1[1], p2[1])
 
 			# orfhitMerged inherits the properties of the orf with smaller full_sequence_E-value
-			orfMerged = (accid, beginMerged, endMerged, x[0][0][3])
+			# repOrfhit: the orfhit with smaller evalue
+			if x[0][3] < x[1][3]:
+				repOrfhit = x[0]
+			else:
+				repOrfhit = x[1]
+			orfMerged = (accid, beginMerged, endMerged, repOrfhit[0][3])
 			orfhitMerged = [orfMerged]
-			orfhitMerged.extend(x[0][1:])
-			if x[1][3] < x[0][3]:
-				orfMerged = (accid, beginMerged, endMerged, x[1][0][3])
-				orfhitMerged = [orfMerged]
-				orfhitMerged.extend(x[1][1:])
+			orfhitMerged.extend(repOrfhit[1:])
+			print('hello {} and {} merged into {}'.format(
+				x[0], x[1], orfhitMerged))
 
 			orfHitsMerged.append(tuple(orfhitMerged))
 
@@ -1049,7 +1099,9 @@ def mergeOrfs(mOrfHits, maxDistBetweenOrfs):
 	return (morfHitsCopy, morfsMerged)
 
 
-# assumed: there are no orfs overlapped in genome.
+# Assumed: there are no orfs overlapped (overlapped means at least 50% of short orf is overlapped with long orf) 
+# in genome.
+#
 # morfhitsNeighbors: {seqid: orfhitsNeighbors, ..., seqid: orfhitsNeighbors}
 # orfhitsNeighbors: {orf: neighbors, ..., orf: neighbors}
 # neighbors: [before, after]
@@ -1062,7 +1114,7 @@ def hitNeighors(morfhits):
 		n = len(orfhits)
 		if n == 0:
 			continue
-		# start coordinates of all hits
+		# Sort orfhits by start boundary
 		orfhits.sort(key = lambda x: x[0][1])
 		triples = zip(orfhits, orfhits[1:], orfhits[2:])
 		orfhitsNeighbors = {}
@@ -1335,39 +1387,39 @@ def getFullIS4seqOnStream(args):
 # hmmhit: (familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
 # bd: [start, end], boundary of hit (IS element)
 # 
-# mispairs: {seqid: ispairs, ..., seqid: ispairs}
-# ispairs: {qseqid: g, ..., qseqid: g}
-# g: [ispair, ..., ispair]
-# ispair: {'qseqid':qseqid, 'length':length, 'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
-#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident,
-#		'orfBegin':orfBegin, 'orfEnd':orfEnd, 'orfhit':orfhit, ...}
+# morfhits: {seqid: orfhits, ...}
+# orfhits: [orfhit, ...]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orf: (seqid, begin, end, strand)
+#
 # 1. define IS boundary by TIR if TIR is available in an IS element
 # 2.1 define IS boundary by alignment if no TIR is available in a multiple-copy IS element and alignment 
 #	does not span/intersect multiple Tpase ORFs; else
 # 2.2 define IS boundary by ORF
 # 3. define IS boundary by ORF if no TIR is available in a single-copy IS element
-def mTIR2hits4ispair(mispairs, mTIR, morfhitsNeighbors):
+def mTIR2hits4orfhit(morfhits, mTIR, morfhitsNeighbors):
 	mhits = {}
-	for seqid, ispairs in mispairs.items():
-		if len(ispairs) == 0:
+	for seqid, orfhits in morfhits.items():
+		if len(orfhits) == 0:
 			continue
 		hits = []
-		for qseqid, g in ispairs.items():
-			orfhitsNeighbors = morfhitsNeighbors[seqid]
+		orfhitsNeighbors = morfhitsNeighbors[seqid]
+		for orfhit in orfhits:
 			hit = {}
-			orfhit = g[0]['orfhit']
 			orf = orfhit[0]
 			orfStr = '_'.join([str(item) for item in orf])
 			hit['orf'] = orf
 			hit['hmmhit'] = orfhit[1:]
+			ncopy4tpase = orfhit[4]
 			if orfStr not in mTIR:
 				hit['tirs'] = []
 			else:
 				hit['tirs'] = mTIR[orfStr][2]
 
-			ncopy = len(g)
+			ncopy = ncopy4tpase
 
-			# IS element with TIR, with boundary defined by the first TIR
+			# IS element with TIR, with boundary defined by the first TIR with the best irScore calculated by
+			# tools.irScore().
 			if len(hit['tirs']) > 0 and len(hit['tirs'][0]) > 0:
 				tir = hit['tirs'][0]
 				hit['bd'] = [tir[-6], tir[-3]]
@@ -1375,8 +1427,7 @@ def mTIR2hits4ispair(mispairs, mTIR, morfhitsNeighbors):
 			# the longest blast alignment, namely, g[1] because g[0] is the 
 			# alignment of query and itself.
 			elif ncopy > 1:
-				#hit['bd'] = [g[1]['qstart'], g[1]['qend']]
-				qstart, qend = g[1]['qstart'], g[1]['qend']
+				qstart, qend = orf[1:3]
 
 				# if aligned region spans two or more Tpases, eg. composite transposon, 
 				# the current hit in the aligned region is trimmed to the tpase ORF.
@@ -1452,12 +1503,115 @@ def getCopy(mOrfHits, mDNA):
 				mispairs[args[0]] = ispairs
 	return mispairs
 
+# Get the representative orfhit in the cluster/group
+def consensusBoundary(bds):
+	# Get the representative start boundary
+	bds.sort(key=operator.itemgetter(0))
+	gs4starts = itertools.groupby(bds, key=operator.itemgetter(0))
+	# k: start boundary
+	# g4start: group of orfhits with same start boundary
+	# The most common startboundary is the representative startboundary.
+	# When multiple most common startboundaries (groups with same ncommons) exist,
+	# the most common startboundary with smallest value of startboundary is selected 
+	# the representative startboundary, which ensures that the representative orfhit 
+	# is as longe as possible when the other conditions are same.
+	k_g4start = next(gs4starts)
+	startboundary = k_g4start[0]
+
+	# Get the representative end boundary
+	#
+	# When multiple most common endboundaries exist,
+	# the most common endboundary with the greatest value of endboundary is selected
+	# the representative startboundary, which ensures that the representative orfhit 
+	# is as longe as possible when the other conditions are same.
+	bds.sort(key=operator.itemgetter(1), reverse=True)
+	gs4ends = itertools.groupby(bds, key=operator.itemgetter(1))
+	k_g4end = next(gs4ends)
+	endboundary = k_g4end[0]
+
+	return (startboundary, endboundary)
+
+def consensusBoundaryByCutoff(bds, cutoff=0):
+	starts = []
+	ends = []
+	for bd in bds:
+		starts.append(bd[0])
+		ends.append(bd[1])
+
+	n4windows = ncopyByCutoff(starts, cutoff)
+
+	# Sort start (left) boundaries to ensure the first boundary with the most number of items in window
+	# is the most left one when multiple items are maximal. 
+	# It ensure that the representative bd is the longest bd.
+	n4windowsSorted = sorted(n4windows)
+	# Get the key (the specific items with same value in starts) of the window with 
+	# the most amount of items within the windows.
+	startboundary = max(n4windowsSorted, key = lambda x: n4windows[x])
+
+	n4windows = ncopyByCutoff(ends, cutoff)
+
+	# Sort end (right) boundaries to ensure the first boundary with the most number of items in window
+	# is the most right one when multiple items are maximal.
+	# It ensure that the representative bd is the longest bd.
+	n4windowsSorted = sorted(n4windows, reverse=True)
+	# Get the key (the specific items with same value in ends) of the window with 
+	# the most amount of items within the windows.
+	endboundary = max(n4windowsSorted, key = lambda x: n4windows[x])
+
+	return (startboundary, endboundary)
+
+# Get the distribution of a series of integers along a series of windows defined by item and cutoff.
+# algorithm: 
+# For n items in a list, ilist, we create n windows, (i-cutoff, i+cutoff) where the windows satisfy i-cutoff >= 1.
+# Count the number of items in each window.
+# Note: some items in ilist might be equal, and the number of windows should be less than n, namely, nwindows <= n.
+#
+# ilistr: [i, ...], i is an integer
+#
+# Return n4windows
+# n4windows: {k:n4window, ...}
+# k: the integer, namely, i in ilist
+# n4window: number of items (integers) in the window
+#
+def ncopyByCutoff(ilist, cutoff=0):
+	ilist.sort()
+	gs = itertools.groupby(ilist)
+	windows = {}
+	kgs = []
+	for k,g in gs:
+		# requirement: k >= cutoff
+		if k <= cutoff:
+			start = 1
+		else:
+			start = k - cutoff
+		end = k + cutoff
+		windows[k] = (start, end)
+		kgs.append([k,list(g)])
+	# n4window: {k:n4window, ...}
+	n4windows = {}
+	for k4win,window in windows.items():
+		n4windows[k4win] = 0
+		for k,g in kgs:
+			if window[0] <= k <= window[1]:
+				n4windows[k4win] += len(g)
+	return n4windows
+
+		
 # orfHits: [orfhit, ..., orfhit]
 # orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
 # orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
 def clusterIntersect4orf(orfhits, ids):
-	# remove the intersected/overlapped orfhits
+	# Get the single-copy Tpases by removing the intersected/overlapped orfhits
 	orfhitsNew = [orfhit for i,orfhit in enumerate(orfhits) if i not in ids]
+	# Replace ov with ncopy4tpase which is 1 in case of orfhits with single-copy Tpase
+	for i,orfhit in enumerate(orfhitsNew):
+		orf, clusterName, evalue4domain, evalue4fullseq, ov = orfhit
+		# single-copy Tpase
+		ncopy4tpase = 1
+		orfhitsNew[i] = (orf, clusterName, evalue4domain, evalue4fullseq, ncopy4tpase)
+
+	# We now begin to get multi-copy Tpases by clustering overlapped orfhits and 
+	# retrieving the representative orfhit of each cluster of overlapped orfhits.
 
 	idsList = sorted(ids)
 	data = []
@@ -1465,16 +1619,28 @@ def clusterIntersect4orf(orfhits, ids):
 		data.append(orfhits[id][0][1:3])
 	Y = numpy.array(data, int)
 	print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
-	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
+	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
+	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
 	del distMatrix
 	for i, id in enumerate(idsList):
 		print('intersected orfhits', i, orfhits[id])
 
-	# form flat clusters from the hierarchical clustering
-	# Note: t=1.1 instead of 1 ensures that the intersected orfhits with only 1 bp intersect are 
-	# included in the same cluster.
-	t = 1.1
+	# Form flat clusters from the hierarchical clustering
+	#
+	# When tools.distFunction() is used:
+	# Use t=1/200 to ensures that the intersected orfhits with 100 or less bps intersect will not be
+	# included in the same cluster, namely, all nodes with disantces >= 0.005 will be excluded to the
+	# same cluster.
+	# Refer to tools.distFunction() for definition of distance between two vectors.
+	#t = 0.005
+	#
+	# When tools.distFunctionByoverlap_min() is used:
+	# use t=0.5 (50%) to ensure that the orfhits with the overlap of 50% or less  will not be included
+	# in the same cluster. 
+	# Refer to tools.distFunctionByoverlap_min for definition of distance between two vectors.
+	t = 0.5
+
 	clusters = scipy.cluster.hierarchy.fcluster(hclusters, t, criterion='distance')
 
 	# determine the representative orfhit in each cluster
@@ -1489,32 +1655,92 @@ def clusterIntersect4orf(orfhits, ids):
 	print(clustersDic)
 	# determine the representative orfhit for each cluster and append the representative orfhits to orfhitsNew
 	for cluster in clustersDic.values():
-		# sort and group by full_sequence_E-value
 		print('hello, size of cluster:', len(cluster))
+		for id in cluster:
+			print('hello clustered orfhits:', orfhits[idsList[id]])
+
+		'''
+		# sort and group by full_sequence_E-value
 		cluster.sort(key = lambda x: orfhits[idsList[x]][3])
 		gs = itertools.groupby(cluster, key = lambda x: orfhits[idsList[x]][3])
-		# sort orfhits by ORF length where gs[0] is the group containing orfhits with the least e-value.
-		k_g = next(gs) # get the first tuple from gs, (k,g)
+		# get the first tuple from gs, (k,g)
+		# k: evalue
+		k_g = next(gs)
+		# k_g: (key, group)
 		g = list(k_g[1])
-		g.sort(key = lambda x: orfhits[idsList[x]][0][2]-orfhits[idsList[x]][0][1])
+		'''
+		# sort and group by (strand, clusterName)
+		#cluster.sort(key = lambda x: (orfhits[idsList[x]][0][3], orfhits[idsList[x]][1]))
+		#gs = itertools.groupby(cluster, key = lambda x: (orfhits[idsList[x]][0][3], orfhits[idsList[x]][1]))
+
+		# sort and group by clusterName
+		cluster.sort(key = lambda x: orfhits[idsList[x]][1])
+		gs = itertools.groupby(cluster, key = lambda x: orfhits[idsList[x]][1])
+
+		# get the largest group, namely, the group with the most group members
+		gmax = 0
+		k_g = None
+		for clusterName,g in gs:
+			glist = list(g)
+			nglist = len(glist)
+			if nglist > gmax:
+				gmax = nglist
+				k_g = (clusterName, glist)
+		g = k_g[1]
+
+		ncopy4tpase = len(g)
+		if ncopy4tpase > 1:
+			for id in g:
+				print('hello overlapped orfhits', orfhits[idsList[id]])
+		'''
+		# sort orfhits by ORF length
+		g.sort(key = lambda x: orfhits[idsList[x]][0][2]-orfhits[idsList[x]][0][1], reverse=True)
+		#g.sort(key = lambda x: orfhits[idsList[x]][0][2]-orfhits[idsList[x]][0][1])
 		# id of the representative orfhit with the longest length, where orfhit == orfhits[idsList[id]]
 		repid = g[0]
 		orfhit = orfhits[idsList[repid]]
+		'''
+
+		bds = []
+		for id in g:
+			orf = orfhits[idsList[id]][0]
+			bds.append(orf[1:3])
+		# get representative boundary for the overlapped orfhits
+		#bd = consensusBoundary(bds)
+		bd = consensusBoundaryByCutoff(bds, cutoff=CUTOFF4WINDOW)
+		# Get meta information such as seqid and evalue of the representative orfhit
+		#
+		# Here, we simply use the first orfhit in group of orfhits with same evalue to
+		# retrieve the seqid, clusterName, evalue for the representative orfhit.
+		orf, clusterName, evalue4domain, evalue4fullseq, ov = orfhits[idsList[g[0]]]
+		seqid = orf[0]
+		strand = orf[3]
+		# build the representative orfhit but replacing ov with ncopy4tpase
+		orfhit = ((seqid, bd[0], bd[1], strand), clusterName, evalue4domain, evalue4fullseq, ncopy4tpase)
+
+		# Add the multi-copy orfhit into the orfhitsNew
 		orfhitsNew.append(orfhit)
-		print('representative orfhit: repid={} orfhitid={} orfhitorf={} cluster={}'.format(
-			repid, idsList[repid], orfhit[0], cluster))
+		#print('representative orfhit: repid={} orfhitid={} orfhitorf={} cluster={}'.format(
+		#	repid, idsList[repid], orfhit[0], cluster))
+		print('representative orfhit:', orfhit)
+
 	# sort by begin of ORF
 	orfhitsNew.sort(key = lambda x: x[0][1])
 	return orfhitsNew
 
 # Remove the redundant Tpase ORFs
-def removeOverlappedOrfhits(mOrfHits):
+def removeRedundantOrfhits(mOrfHits):
 	mOrfHitsNew = {}
 	for seqid, orfhits in mOrfHits.items():
 		ids = set()
 		for pair in itertools.combinations(range(len(orfhits)), 2):
 			bd1 = orfhits[pair[0]][0][1:3]
 			bd2 = orfhits[pair[1]][0][1:3]
+			# only check the overlapped orfhits on the same strand
+			if orfhits[pair[0]][0][3] != orfhits[pair[1]][0][3]:
+				continue
+			# When measure is percentage of overlap between two sequences, the percentage is measured
+			# by shorter sequence. Refer to tools.chooseMeasure() for details.
 			measure, threshold = tools.chooseMeasure(bd1, bd2)
 			if measure < threshold:
 				continue
@@ -1540,9 +1766,16 @@ def removeOverlappedOrfhits(mOrfHits):
 # orfHits: [orfhit, ..., orfhit]
 # orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
 # orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
+#
+# Return mOrfHitsNew
+# mOrfHitsNew: {seqid: orfHits, ...}
+# orfHits: [orfhit, ..., orfhit]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
+# 
 def addNonORFcopy(mispairs, mOrfHits):
 	# Find the new copies without qseqid (namely, the copy without predicted Tpase ORF),
-	#       which is missed by querying pHMM against proteome.
+	#       which is missed by process querying pHMM against proteome.
 	# For example, IS1I (257908, 258675, -) in NC_000913.gbk, which is annotated by NCBI but no CDS 
 	#	is annotated by NCBI.
 	# Such copy only appears in subject, namely, it will not appear in the list of query sequences because
@@ -1558,12 +1791,15 @@ def addNonORFcopy(mispairs, mOrfHits):
 			# hit[0] is the self of query sequence, hit[1:] are the additional copies of qeury sequence
 			copypairs[seqid].extend(hits[1:])
 
-	# Add the new copies without Tpase ORF to mOrfHits
+	# Add the new copies without the predicted Tpase ORF to mOrfHits
 	mOrfHitsNew = {}
 	for seqid,orfhits in mOrfHits.items():
+		# Get the query sequences (Tpase ORFs) in a DNA sequence
 		mOrfHitsNew[seqid] = orfhits
 		if len(copypairs[seqid]) == 0:
 			continue
+		# Add all subject sequences (additional copies except query sequence) to orfhits (mOrfHitsNew[seqid])
+		# in a DNA sequence.
 		for hit in copypairs[seqid]:
 			begin, end, strand = hit['sstart'], hit['send'], '+'
 			if begin > end:
@@ -1588,19 +1824,20 @@ def addNonORFcopy(mispairs, mOrfHits):
 			orfhits.append(orfhit4copy)
 
 	# remove redundant orfhits by clustering the overlaped/intersected copies
-	mOrfHitsNew = removeOverlappedOrfhits(mOrfHitsNew)
+	mOrfHitsNew = removeRedundantOrfhits(mOrfHitsNew)
 	return mOrfHitsNew
 
-def getFullIS(mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors):
-	mInput4ssw, mboundary = is_analysis.prepare4ssw2findIRbyDNAbyFar4ispair(
-			mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+def getFullIS(morfhits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors):
+	mInput4ssw, mboundary = is_analysis.prepare4ssw2findIRbyDNAbyFar4orfhits(
+			morfhits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
 
-	#filters = constants.filters4ssw4flankingAndISmax
-	#filters = constants.filters4ssw4flanking
 	filters = constants.filters4ssw4trial
-	#filters = constants.filters4ssw4oasis
-	#filters = constants.filters4ssw_default
 	TIRfilters = []
+	# TIRs: [TIR, ...]
+	# ir4orf: [familyName, orfStr, ir], both familyName and orfStr are from pHMM hit.
+	# orfStr: string, e.g., 'gi|256374160|ref|NC_013093.1|_20_303_+' which is the orfStr of
+	#	orf('gi|256374160|ref|NC_013093.1|', 20, 303, '+')
+	# ir: [] or [score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2]
 	for filter in filters:
 		TIRs = is_analysis.findIRbySSW(mInput4ssw, filter)
 		TIRfilters.extend([(TIR, filter) for TIR in TIRs])
@@ -1619,7 +1856,7 @@ def getFullIS(mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbor
 	#	does not span/intersect multiple Tpase ORFs; else
 	# 2.2 define IS boundary by ORF
 	# 3. define IS boundary by ORF if no TIR is available in a single-copy IS element
-	mHits = mTIR2hits4ispair(mispairs, mTIR, morfhitsNeighbors)
+	mHits = mTIR2hits4orfhit(morfhits, mTIR, morfhitsNeighbors)
 
 	return mHits
 
@@ -1659,7 +1896,6 @@ def chooseHits(mHitsByNear, mHitsByFar):
 			hit = sorted(hitpair, 
 					key = lambda x: tools.irScore(x['tirs'][0]) if len(x['tirs'])>0 else 0, 
 					reverse=True)[0]
-
 			hits.append(hit)
 		hits.sort(key = lambda x: x['bd'][0])
 		mhits[accid] = hits
@@ -2098,6 +2334,7 @@ def pred(args):
 	#print('Finish converting hits to orfHits at', datetime.datetime.now().ctime())
 	
 	# Merge orfs if two orfs with distance < maxDistBetweenOrfs
+	# Note: we only merge orfs of family IS200/IS605 in current version.
 	maxDistBetweenOrfs = constants.maxDistBetweenOrfs
 	mOrfHits, morfsMerged = mergeOrfs(mOrfHits, maxDistBetweenOrfs)
 
@@ -2116,8 +2353,6 @@ def pred(args):
 	# into the list of hits, the mOrfHits is updated in place.
 	#mOrfHitsOld = mOrfHits
 	mOrfHits = addNonORFcopy(mispairs, mOrfHits)
-	# Update mispairs data structure with the updated mOrfHits
-	mispairs = getCopy(mOrfHits, mDNA)
 
 	#print('hitNeighors() begins at', datetime.datetime.now().ctime())
 	minDist4ter2orf = constants.minDist4ter2orf
@@ -2127,13 +2362,15 @@ def pred(args):
 	print('getFullIS() begins at', datetime.datetime.now().ctime())
 	# look for tir in the neighboring region of Tpase ORF in case of single-copy IS
 	maxDist4ter2orf = constants.outerDist4ter2tpase[0]
-	#mHitsByNear = getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
-	mHitsByNear =  getFullIS(mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+	mHitsByNear = getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+	# Update mispairs data structure with the updated mOrfHits
+	#mispairs = getCopy(mOrfHits, mDNA)
+	#mHitsByNear =  getFullIS(mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
 
 	# look for tir in the widen region of Tpase ORF in case of single-copy IS
 	maxDist4ter2orf = constants.outerDist4ter2tpase[1]
-	#mHitsByFar = getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
-	mHitsByFar = getFullIS(mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+	mHitsByFar = getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+	#mHitsByFar = getFullIS(mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
 
 	# choose the tir between mHitsByNear and mHitsByFar:
 	# rule: keep tir near Tpase ORF if tir found in mHitsByNear, else use
@@ -2153,7 +2390,7 @@ def pred(args):
 
 	# remove redundant IS elements with same boundary and same TIR
 	mHits = removeRedundantIS(mHits)
-	mHits = removeOverlappedHits(mHits)
+	mHits = removeOverlappedIS(mHits)
 
 	# Calculate socore for each hit and then attach score to hit
 	#print('Begin scoring hits at', datetime.datetime.now().ctime())
