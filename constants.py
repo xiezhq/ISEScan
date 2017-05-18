@@ -55,7 +55,8 @@ path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 #dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.4')
-dir4prediction = os.path.join(path2results, 'prediction.ncbi')
+#dir4prediction = os.path.join(path2results, 'prediction.ncbi')
+dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.4.test')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
@@ -161,7 +162,7 @@ minMax4tir = {
 		'IS1595': (10, 43, 15, 1),
 		'IS1634': (11, 32, 12, 1),
 		'IS200/IS605': (10000, 0, 10000, 0), # prevent program from finding any tir with irLen > 0
-		'IS200/IS605_8': (11, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
+		#'IS200/IS605_8': (11, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
 		#'IS200/IS605': (11, 11, 11, -1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
 		'IS21': (8, 76, 10, 1),
 		'IS256': (8, 48, 15, 1),
