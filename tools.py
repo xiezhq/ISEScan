@@ -2143,6 +2143,85 @@ def distFunction(u, v):
 		d = 10 - intersect
 	return d
 
+def distFunctionByoverlap_min(p1, p2):
+	a, b = p1
+	c, d = p2
+	# a <=b and c <= d are satisfied
+	intersect = min(b, d) - max(a, c) + 1
+	if intersect > 0:
+		overlap = float(intersect) / (min(b-a,d-c)+1)
+	else:
+		overlap = 0.0
+	return 1 - overlap
+
+# Get the distribution of a series of integers along a series of windows defined by item and cutoff.
+# algorithm: 
+# For n items in a list, ilist, we create n windows, (i-cutoff, i+cutoff) where the windows satisfy i-cutoff >= 1.
+# Count the number of items in each window.
+# Note: some items in ilist might be equal, and the number of windows should be less than n, namely, nwindows <= n.
+#
+# ilistr: [i, ...], i is an integer
+#
+# Return n4windows
+# n4windows: {k:n4window, ...}
+# k: the integer, namely, i in ilist
+# n4window: number of items (integers) in the window
+#
+def ncopyByCutoff(ilist, cutoff=0):
+	ilist.sort()
+	gs = itertools.groupby(ilist)
+	windows = {}
+	kgs = []
+	for k,g in gs:
+		# requirement: k >= cutoff
+		if k <= cutoff:
+			start = 1
+		else:
+			start = k - cutoff
+		end = k + cutoff
+		windows[k] = (start, end)
+		kgs.append([k,list(g)])
+	# n4windows: {k:n4window, ...}
+	n4windows = {}
+	for k4win,window in windows.items():
+		n4windows[k4win] = 0
+		for k,g in kgs:
+			if window[0] <= k <= window[1]:
+				n4windows[k4win] += len(g)
+	return n4windows
+
+def consensusBoundaryByCutoff(bds, cutoff=0):
+	starts = []
+	ends = []
+	for bd in bds:
+		starts.append(bd[0])
+		ends.append(bd[1])
+
+	n4windows = ncopyByCutoff(starts, cutoff)
+	# n4windows: {k:n4window, ...}
+	# k: the integer, namely, element in starts
+	# n4window: number of items (integers) in the window
+
+	# Sort start (left) boundaries to ensure the first boundary with the most number of items in window
+	# is the most left one when multiple items are maximal. 
+	# It ensure that the representative bd is the longest bd.
+	n4windowsSorted = sorted(n4windows.keys())
+	# Get the key (the specific items with same value in starts) of the window with 
+	# the most amount of items within the windows.
+	startboundary = max(n4windowsSorted, key = lambda x: n4windows[x])
+
+	n4windows = ncopyByCutoff(ends, cutoff)
+
+	# Sort end (right) boundaries to ensure the first boundary with the most number of items in window
+	# is the most right one when multiple items are maximal.
+	# It ensure that the representative bd is the longest bd.
+	n4windowsSorted = sorted(n4windows.keys(), reverse=True)
+	# Get the key (the specific items with same value in ends) of the window with 
+	# the most amount of items within the windows.
+	endboundary = max(n4windowsSorted, key = lambda x: n4windows[x])
+
+	return (startboundary, endboundary)
+
 # based on the bool value of constants.intersected2remove, choose the measure and threshold for 
 # clustering and removing intersected IS elements in the same genome sequence
 # bd1, bd2: [start, end], boundary of IS element
@@ -2156,31 +2235,6 @@ def chooseMeasure(bd1, bd2):
 		threshold = constants.overlap2removeRedundancy
 	return (measure, threshold)
 
-# check the intersection between the current upsteam and downstream tir search windows
-# and the neighboring tpase ORFs, and then probably shrink the tir search windows to
-# avoid the insersection with the neighboring tpase ORFs.
-def tirwindowIntersectORF(start1, end1, start2, end2, orf, orfhitsNeighbors, minDist4ter2orf):
-	orfBegin, orfEnd = orf[1:3]
-	before = orfhitsNeighbors[orf][0]
-	after = orfhitsNeighbors[orf][1]
-	if before != None and start1 <= before[0][2]:
-		print('hello, before', before)
-		print('shrink the boundary of tir search region around ORF {}, start1 ({}) to {}'.format(
-			orf, start1,  before[0][2] + 1))
-		start1 = before[0][2] + 1
-		end1 = orfBegin - minDist4ter2orf
-		if start1 > end1:
-			end1 = start1
-
-	if after != None and end2 >= after[0][1]:
-		print('hello, after', after)
-		print('shrink the boundary of tir search region around ORF {}, end2 ({}) to {}'.format(
-			orf, end2,  after[0][1] - 1))
-		end2 = after[0][1] - 1
-		start2 = orfEnd + minDist4ter2orf
-		if start2 > end2:
-			start2 = end2
-	return (start1, end1, start2, end2)
 
 def getNewick(node, newick, parentDist, leafNames):
 	if node.is_leaf():

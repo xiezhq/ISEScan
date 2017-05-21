@@ -29,7 +29,7 @@ makeblastdb = 'makeblastdb'
 #
 # If removeShortIS is True, ISEScan will remove partial IS elements which include 
 # IS element with length < 400 or single copy IS element without perfect TIR.
-# If removeShortIS is False, ISEScan will only report partial IS element as well as full-length IS element.
+# If removeShortIS is False, ISEScan will report partial IS element as well as full-length IS element.
 # The default is True.
 removeShortIS = True
 #removeShortIS = False
