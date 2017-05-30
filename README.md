@@ -59,7 +59,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 
 ## Release History 
 * 1.5.1
-  * Change: modified consensusBoundaryByCutoff() and ncopyByCutoff(), to determine the left and right boundaries of multi-copy pro-IS element simultaneously, namely, to determine the optimal combined left and right boundaries instead of separate left and right boundaries.
+  * Change: changed consensusBoundaryByCutoff() to consensusBoundaryByCutoffBySeparated()
+  * Change: added consensusBoundaryByCutoffByCombined() and getbds4opt4start(), to determine the left and right boundaries of multi-copy pro-IS element simultaneously, namely, to determine the optimal combined left and right boundaries instead of separated left and right boundaries.
 * 1.5
   * Change: add consensusBoundaryByCutoff() and ncopyByCutoff() in tools.py, to determine the optimal boundary of multi-copy pro-IS element.
 * 1.4

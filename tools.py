@@ -6,6 +6,7 @@ import constants
 import re
 import sys
 import itertools
+import operator # for getbds4opt4start()
 import subprocess, shlex
 import errno # for makedir()
 
@@ -2160,12 +2161,12 @@ def distFunctionByoverlap_min(p1, p2):
 # Count the number of items in each window.
 # Note: some items in ilist might be equal, and the number of windows should be less than n, namely, nwindows <= n.
 #
-# ilistr: [i, ...], i is an integer
+# ilist: [i, ...], i is either left or right boundary 
 #
 # Return n4windows
 # n4windows: {k:n4window, ...}
-# k: the integer, namely, i in ilist
-# n4window: number of items (integers) in the window
+# k: the boundary, namely, i in ilist
+# n4window: number of items (varied boundaries, namely, potential copies) in the window
 #
 def ncopyByCutoff(ilist, cutoff=0):
 	ilist.sort()
@@ -2190,7 +2191,75 @@ def ncopyByCutoff(ilist, cutoff=0):
 				n4windows[k4win] += len(g)
 	return n4windows
 
-def consensusBoundaryByCutoff(bds, cutoff=0):
+def getbds4opt4start(n4windows, bds):
+	ks4ncopy = list(n4windows.items())
+	ks4ncopy.sort(key=operator.itemgetter(1), reverse=True)
+	# ks4ncopy: [(k,n4window), ...], sorted by n4window
+	bds4opt4k = []
+	# bds4opt4k: [bd, ...], boundaries with the most number of items in windows
+	# Note: there might be more than one window (k), which have the most number of items in the window
+	# bd: (start, end)
+	for bd in bds:
+		if bd[0] == ks4ncopy[0][0]:
+			bds4opt4k.append(bd)
+	return bds4opt4k
+
+def getWindowKey4abundance(ilist):
+	cutoffs = set()
+	ilist.sort()
+	# get all possible cutoff values (distance between two items) between any two items in ilist.
+	for pair in itertools.combinations(ilist, 2):
+		cutoffs.add(pair[1]-pair[0])
+	# n4windows4cutoffs: {k:n4win, ...}
+	# n4win: is the total number of items in the window centered at k under all possible cutoffs.
+	n4windows4cutoffs = {}
+	for cutoff in cutoffs:
+		# n4windows: {k:n, ...}
+		# k: item in ilist
+		# n: number of items in the window centered at k under a cutoff
+		n4windows = ncopyByCutoff(ilist, cutoff)
+		for k,n in n4windows.items():
+			if k not in n4windows4cutoffs.keys():
+				n4windows4cutoffs[k] = 0
+			n4windows4cutoffs[k] += n
+	return n4windows4cutoffs
+	
+def consensusBoundaryByCutoffBySeparated(bds):
+	starts = []
+	ends = []
+	for bd in bds:
+		starts.append(bd[0])
+		ends.append(bd[1])
+
+	# Get the number of items in each window centered at the specific key (item in starts) of n4windows
+	print('hello starts and bds', starts, bds)
+	n4windows = getWindowKey4abundance(starts)
+	print('hello starts window', n4windows)
+
+	# Sort start (left) boundaries to ensure the first boundary with the most number of items in window
+	# is the most left one when multiple items are maximal. 
+	# It ensure that the representative bd is the longest bd.
+	#
+	# Get the key (the specific items with same value in starts) of the window with 
+	# the most amount of items within the windows.
+	startboundary = max(sorted(n4windows.keys()), key = lambda x: n4windows[x])
+
+	# Get the number of items in each window centered at the specific key (item in ends) of n4windows
+	print('hello ends', ends)
+	n4windows = getWindowKey4abundance(ends)
+	print('hello ends window', n4windows)
+
+	# Sort end (right) boundaries to ensure the first boundary with the most number of items in window
+	# is the most right one when multiple items are maximal.
+	# It ensure that the representative bd is the longest bd.
+	#
+	# Get the key (the specific items with same value in ends) of the window with 
+	# the most amount of items within the windows.
+	endboundary = max(sorted(n4windows.keys(), reverse=True), key = lambda x: n4windows[x])
+
+	return (startboundary, endboundary)
+
+def consensusBoundaryByCutoffByCombined(bds, cutoff=0):
 	starts = []
 	ends = []
 	for bd in bds:
@@ -2199,9 +2268,10 @@ def consensusBoundaryByCutoff(bds, cutoff=0):
 
 	n4windows = ncopyByCutoff(starts, cutoff)
 	# n4windows: {k:n4window, ...}
-	# k: the integer, namely, element in starts
+	# k: the integer, namely, element in left starts (boundaries) 
 	# n4window: number of items (integers) in the window
 
+	'''
 	# Sort start (left) boundaries to ensure the first boundary with the most number of items in window
 	# is the most left one when multiple items are maximal. 
 	# It ensure that the representative bd is the longest bd.
@@ -2209,9 +2279,13 @@ def consensusBoundaryByCutoff(bds, cutoff=0):
 	# Get the key (the specific items with same value in starts) of the window with 
 	# the most amount of items within the windows.
 	startboundary = max(n4windowsSorted, key = lambda x: n4windows[x])
+	'''
+	bds4opt4start = getbds4opt4start(n4windows, bds)
+
 
 	n4windows = ncopyByCutoff(ends, cutoff)
 
+	'''
 	# Sort end (right) boundaries to ensure the first boundary with the most number of items in window
 	# is the most right one when multiple items are maximal.
 	# It ensure that the representative bd is the longest bd.
@@ -2219,6 +2293,31 @@ def consensusBoundaryByCutoff(bds, cutoff=0):
 	# Get the key (the specific items with same value in ends) of the window with 
 	# the most amount of items within the windows.
 	endboundary = max(n4windowsSorted, key = lambda x: n4windows[x])
+	'''
+	bds4opt4end = getbds4opt4start(n4windows, bds)
+
+	# Get the bds with both optimal starts and ends
+	set4bds4opt4start = set(bds4opt4start)
+	set4bds4opt4end = set(bds4opt4end)
+	commonbds = set4bds4opt4start & set4bds4opt4end
+	# commonbds: {bd, ...}
+	ncommonbds = len(commonbds)
+	if ncommonbds > 0:
+		commonbdsSortByLen = sorted(commonbds, key = lambda x: x[1]-x[0], reverse = True)
+		# Get the representative bd, namely, the longest one among the bds with 
+		# both optimal starts and ends (commonbds). 
+		startboundary, endboundary = commonbdsSortByLen[0]
+	elif cutoff == 0:
+		# When ncommonbds == 0, cutoff == 0,
+		# get the representative bd, namely, the longest one among the bds wit
+		# both optimal starts and ends (commonbds).
+		noncommonbds = bds4opt4start + bds4opt4end
+		noncommonbdsSortByLen = sorted(noncommonbds, key = lambda x: x[1]-x[0], reverse = True)
+		startboundary, endboundary = noncommonbdsSortByLen[0]
+	else:
+		# When ncommonbds == 0, cutoff > 0,
+		# determine the representative bd by more strict cutoff, namely, cutoff - 1
+		startboundary, endboundary = consensusBoundaryByCutoff(bds4opt4start + bds4opt4end, cutoff - 1)
 
 	return (startboundary, endboundary)
 

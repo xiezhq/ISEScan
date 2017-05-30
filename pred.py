@@ -260,12 +260,14 @@ def clusterIntersect(hits, ids):
 	Y = numpy.array(data, int)
 	print('data: {}\n{}'.format(Y.shape, Y))
 
+	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	#distMatrix = scipy.spatial.distance.pdist(Y, metric='euclidean')
 	#print('distMatrix: {}\n{}'.format(distMatrix.shape, distMatrix))
 
 	# fastcluster requires the dissimilarity matrix instead of similarity matrix!
 	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
 	del distMatrix
 	#cophenet = scipy.cluster.hierarchy.cophenet(hclusters, distMatrix)
 	#print('cophenetCorrelation = {}'.format(cophenet[0]))
@@ -281,7 +283,14 @@ def clusterIntersect(hits, ids):
 
 	# form flat clusters from the hierarchical clustering
 	# Note: t=1.1 instead of 1.0 ensures that the intersected hits with only 1 bp intersect are included in same cluster. 
-	t = 1.1
+	#t = 1.1
+	#
+	# When tools.distFunctionByoverlap_min() is used:
+	# use t=0.5 (50%) to ensure that the orfhits with the overlap of 50% or less  will not be included
+	# in the same cluster.
+	# Refer to tools.distFunctionByoverlap_min for definition of distance between two vectors.
+	t = 0.5
+
 	clusters = scipy.cluster.hierarchy.fcluster(hclusters, t, criterion='distance')
 
 	# determine the representative hit in each cluster
@@ -1462,6 +1471,31 @@ def getCopy(mOrfHits, mDNA):
 				mispairs[args[0]] = ispairs
 	return mispairs
 
+# Return maxgs
+# maxgs: the group of groups with the largest number of items in the original group
+def largeGroup(gs):
+	gslist = []
+	for k,g in gs:
+		g = list(g)
+		gslist.append((k,g, len(g)))
+	# sort by number of items in group
+	gslist.sort(key = operator.itemgetter(2), reverse = True)
+	# group by number of items in group
+	# gss: groups of groups
+	gss = itertools.groupby(gslist, key = operator.itemgetter(2))
+
+	# Get the largest groups
+	#
+	# next(gss) to get the first item (a tuple) in gss, (n, gs)
+	# n: number of groups in gs
+	n_gs = next(gss)
+	maxgs = n_gs[1]
+	# maxgs: the group of groups with the largest number of items in the original group
+	# list(maxgs): [g, ...]
+	# g: (k, group, n)
+
+	return maxgs
+
 # orfHits: [orfhit, ..., orfhit]
 # orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
 # orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
@@ -1488,6 +1522,7 @@ def clusterIntersect4orf(orfhits, ids):
 	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
 	del distMatrix
 	for i, id in enumerate(idsList):
 		print('intersected orfhits', i, orfhits[id])
@@ -1520,16 +1555,9 @@ def clusterIntersect4orf(orfhits, ids):
 		for id in cluster:
 			print('hello clustered orfhits:', orfhits[idsList[id]])
 
-		'''
-		# sort and group by full_sequence_E-value
+		# sort by full_sequence_E-value
 		cluster.sort(key = lambda x: orfhits[idsList[x]][3])
-		gs = itertools.groupby(cluster, key = lambda x: orfhits[idsList[x]][3])
-		# get the first tuple from gs, (k,g)
-		# k: evalue
-		k_g = next(gs)
-		# k_g: (key, group)
-		g = list(k_g[1])
-		'''
+
 		# sort and group by (strand, clusterName)
 		#cluster.sort(key = lambda x: (orfhits[idsList[x]][0][3], orfhits[idsList[x]][1]))
 		#gs = itertools.groupby(cluster, key = lambda x: (orfhits[idsList[x]][0][3], orfhits[idsList[x]][1]))
@@ -1538,37 +1566,38 @@ def clusterIntersect4orf(orfhits, ids):
 		cluster.sort(key = lambda x: orfhits[idsList[x]][1])
 		gs = itertools.groupby(cluster, key = lambda x: orfhits[idsList[x]][1])
 
-		# get the largest group, namely, the group with the most group members
-		gmax = 0
-		k_g = None
-		for clusterName,g in gs:
-			glist = list(g)
-			nglist = len(glist)
-			if nglist > gmax:
-				gmax = nglist
-				k_g = (clusterName, glist)
-		g = k_g[1]
+		# Get the largest group with the most number of items.
+		# If more than one largest groups exist, we only keep the group containing the item with 
+		# the smallest evalue.
+		#
+		# gs: groups of items, the items in the same group are sorted by evalue
+		# maxgs: iterator, group of groups grouped by clusterName
+		maxgs = largeGroup(gs)
+		maxgs = list(maxgs)
+		# maxgs: [gnew, ...]
+		# gnew: (clusterName, g, n4items)
+		# g: [index, ...]
+		#
+		# Get the group containing item with smallest evalue
+		maxgs.sort(key = lambda x: orfhits[idsList[x[1][0]]][3]) # x[1][0]: the first item of group sorted by evalue
+		g = maxgs[0][1]
 
 		ncopy4tpase = len(g)
 		if ncopy4tpase > 1:
 			for id in g:
 				print('hello overlapped orfhits', orfhits[idsList[id]])
-		'''
-		# sort orfhits by ORF length
-		g.sort(key = lambda x: orfhits[idsList[x]][0][2]-orfhits[idsList[x]][0][1], reverse=True)
-		#g.sort(key = lambda x: orfhits[idsList[x]][0][2]-orfhits[idsList[x]][0][1])
-		# id of the representative orfhit with the longest length, where orfhit == orfhits[idsList[id]]
-		repid = g[0]
-		orfhit = orfhits[idsList[repid]]
-		'''
 
 		bds = []
 		for id in g:
 			orf = orfhits[idsList[id]][0]
 			bds.append(orf[1:3])
 		# get representative boundary for the overlapped orfhits
-		#bd = consensusBoundary(bds)
-		bd = tools.consensusBoundaryByCutoff(bds, cutoff=CUTOFF4WINDOW)
+		if len(bds) > 1:
+			bd = tools.consensusBoundaryByCutoffBySeparated(bds)
+			#bd = tools.consensusBoundaryByCutoffByCombined(bds, cutoff=CUTOFF4WINDOW)
+		else:
+			bd = bds[0]
+
 		# Get meta information such as seqid and evalue of the representative orfhit
 		#
 		# Here, we simply use the first orfhit in group of orfhits with same evalue to
