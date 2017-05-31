@@ -346,6 +346,7 @@ def removeOverlappedHits(mhits):
 			print('{}: {} intersected hits found, clustering them to pick the representative for each cluster'.format(accid, len(ids)))
 			hitsNew = clusterIntersect(hits, ids)
 		else:
+			print('{}: no intersected hits found'.format(accid))
 			hitsNew = hits[:]
 
 		mhitsNew[accid] = hitsNew
@@ -1418,10 +1419,9 @@ def mTIR2hits4orfhit(morfhits, mTIR, morfhitsNeighbors):
 			# add copy number info to hit (IS element)
 			hit['occurence'] = {}
 			hit['occurence']['ncopy4is'] = ncopy
-			hit['occurence']['ncopy4orf'] = 0
+			hit['occurence']['ncopy4orf'] = ncopy
 			hit['occurence']['sim4orf'] = 0.0
 			hit['occurence']['sim4is'] = 0.0
-
 			hits.append(hit)
 		if len(hits) > 0:
 			hits.sort(key = lambda x: x['bd'][0])
@@ -1630,11 +1630,21 @@ def removeOverlappedOrfhits(mOrfHits):
 			if measure < threshold:
 				continue
 			ids.update(pair)
+		# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
+		# contains multi-copy tpase
 		if len(ids) > 0:
 			print('hello seqid:', seqid)
 			orfhitsNew = clusterIntersect4orf(orfhits, ids)
+		# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
 		else:
-			orfhitsNew = orfhits
+			orfhitsNew = []
+			for orfhit in orfhits:
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+				ncopy4tpase = 1
+				orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
+			#	ncopy4tpase = 1 for single-copy hits
+			orfhitsNew.append(orfhitNew)
 		mOrfHitsNew[seqid] = orfhitsNew
 	return mOrfHitsNew
 
@@ -1665,12 +1675,14 @@ def addNonORFcopy(mispairs, mOrfHits):
 	#	is annotated by NCBI.
 	# Such copy only appears in subject, namely, it will not appear in the list of query sequences because
 	# it has no predicted Tpase ORF (query sequences are extended ORF sequences in our method).
-	# copypairs: {seqid:pairs, ...}
-	# pairs: [hit, ...]
+	# copypairs: {seqid:pairs, ...}, dictionary for multi-copy hits
+	# pairs: [hit, ...], one multi-copy hit with the additional subject seqs which are the the additional
+	#	copies of the query seq.
 	copypairs = {}
 	for seqid,ispairs in mispairs.items():
 		copypairs[seqid] = []
 		for qseqid,hits in ispairs.items():
+			# single-copy hit, namely, single-copy extended tpase ORF
 			if len(hits) < 2:
 				continue
 			# hit[0] is the self of query sequence, hit[1:] are the additional copies of qeury sequence
@@ -1839,6 +1851,7 @@ def refineHits(mHits):
 			continue
 		# sort hit by begin of orf
 		#hitsCopy.sort(key=lambda x: x['orf'][1])
+		# sort hit by begin of boundary 
 		hitsCopy.sort(key=lambda x: x['bd'][0])
 		mhitsCopy[accid] = hitsCopy
 	

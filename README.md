@@ -58,6 +58,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.2
+  * Fix bug for genome sequence without multi-copy IS elements
 * 1.5.1
   * Change: changed consensusBoundaryByCutoff() to consensusBoundaryByCutoffBySeparated()
   * Change: added consensusBoundaryByCutoffByCombined() and getbds4opt4start(), to determine the left and right boundaries of multi-copy pro-IS element simultaneously, namely, to determine the optimal combined left and right boundaries instead of separated left and right boundaries.
