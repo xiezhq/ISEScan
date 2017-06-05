@@ -57,8 +57,7 @@ path2results = ''
 
 #dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.4')
 #dir4prediction = os.path.join(path2results, 'prediction.ncbi')
-#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.4.test')
-dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.1.test')
+dir4prediction = os.path.join(path2results, 'prediction.test')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'

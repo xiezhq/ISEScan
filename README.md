@@ -58,6 +58,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.3
+  * Fix bug in getFullIS4seqOnStream() for genome sequence with long multi-copy fregments containing the common IS element
 * 1.5.2
   * Fix bug for genome sequence without multi-copy IS elements
 * 1.5.1
