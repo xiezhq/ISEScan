@@ -261,7 +261,7 @@ def clusterIntersect(hits, ids):
 	print('data: {}\n{}'.format(Y.shape, Y))
 
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
-	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
+	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	#distMatrix = scipy.spatial.distance.pdist(Y, metric='euclidean')
 	#print('distMatrix: {}\n{}'.format(distMatrix.shape, distMatrix))
 
