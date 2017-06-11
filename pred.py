@@ -1445,14 +1445,17 @@ def getCopy(mOrfHits, mDNA):
 
 	'''
 	for args in margs:
-		mispairs[seqid] = getFullIS4seqOnStream(args)
+		mispairs[args[0]] = getFullIS4seqOnStream(args)
 	'''
 
 	nseq = len(margs)
-	#if nseq > constants.nproc:
-	#	nproc = constants.nproc
-	#else:
-	#	nproc = nseq
+
+	'''
+	if nseq > constants.nproc:
+		nproc = constants.nproc
+	else:
+		nproc = nseq
+	'''
 	if nseq > constants.nthread:
 		nthread = constants.nthread
 	else:

@@ -56,7 +56,7 @@ path2results = ''
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 
 #dir4prediction = os.path.join(path2results, 'prediction.ncbi')
-#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.2')
+#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.2.1')
 dir4prediction = os.path.join(path2results, 'prediction.test')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
