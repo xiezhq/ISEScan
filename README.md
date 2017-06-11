@@ -58,6 +58,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.2-fix-bug-for-single-copy
+  * Fix bug in removeOverlappedOrfhits() for genome sequence without multi-copy IS elements
 * 1.5.2
   * Fix bug for genome sequence without multi-copy IS elements
 * 1.5.1
