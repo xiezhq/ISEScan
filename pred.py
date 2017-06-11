@@ -260,14 +260,15 @@ def clusterIntersect(hits, ids):
 	Y = numpy.array(data, int)
 	print('data: {}\n{}'.format(Y.shape, Y))
 
-	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
+	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	#distMatrix = scipy.spatial.distance.pdist(Y, metric='euclidean')
 	#print('distMatrix: {}\n{}'.format(distMatrix.shape, distMatrix))
 
 	# fastcluster requires the dissimilarity matrix instead of similarity matrix!
-	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
 	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
 	del distMatrix
 	#cophenet = scipy.cluster.hierarchy.cophenet(hclusters, distMatrix)
 	#print('cophenetCorrelation = {}'.format(cophenet[0]))
@@ -1326,13 +1327,29 @@ def getFullIS4seqOnStream(args):
 
 	# get copies of IS elements from ORF extended sequence (query) and genome sequence (subject)
 	ispairs = {}
-	# ispairs: {qseqid:[hit, ...]}
+	# ispairs: {qseqid:[hit, ...], ...}
 	# hit: {'qseqid':qseqid, 'sseqid':sseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'length':length, ...}
 	for k, g in itertools.groupby(
 			sorted(tools.getBlastResult4dnaOnStream(blastOut4orfExt), key=lambda x: x['qseqid']), 
 			key=lambda x: x['qseqid']):
 		ispairs[k] = list(g)
 		ispairs[k].sort(key = lambda x: x['length'], reverse = True)
+
+		# Let the first element in g the self-alignment hit. It ensure that the codes in other places
+		# can function correctly when they assume the first element of g is the self-alignment. One such
+		# codes is in addNonORFcopy().
+		for i,hit in enumerate(ispairs[k]):
+			qbd = [hit['qstart'], hit['qend']]
+			qbd.sort()
+			sbd = [hit['sstart'], hit['send']]
+			sbd.sort()
+			if qbd == sbd:
+				break
+		# if the self-alignment is not the first element in g, move the first i+1 elements,
+		# else do nothing.
+		if i > 0:
+			ispairs[k][1:i+1] = ispairs[k][:i]
+			ispairs[k][0] = hit
 	
 	# orfhits: [orfhit, ..., orfhit]
 	# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
@@ -1343,8 +1360,9 @@ def getFullIS4seqOnStream(args):
 			orfstr = '_'.join([str(item) for item in orfhit[0][1:]])
 			if orfstr == orfstr4is:
 				break
-		for ispair in g:
-			ispair['orfhit'] = orfhit
+		for i,hit in enumerate(g):
+			g[i]['orfhit'] = orfhit
+		ispairs[qseqid] = g
 	return ispairs
 
 # Return mhits:
@@ -1445,17 +1463,14 @@ def getCopy(mOrfHits, mDNA):
 
 	'''
 	for args in margs:
-		mispairs[args[0]] = getFullIS4seqOnStream(args)
+		mispairs[seqid] = getFullIS4seqOnStream(args)
 	'''
 
 	nseq = len(margs)
-
-	'''
-	if nseq > constants.nproc:
-		nproc = constants.nproc
-	else:
-		nproc = nseq
-	'''
+	#if nseq > constants.nproc:
+	#	nproc = constants.nproc
+	#else:
+	#	nproc = nseq
 	if nseq > constants.nthread:
 		nthread = constants.nthread
 	else:
@@ -1524,8 +1539,9 @@ def clusterIntersect4orf(orfhits, ids):
 	print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
 	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
-	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
 	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
 	del distMatrix
 	for i, id in enumerate(idsList):
 		print('intersected orfhits', i, orfhits[id])
@@ -1636,16 +1652,18 @@ def removeOverlappedOrfhits(mOrfHits):
 		# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
 		# contains multi-copy tpase
 		if len(ids) > 0:
+			print('hello seqid:', seqid)
 			orfhitsNew = clusterIntersect4orf(orfhits, ids)
 		# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
 		else:
 			orfhitsNew = []
 			for orfhit in orfhits:
-				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
-				ncopy4tpase = 1 # single-copy hits
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+				ncopy4tpase = 1
 				orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
-				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
-				orfhitsNew.append(orfhitNew)
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
+			#	ncopy4tpase = 1 for single-copy hits
+			orfhitsNew.append(orfhitNew)
 		mOrfHitsNew[seqid] = orfhitsNew
 	return mOrfHitsNew
 
@@ -2234,6 +2252,7 @@ def pred(args):
 	maxDistBetweenOrfs = constants.maxDistBetweenOrfs
 	mOrfHits, morfsMerged = mergeOrfs(mOrfHits, maxDistBetweenOrfs)
 
+
 	# Get copies of the IS elements in a sequence
 	#
 	# mispairs: {seqid:ispairs, ...}
@@ -2243,7 +2262,6 @@ def pred(args):
 	#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident}
 	# Search for copies of IS elements and create mispairs data structure
 	mispairs = getCopy(mOrfHits, mDNA)
-
 	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of 
 	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.) 
 	# into the list of hits, the mOrfHits is updated in place.
