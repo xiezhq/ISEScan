@@ -266,9 +266,9 @@ def clusterIntersect(hits, ids):
 	#print('distMatrix: {}\n{}'.format(distMatrix.shape, distMatrix))
 
 	# fastcluster requires the dissimilarity matrix instead of similarity matrix!
-	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
 	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
-	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
 	del distMatrix
 	#cophenet = scipy.cluster.hierarchy.cophenet(hclusters, distMatrix)
 	#print('cophenetCorrelation = {}'.format(cophenet[0]))
@@ -1539,9 +1539,9 @@ def clusterIntersect4orf(orfhits, ids):
 	print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
 	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
-	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
 	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
-	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
 	del distMatrix
 	for i, id in enumerate(idsList):
 		print('intersected orfhits', i, orfhits[id])
@@ -1658,12 +1658,11 @@ def removeOverlappedOrfhits(mOrfHits):
 		else:
 			orfhitsNew = []
 			for orfhit in orfhits:
-			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
-				ncopy4tpase = 1
+				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+				ncopy4tpase = 1 # for single-copy hits
 				orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
-			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
-			#	ncopy4tpase = 1 for single-copy hits
-			orfhitsNew.append(orfhitNew)
+				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
+				orfhitsNew.append(orfhitNew)
 		mOrfHitsNew[seqid] = orfhitsNew
 	return mOrfHitsNew
 
