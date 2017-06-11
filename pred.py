@@ -1334,6 +1334,22 @@ def getFullIS4seqOnStream(args):
 		ispairs[k] = list(g)
 		ispairs[k].sort(key = lambda x: x['length'], reverse = True)
 	
+		# Let the first element in g the self-alignment hit. It ensure that the codes in other places
+		# can function correctly when they assume the first element of g is the self-alignment. One such
+		# codes is in addNonORFcopy().
+		for i,hit in enumerate(ispairs[k]):
+			qbd = [hit['qstart'], hit['qend']]
+			qbd.sort()
+			sbd = [hit['sstart'], hit['send']]
+			sbd.sort()
+			if qbd == sbd:
+				break
+		# if the self-alignment is not the first element in g, move the first i+1 elements,
+		# else do nothing.
+		if i > 0:
+			ispairs[k][1:i+1] = ispairs[k][:i]
+			ispairs[k][0] = hit
+	
 	# orfhits: [orfhit, ..., orfhit]
 	# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
 	# orf: (accid, begin, end, strand), example, ('NC_000915.1', 20, 303, '+')
@@ -1343,8 +1359,9 @@ def getFullIS4seqOnStream(args):
 			orfstr = '_'.join([str(item) for item in orfhit[0][1:]])
 			if orfstr == orfstr4is:
 				break
-		for ispair in g:
-			ispair['orfhit'] = orfhit
+		for i,hit in enumerate(g):
+			g[i]['orfhit'] = orfhit
+		ispairs[qseqid] = g
 	return ispairs
 
 # Return mhits:
