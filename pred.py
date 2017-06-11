@@ -1633,18 +1633,16 @@ def removeOverlappedOrfhits(mOrfHits):
 		# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
 		# contains multi-copy tpase
 		if len(ids) > 0:
-			print('hello seqid:', seqid)
 			orfhitsNew = clusterIntersect4orf(orfhits, ids)
 		# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
 		else:
 			orfhitsNew = []
 			for orfhit in orfhits:
-			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
-				ncopy4tpase = 1
+				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+				ncopy4tpase = 1 # single-copy hits
 				orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
-			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
-			#	ncopy4tpase = 1 for single-copy hits
-			orfhitsNew.append(orfhitNew)
+				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
+				orfhitsNew.append(orfhitNew)
 		mOrfHitsNew[seqid] = orfhitsNew
 	return mOrfHitsNew
 
@@ -2232,7 +2230,6 @@ def pred(args):
 	# Merge orfs if two orfs with distance < maxDistBetweenOrfs
 	maxDistBetweenOrfs = constants.maxDistBetweenOrfs
 	mOrfHits, morfsMerged = mergeOrfs(mOrfHits, maxDistBetweenOrfs)
-
 
 	# Get copies of the IS elements in a sequence
 	#
