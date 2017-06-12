@@ -58,6 +58,9 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.4
+  * Add module to remove the potentail false positive single-copy hits in the 'new' family: 1) if e-value > e-50 or 2) if e-50 > e-value > e-100 and !(irLen >= 25 and irId/irLen >= 75%) (not implemented yet).
+  * Add module to remove partial IS elements with single copy: 1) if evalue > e-50
 * 1.5.3
   * Fix bug in getFullIS4seqOnStream() for genome sequence with long multi-copy fregments containing the common IS element
   * Use 'average' instead of 'single' method in fastcluster.linkage()

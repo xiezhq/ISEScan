@@ -55,7 +55,7 @@ path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 
-#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.3')
+#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.4')
 #dir4prediction = os.path.join(path2results, 'prediction.ncbi')
 dir4prediction = os.path.join(path2results, 'prediction.test')
 

@@ -1814,6 +1814,40 @@ def chooseHits(mHitsByNear, mHitsByFar):
 		mhits[accid] = hits
 	return mhits
 
+# Remove the potential false positive hits which are neither complete or partial IS elements.
+# mhits: {seqid: hits, ..., seqid: hits}
+# hits: [hit, ..., hit]
+# hit: {'orf': orf, 'tirs': tirs, 'hmmhit': hmmhit, 'bd': bd, 'occurence': occurence}
+# orf: (seqid, begin, end, strand)
+# tirs: [tir, ..., tir]
+# tir: (score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2)
+# hmmhit: (familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+# bd: [start, end], boundary of hit (IS element)
+# occurence: {'ncopy4orf': ncopy4orf, 'sim4orf': sim4orf, 'ncopy4is': ncopy4is, 'sim4is': sim4is}
+#
+def removeFalsePositive(mhits):
+	evalue4singleCopy = constants.evalue4singleCopy
+	mhitsNew = {}
+	for accid,hits in mhits.items():
+		hitsNew = []
+		for hit in hits:
+			familyName = hit['hmmhit'][0]
+			if '|' in familyName:
+				familyCluster = familyName.split('|',1)[0]
+			else:
+				familyCluster = familyName
+			family, cluster = familyCluster.rsplit('_', 1)
+			# deal with family 'new'
+			if family == 'new':
+				# single-copy hits
+				if hit['occurence']['ncopy4is'] < 2:
+					# The hits with evalue > cutoff are thrown away.
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						continue
+			hitsNew.append(hit)
+		mhitsNew[accid] = hitsNew
+	return mhitsNew
+
 # Remove short hit
 def refineHits(mHits):
 	evalue_cutoff = constants.min4evalue
@@ -1840,15 +1874,23 @@ def refineHits(mHits):
 			#if hit['hmmhit'][2] > evalue_cutoff:
 			#	continue
 
+			'''
 			# test evalue and number of Tpase copies (IS copies)
-			# filter out hits with non-significant e-value and without TIR
+			# filter out hits with evalue > evalue4singleCopy and without TIR
 			if hit['hmmhit'][2] > evalue4singleCopy and len(hit['tirs']) == 0:
 				print('remove partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
 					isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 				continue
 			elif hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
+			'''
+			# deal with single-copy hits
+			if hit['occurence']['ncopy4is'] < 2:
+				# filter out hits with evalue > cutoff
+				if hit['hmmhit'][2] > evalue4singleCopy:
+					continue
+				'''
 				# filter out hits without TIR
-				if len(hit['tirs']) == 0:
+				elif len(hit['tirs']) == 0:
 					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
 						isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 					continue
@@ -1862,6 +1904,7 @@ def refineHits(mHits):
 					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{} evalue={}'.format(
 						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['bd'], hit['orf'], hit['hmmhit'][2]))
 					continue
+				'''
 
 			hitsCopy.append(hit)
 		if len(hitsCopy) == 0:
@@ -2296,6 +2339,9 @@ def pred(args):
 	#for hits in mHits.values():
 	#	for hit in hits:
 	#		print('raw hit', hit['bd'], hit['orf'], hit['hmmhit'], hit['occurence'], hit['tirs'])
+
+	# remove the potential false positive hits
+	mHits = removeFalsePositive(mHits)
 
 	# remove hits that are partial IS elements identified by length, evalue and irId/irLen
 	if constants.removeShortIS == True:
