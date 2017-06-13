@@ -1490,10 +1490,12 @@ def getCopy(mOrfHits, mDNA):
 	'''
 
 	nseq = len(margs)
-	#if nseq > constants.nproc:
-	#	nproc = constants.nproc
-	#else:
-	#	nproc = nseq
+	'''
+	if nseq > constants.nproc:
+		nproc = constants.nproc
+	else:
+		nproc = nseq
+	'''
 	if nseq > constants.nthread:
 		nthread = constants.nthread
 	else:

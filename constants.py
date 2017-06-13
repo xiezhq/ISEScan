@@ -55,9 +55,9 @@ path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 
-#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.4')
+dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.4')
 #dir4prediction = os.path.join(path2results, 'prediction.ncbi')
-dir4prediction = os.path.join(path2results, 'prediction.test')
+#dir4prediction = os.path.join(path2results, 'prediction.test')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
@@ -366,9 +366,10 @@ gene2pepTable = {'11': table11}
 
 # default number of processes to use in calculation if it is not given
 #nproc = 32
-nproc = 16
-#nproc = 1
+#nproc = 16
+#nproc = 8
+nproc = 2
 # default number of threads to use in calculation if it is not given
-#nthread = 2
-nthread = 16
+nthread = 8
+#nthread = 16
 #nthread = 32
