@@ -184,11 +184,6 @@ def prepare4ssw2findIRbyDNAbyFar4orfhits(morfhits, mDna, maxDist4ter2orf, minDis
 			else:
 				start1, end1, start2, end2 = pseudoSeqBoundary_v4(orfBegin, orfEnd, 
 									maxDist4ter2orf, minDist4ter2orf)
-				if maxDist4ter2orf >= 500:
-					minLen = minMax4tir[2]
-				#if maxDist4ter2orf < 500:
-				#	minLen = minMax4tir[0]
-
 			'''
 			if ncopy4tpase <= 1:
 				start1, end1, start2, end2 = tirwindowIntersectORF(

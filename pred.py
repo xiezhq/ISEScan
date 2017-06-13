@@ -1826,7 +1826,10 @@ def chooseHits(mHitsByNear, mHitsByFar):
 # occurence: {'ncopy4orf': ncopy4orf, 'sim4orf': sim4orf, 'ncopy4is': ncopy4is, 'sim4is': sim4is}
 #
 def removeFalsePositive(mhits):
-	evalue4singleCopy = constants.evalue4singleCopy
+	cutoff4irId4short = constants.cutoff4irId4short # 13 by default
+	cutoff4irId4long = constants.cutoff4irId4long # 20 by default
+	irSim4singleCopy = constants.irSim4singleCopy # 0.75 by default, namely, 75%
+	evalue4singleCopy = constants.evalue4singleCopy # e-50 by default
 	mhitsNew = {}
 	for accid,hits in mhits.items():
 		hitsNew = []
@@ -1844,15 +1847,43 @@ def removeFalsePositive(mhits):
 					# The hits with evalue > cutoff are thrown away.
 					if hit['hmmhit'][2] > evalue4singleCopy:
 						continue
+					# remove hits without tir
+					elif len(hit['tirs']) == 0:
+						continue
+					# remove hits with tir sequence pair aligned with gap
+					elif hit['tirs'][0][3] > 0:
+						continue
+					# remove hits with irId < 20
+					elif hit['tirs'][0][1] < cutoff4irId4long:
+						continue
+					# remove hits with irId/irLen < 75%
+					elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
+						continue
+				# multi-copy hits
+				else:
+					# evalue > cutoff
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						# remove hits with irId < 13
+						if len(hit['tirs']) == 0 or hit['tirs'][0][1] < cutoff4irId4short:
+							continue
+						# remove hits with gaps in TIR and irId < 20
+						elif hit['tirs'][0][1] < cutoff4irId4long and hit['tirs'][0][3] > 0:
+							continue
+			# familys other than 'new'
+			else:
+				pass
 			hitsNew.append(hit)
 		mhitsNew[accid] = hitsNew
 	return mhitsNew
 
 # Remove short hit
 def refineHits(mHits):
-	evalue_cutoff = constants.min4evalue
-	evalue4singleCopy = constants.evalue4singleCopy
-	irSim4singleCopy = constants.irSim4singleCopy
+	evalue4singleCopy = constants.evalue4singleCopy # e-50 by default
+	cutoff4irId4short = constants.cutoff4irId4short # 13 by default
+	cutoff4irId4long = constants.cutoff4irId4long # 20 by default
+	cutoff4irId4multicopy = constants.cutoff4irId4multicopy # 10 by default
+	excludedFamilys = constants.excludedFamilys
+
 	mhitsCopy = {}
 	for accid in mHits.keys():
 		hitsCopy = []
@@ -1871,41 +1902,40 @@ def refineHits(mHits):
 					minLen4is, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 				continue
 
-			#if hit['hmmhit'][2] > evalue_cutoff:
-			#	continue
-
-			'''
-			# test evalue and number of Tpase copies (IS copies)
-			# filter out hits with evalue > evalue4singleCopy and without TIR
-			if hit['hmmhit'][2] > evalue4singleCopy and len(hit['tirs']) == 0:
-				print('remove partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
-					isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
-				continue
-			elif hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
-			'''
-			# deal with single-copy hits
+			# single-copy hits
 			if hit['occurence']['ncopy4is'] < 2:
 				# filter out hits with evalue > cutoff
 				if hit['hmmhit'][2] > evalue4singleCopy:
 					continue
-				'''
-				# filter out hits without TIR
-				elif len(hit['tirs']) == 0:
-					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
-						isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
-					continue
-				# filter out hits with gaps in TIR (alignment of left hand rigth hand TIR sequences)
-				elif hit['tirs'][0][3] > 0:
-					print('remove single-copy partial IS element with gap in tir: nGaps={} bd={} orf{} evalue={}'.format(
-						hit['tirs'][0][3], hit['bd'], hit['orf'], hit['hmmhit'][2]))
-					continue
-				# filter out hits with irId/irLen < irSim4singleCopy (default 0.85)
-				elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
-					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{} evalue={}'.format(
-						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['bd'], hit['orf'], hit['hmmhit'][2]))
-					continue
-				'''
-
+				# familys other than IS200/IS605
+				elif family != 'IS200/IS605':
+					# filter out hits without tir
+					if len(hit['tirs']) == 0:
+						continue
+					# filter out hits with irId < 13
+					elif hit['tirs'][0][1] < cutoff4irId4short:
+						continue
+					# filter out hits with gaps in TIR and irId < 20
+					elif hit['tirs'][0][1] < cutoff4irId4long and hit['tirs'][0][3] > 0:
+						continue
+				# family IS200/IS605
+				else:
+					pass
+			# multi-copy hits
+			else:
+				# IS200/IS605
+				if family == 'IS200/IS605':
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						continue
+				elif family not in excludedFamilys:
+					# filter out hits without tir
+					if len(hit['tirs']) == 0:
+						continue
+					# filter out hits with irId < 10
+					elif hit['tirs'][0][1] < cutoff4irId4multicopy:
+						continue
+				else:
+					pass
 			hitsCopy.append(hit)
 		if len(hitsCopy) == 0:
 			print('Warning: no valid hit found for {}'.format(accid))

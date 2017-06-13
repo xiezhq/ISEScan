@@ -273,11 +273,32 @@ min4evalue = 1e-10
 
 # more strict evalue and tir are required for single copy hits
 evalue4singleCopy = 1e-50
-irSim4singleCopy = 0.85 # irId/irLen
+#irSim4singleCopy = 0.85 # irId/irLen
+irSim4singleCopy = 0.75 # irId/irLen
 
 # E-value cutoff for filtering hits returned by HMM search
 evalue2filterHMMhits = min4evalue
 #evalue2filterHMMhits = 10 # do not filter out any hits returned by HMM search
+
+# Paramter for removing potential falsely discovered novel IS elements (family 'new') and partial IS elements
+#
+# {excludedFamilys:(full,partial,no)}:
+#	{'IS110':(54,19,3), 'IS4':(2,3,1), 'IS5':(2,1,1), 'IS6':(2,0,0), 'IS630':(1,1,7), 
+#	'IS66':(1,0,2), 'IS91':(1,1,2), 'ISAS1':(2,0,0), 'ISH3':(8,1,3), 'ISNCY':(3,1,4)}
+# The full IS elements in the familys above might exist without perfect TIR with irId < 10. 
+# We should hence exclude these familys when filtering out the partial IS elements without perfect TIR.
+#excludedFamilys = ['IS110', 'IS4', 'IS5', 'IS6', 'IS630', 'IS66', 'IS91', 'ISAS1', 'ISH3', 'ISNCY']
+excludedFamilys = ['IS110', 'IS4', 'IS5', 'IS6', 'ISAS1', 'ISH3', 'ISNCY']
+#
+# number of matches in tir alignment, 
+# which are used for removing the potential falsely discovered IS elements (false positive) and partial IS elements without perfect TIR.
+# Refer to removeFalsePositive() and refineHits() in pred.py for more details.
+cutoff4irId4short = 13
+cutoff4irId4long = 20
+cutoff4irId4multicopy = 10
+#
+# Paramter for removing potential falsely discovered novel IS elements (family 'new') and partial IS elements
+
 
 # width of line in fasta file created by us
 fastaLineWidth = 60
