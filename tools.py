@@ -2232,9 +2232,7 @@ def consensusBoundaryByCutoffBySeparated(bds):
 		ends.append(bd[1])
 
 	# Get the number of items in each window centered at the specific key (item in starts) of n4windows
-	print('hello starts and bds', starts, bds)
 	n4windows = getWindowKey4abundance(starts)
-	print('hello starts window', n4windows)
 
 	# Sort start (left) boundaries to ensure the first boundary with the most number of items in window
 	# is the most left one when multiple items are maximal. 
@@ -2245,9 +2243,7 @@ def consensusBoundaryByCutoffBySeparated(bds):
 	startboundary = max(sorted(n4windows.keys()), key = lambda x: n4windows[x])
 
 	# Get the number of items in each window centered at the specific key (item in ends) of n4windows
-	print('hello ends', ends)
 	n4windows = getWindowKey4abundance(ends)
-	print('hello ends window', n4windows)
 
 	# Sort end (right) boundaries to ensure the first boundary with the most number of items in window
 	# is the most right one when multiple items are maximal.

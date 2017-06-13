@@ -275,9 +275,10 @@ def clusterIntersect(hits, ids):
 	#nids = len(ids)
 	#print('nids={} timesOfMergingCluster={}'.format(nids, len(hclusters)))
 	#for i, cluster in enumerate(hclusters):
-	#	print('cluster {:>3} {:>6} {:>6} {:>9.2g} {:>6}'.format(i, int(cluster[0]), int(cluster[1]), cluster[2], int(cluster[3])))
-	for i, id in enumerate(idsList):
-		print('intersected hits', i, hits[id]['bd'], hits[id]['orf'], hits[id]['occurence'], hits[id]['hmmhit'], hits[id]['tirs'])
+	#	print('cluster {:>3} {:>6} {:>6} {:>9.2g} {:>6}'.format(
+	#	i, int(cluster[0]), int(cluster[1]), cluster[2], int(cluster[3])))
+	#for i, id in enumerate(idsList):
+	#	print('intersected hits', i, hits[id]['bd'], hits[id]['orf'], hits[id]['occurence'], hits[id]['hmmhit'], hits[id]['tirs'])
 
 	# dengrogram of hierachical clustering
 	#scipy.cluster.hierarchy.dendrogram(hclusters)
@@ -304,7 +305,6 @@ def clusterIntersect(hits, ids):
 			clustersDic[clusterid].append(i)
 		else:
 			clustersDic[clusterid] = [i]
-	print(clustersDic)
 
 	# determine the representative hit for each cluster and append the representative hits to hitsNew
 	for cluster in clustersDic.values():
@@ -323,34 +323,58 @@ def clusterIntersect(hits, ids):
 		repid = g[0]
 		hit = hits[idsList[repid]]
 		hitsNew.append(hit)
-		print('representative hit: repid={} hitid={} hitbd={} cluster={}'.format(
-			repid, idsList[repid], hit['bd'], cluster))
+		#print('representative hit: repid={} hitid={} hitbd={} cluster={}'.format(
+		#	repid, idsList[repid], hit['bd'], cluster))
 	hitsNew.sort(key = lambda x: x['bd'][0])
+	return hitsNew
+
+def parallel4overlappedHits(args):
+	accid, hits = args
+	ids = set()
+	for pair in itertools.combinations(range(len(hits)), 2):
+		#if hits[pair[0]]['orf'][3] != hits[pair[1]]['orf'][3]:
+		#	continue # count hits with orf on different strands as different IS
+
+		bd1 = hits[pair[0]]['bd']
+		bd2 = hits[pair[1]]['bd']
+		measure, threshold = tools.chooseMeasure(bd1, bd2)
+		if measure < threshold:
+			continue
+
+		ids.update(pair)
+	if len(ids) > 0:
+		print('{}: {} intersected hits found, do clustering to pick the representative hit for each cluster'.format(accid, len(ids)))
+		hitsNew = clusterIntersect(hits, ids)
+	else:
+		print('{}: no intersected hits found'.format(accid))
+		hitsNew = hits[:]
 	return hitsNew
 
 def removeOverlappedHits(mhits):
 	mhitsNew = {}
+	margs = []
 	for accid, hits in mhits.items():
-		ids = set()
-		for pair in itertools.combinations(range(len(hits)), 2):
-			#if hits[pair[0]]['orf'][3] != hits[pair[1]]['orf'][3]:
-			#	continue # count hits with orf on different strands as different IS
-
-			bd1 = hits[pair[0]]['bd']
-			bd2 = hits[pair[1]]['bd']
-			measure, threshold = tools.chooseMeasure(bd1, bd2)
-			if measure < threshold:
-				continue
-
-			ids.update(pair)
-		if len(ids) > 0:
-			print('{}: {} intersected hits found, clustering them to pick the representative for each cluster'.format(accid, len(ids)))
-			hitsNew = clusterIntersect(hits, ids)
-		else:
-			print('{}: no intersected hits found'.format(accid))
-			hitsNew = hits[:]
-
-		mhitsNew[accid] = hitsNew
+		args = (accid, hits)
+		margs.append(args)
+	for args in margs:
+		mhitsNew[args[0]] = parallel4overlappedHits(args)
+	'''
+	nseq = len(margs)
+	if nseq > constants.nproc:
+		nproc = constants.nproc
+	else:
+		nproc = nseq
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
+		future2args = {executor.submit(parallel4overlappedHits, args): args for args in margs}
+		for future in concurrent.futures.as_completed(future2args):
+			args = future2args[future]
+			try:
+				hitsNew = future.result()
+			except Exception as e:
+				print('{} generated an exception: {} in parallel4overlappedHits'.format(args[0], e))
+			else: 
+				mhitsNew[args[0]] = hitsNew
+	'''
 	return mhitsNew
 
 	
@@ -1535,15 +1559,15 @@ def clusterIntersect4orf(orfhits, ids):
 	for id in idsList:
 		data.append(orfhits[id][0][1:3])
 	Y = numpy.array(data, int)
-	print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
+	#print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
 	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
 	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
 	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
 	del distMatrix
-	for i, id in enumerate(idsList):
-		print('intersected orfhits', i, orfhits[id])
+	#for i, id in enumerate(idsList):
+	#	print('intersected orfhits', i, orfhits[id])
 
 	# form flat clusters from the hierarchical clustering
 	# Note: t=1.1 instead of 1 ensures that the intersected orfhits with only 1 bp intersect are 
@@ -1566,12 +1590,13 @@ def clusterIntersect4orf(orfhits, ids):
 			clustersDic[clusterid].append(i)
 		else:
 			clustersDic[clusterid] = [i]
-	print(clustersDic)
 	# determine the representative orfhit for each cluster and append the representative orfhits to orfhitsNew
 	for cluster in clustersDic.values():
+		'''
 		print('hello, size of cluster:', len(cluster))
 		for id in cluster:
 			print('hello clustered orfhits:', orfhits[idsList[id]])
+		'''
 
 		# sort by full_sequence_E-value
 		cluster.sort(key = lambda x: orfhits[idsList[x]][3])
@@ -1601,9 +1626,11 @@ def clusterIntersect4orf(orfhits, ids):
 		g = maxgs[0][1]
 
 		ncopy4tpase = len(g)
+		'''
 		if ncopy4tpase > 1:
 			for id in g:
 				print('hello overlapped orfhits', orfhits[idsList[id]])
+		'''
 
 		bds = []
 		for id in g:
@@ -1628,9 +1655,7 @@ def clusterIntersect4orf(orfhits, ids):
 
 		# Add the multi-copy orfhit into the orfhitsNew
 		orfhitsNew.append(orfhit)
-		#print('representative orfhit: repid={} orfhitid={} orfhitorf={} cluster={}'.format(
-		#	repid, idsList[repid], orfhit[0], cluster))
-		print('representative orfhit:', orfhit)
+		#print('representative orfhit:', orfhit)
 
 	# sort by begin of ORF
 	orfhitsNew.sort(key = lambda x: x[0][1])
@@ -1668,19 +1693,23 @@ def removeOverlappedOrfhits(mOrfHits):
 	for seqid, orfhits in mOrfHits.items():
 		args = (seqid, orfhits)
 		margs.append(args)
+	'''
+	for args in margs:
+		mOrfHitsNew[args[0]] = parall4orfhits(args)
+	'''
 	nseq = len(margs)
-	if nseq > constants.nthread:
-		nthread = constants.nthread
+	if nseq > constants.nproc:
+		nproc = constants.nproc
 	else:
-		nthread = nseq
-	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
+		nproc = nseq
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 		future2args = {executor.submit(parall4orfhits, args): args for args in margs}
 		for future in concurrent.futures.as_completed(future2args):
 			args = future2args[future]
 			try:
 				orfhitsNew = future.result()
 			except Exception as e:
-				print('{} generated an exception: {} in removeOverlappedOrfhits'.format(args[0], e))
+				print('{} generated an exception: {} in parall4orfhits'.format(args[0], e))
 			else:
 				mOrfHitsNew[args[0]] = orfhitsNew
 	return mOrfHitsNew
@@ -2356,7 +2385,9 @@ def pred(args):
 	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of 
 	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.) 
 	# into the list of hits, the mOrfHits is updated in place.
+	print('Begin addNonORFcopy at', datetime.datetime.now().ctime())
 	mOrfHits = addNonORFcopy(mispairs, mOrfHits)
+	print('Finish addNonORFcopy at', datetime.datetime.now().ctime())
 	#
 	# Update mispairs data structure with the updated mOrfHits
 	mispairs = getCopy(mOrfHits, mDNA)
@@ -2364,7 +2395,9 @@ def pred(args):
 	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of
 	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.)
 	# into the list of hits, the mOrfHits is updated in place.
+	print('Begin addNonORFcopy1 at', datetime.datetime.now().ctime())
 	mOrfHits = addNonORFcopy(mispairs, mOrfHits)
+	print('Finish addNonORFcopy1 at', datetime.datetime.now().ctime())
 
 	#print('hitNeighors() begins at', datetime.datetime.now().ctime())
 	minDist4ter2orf = constants.minDist4ter2orf
@@ -2400,7 +2433,9 @@ def pred(args):
 
 	# remove redundant IS elements with same boundary and same TIR
 	mHits = removeRedundantIS(mHits)
+	print('Begin removeOverlappedHits at', datetime.datetime.now().ctime())
 	mHits = removeOverlappedHits(mHits)
+	print('Finish removeOverlappedHits at', datetime.datetime.now().ctime())
 
 	# Calculate socore for each hit and then attach score to hit
 	#print('Begin scoring hits at', datetime.datetime.now().ctime())

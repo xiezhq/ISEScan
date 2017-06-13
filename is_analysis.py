@@ -180,7 +180,6 @@ def prepare4ssw2findIRbyDNAbyFar4orfhits(morfhits, mDna, maxDist4ter2orf, minDis
 				maxDist = 0
 				minDist = -dist
 				start1, end1, start2, end2 = pseudoSeqBoundary_v4(qstart, qend, maxDist, minDist)
-				print('hello ncopy4tpase', ncopy4tpase, seqid, qstart, qend, maxDist, minDist, orf, familyCluster)
 			else:
 				start1, end1, start2, end2 = pseudoSeqBoundary_v4(orfBegin, orfEnd, 
 									maxDist4ter2orf, minDist4ter2orf)
