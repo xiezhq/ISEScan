@@ -1636,32 +1636,53 @@ def clusterIntersect4orf(orfhits, ids):
 	orfhitsNew.sort(key = lambda x: x[0][1])
 	return orfhitsNew
 
+def parall4orfhits(args):
+	seqid, orfhits = args
+	ids = set()
+	for pair in itertools.combinations(range(len(orfhits)), 2):
+		bd1 = orfhits[pair[0]][0][1:3]
+		bd2 = orfhits[pair[1]][0][1:3]
+		measure, threshold = tools.chooseMeasure(bd1, bd2)
+		if measure < threshold:
+			continue
+		ids.update(pair)
+	# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
+	# contains multi-copy tpase
+	if len(ids) > 0:
+		orfhitsNew = clusterIntersect4orf(orfhits, ids)
+	# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
+	else:
+		orfhitsNew = []
+		for orfhit in orfhits:
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+			ncopy4tpase = 1 # for single-copy hits
+			orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
+			orfhitsNew.append(orfhitNew)
+	return orfhitsNew
+
 # Remove the redundant Tpase ORFs
 def removeOverlappedOrfhits(mOrfHits):
 	mOrfHitsNew = {}
+	margs = []
 	for seqid, orfhits in mOrfHits.items():
-		ids = set()
-		for pair in itertools.combinations(range(len(orfhits)), 2):
-			bd1 = orfhits[pair[0]][0][1:3]
-			bd2 = orfhits[pair[1]][0][1:3]
-			measure, threshold = tools.chooseMeasure(bd1, bd2)
-			if measure < threshold:
-				continue
-			ids.update(pair)
-		# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
-		# contains multi-copy tpase
-		if len(ids) > 0:
-			orfhitsNew = clusterIntersect4orf(orfhits, ids)
-		# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
-		else:
-			orfhitsNew = []
-			for orfhit in orfhits:
-				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
-				ncopy4tpase = 1 # for single-copy hits
-				orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
-				# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
-				orfhitsNew.append(orfhitNew)
-		mOrfHitsNew[seqid] = orfhitsNew
+		args = (seqid, orfhits)
+		margs.append(args)
+	nseq = len(margs)
+	if nseq > constants.nthread:
+		nthread = constants.nthread
+	else:
+		nthread = nseq
+	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
+		future2args = {executor.submit(parall4orfhits, args): args for args in margs}
+		for future in concurrent.futures.as_completed(future2args):
+			args = future2args[future]
+			try:
+				orfhitsNew = future.result()
+			except Exception as e:
+				print('{} generated an exception: {} in removeOverlappedOrfhits'.format(args[0], e))
+			else:
+				mOrfHitsNew[args[0]] = orfhitsNew
 	return mOrfHitsNew
 
 # Add the IS copies without predicted ORF into the list of hits, and consider those copies as the 
