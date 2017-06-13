@@ -258,7 +258,7 @@ def clusterIntersect(hits, ids):
 		data.append(hits[id]['bd'])
 
 	Y = numpy.array(data, int)
-	print('data: {}\n{}'.format(Y.shape, Y))
+	#print('data: {}\n{}'.format(Y.shape, Y))
 
 	#distMatrix = scipy.spatial.distance.pdist(Y, metric='euclidean')
 	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
@@ -1098,7 +1098,6 @@ def hitNeighors(morfhits):
 			orfhitsNeighbors[orfhits[0][0]] = [None, orfhits[1]] # first orfhit
 			orfhitsNeighbors[orfhits[-1][0]] = [orfhits[-2], None] # last orfhit
 		morfhitsNeighbors[seqid] = orfhitsNeighbors
-		#print('hello, neighbors', orfhitsNeighbors)
 
 	return morfhitsNeighbors
 
@@ -1652,7 +1651,6 @@ def removeOverlappedOrfhits(mOrfHits):
 		# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
 		# contains multi-copy tpase
 		if len(ids) > 0:
-			print('hello seqid:', seqid)
 			orfhitsNew = clusterIntersect4orf(orfhits, ids)
 		# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
 		else:
