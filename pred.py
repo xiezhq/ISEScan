@@ -2184,9 +2184,11 @@ def pred(args):
 	# mDNA:	{seqid: (org, fileid, sequence), ..., seqid: (org, fileid, sequence)}
 	mDNA = {}
 	dnaFiles = tools.rdDNAlist(args['dna_list'])
+	
 	for item in dnaFiles:
 		file, org = item
 		filename = os.path.basename(file)
+
 		#fileid = filename.rsplit('.', 1)[0]
 		fileid = filename
 		fileids.append((fileid, org))
@@ -2211,7 +2213,8 @@ def pred(args):
 		tblout_list = prepare4tblout_list(hmm_path, fileids)
 	if len(tblout_list) == 0:
 		print('No results returned by HMM search was found for sequences in', args['dna_list'])
-		return None
+		print('End in pred', datetime.datetime.now().ctime())
+		return 0
 
 	#print('Processing tblout files at', datetime.datetime.now().ctime())	
 	mtblout_hits_sorted = []
@@ -2330,21 +2333,24 @@ def pred(args):
 		# IS family HMM searches.
 		hits_sorted = refine_hmm_hits(hits_sorted)
 
-		# remove non-significant hits with E-value > cutoff
 		if hits_sorted == None or len(hits_sorted) == 0:
 			e = 'No hit was found for {} {}'.format(seqid, seqid_hits)
 			print(e)
-			return 0
+			continue	
 
+		# remove non-significant hits with E-value > cutoff
 		hits_sorted_refined = refine_hmm_hits_evalue(hits_sorted, e_value)
 		if len(hits_sorted_refined) == 0:
 			print('Warning: no significant hit with E-value <= {} found for {}'.format(
 				e_value, seqid))
 			continue
 		mtblout_hits_sorted_refined.append((seqid, hits_sorted_refined))
-	#print('Finish refining hits for each DNA sequence', datetime.datetime.now().ctime())
 	if len(mtblout_hits_sorted_refined) == 0:
-		return None
+		seqids = [item[0] for item in mtblout_hits_sorted]
+		print('Warning: no significant hit with E-value <= {} found for {}'.format(
+			e_value, ','.join(seqids)))
+		print('End in pred', datetime.datetime.now().ctime())
+		return 0
 
 	mtblout_hits_sorted = mtblout_hits_sorted_refined
 
