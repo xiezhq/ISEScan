@@ -1488,9 +1488,11 @@ def rdDNAlist(dnaListFile):
 	fp.close()
 	return dnaFiles
 
-# Read and return the summarization in file written by outputIndividual() in pred.py
-# return: [] or [nis, %genome, bps4is, len4DNA, familySum, dnaType]
+# Read and return the summarization in file created by outputIndividual() in pred.py
+# return: [] or [nis, %genome, bps4is, len4DNA, familySum]
 # familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
+#
+# Note: return [1] if sumFileByOrg is the *.sum file created by outputIS4multipleSeqOneFile() in pred.py.
 def getSumByOrg(sumFileByOrg, org):
 	if os.path.isfile(sumFileByOrg):
 		fp2sumByOrg = open(sumFileByOrg, 'r')
@@ -1498,22 +1500,33 @@ def getSumByOrg(sumFileByOrg, org):
 		print('In getSumByOrg() in tools.py: no such file to read', sumFileByOrg)
 		return []
 
+
 	familySum = {}
 	sumByOrg = []
+	flag4hmpformat = False
 	for line in fp2sumByOrg:
+		if 'dnaLen' in line:
+			flag4hmpformat = True
+			break
+				
 		if line[0] == '#':
-			continue
+			continue # remove comment line
 		if line[:5] == 'total':
 			sumByOrg = line.split()
 			break
 		if line[:6] == 'family' or line[:6] == '------':
-			continue # head line
+			continue # title line
 		if line.replace('\b','').strip() == '':
 			continue # remove blank line
 		items = line.split()
 		familySum[items[0]] = [int(items[1]), float(items[2]), int(items[3])]
 	fp2sumByOrg.close()
-	if len(sumByOrg) > 0:
+
+	if flag4hmpformat == True:
+		# Return and notify the calling code in parent function that the *.sum file (sumFileByOrg) to read
+		# is the file format which requires getSumByOrg4hmp() instead of getSumByOrg() to process.
+		return [1]
+	elif len(sumByOrg) > 0:
 		return [int(sumByOrg[1]), float(sumByOrg[2]), int(sumByOrg[3]), int(sumByOrg[4]), familySum]
 	else:
 		return []
@@ -1534,8 +1547,8 @@ def getSumByOrg4hmp(sumFileByOrg, org):
 	# dnaLen4is: {seqid:seqlen, ...}
 	for line in fp2sumByOrg:
 		line = line.strip()
-		if line[0] == '#':
-			continue
+		if line[0] == '#' or 'family ' in line:
+			continue # remove comment line and title line
 		if line.replace('\b','').strip() == '':
 			continue # remove blank line
 		items = line.split()
@@ -1815,7 +1828,6 @@ def output4sumFull(sum4is, outfile):
 		# get available data for each family
 		if len(sum4org) > 0:
 			nis4org, percent4org, bps4is, dnaLen4is = sum4org[:4]
-			#print('hello', org, sum4org[5:])
 			dnaLen, ngenome4is, ngenome, nplasmid4is, nplasmid, nphage4is, nphage = sum4org[5:]
 			for family, value in sum4org[4].items():
 				familySum[family] = value
@@ -2032,7 +2044,24 @@ def sum4org(mDNA, dir4data, tax, dir4prediction=constants.dir4prediction):
 		for item in orgid[org]:
 			fileid, seqid, dnaType, dnaLen = item
 			file = os.path.join(path, '.'.join([fileid, 'sum']))
+
+			# process file created by outputIndividual() in pred.py
 			sum4is4all = getSumByOrg(file, seqid)
+			# if sum4is4all is created from the new fileid.sum format (the format requested by hmp),
+			# we only use the first five items in sum4is4all. The sum4is4all created from the old 
+			# seqid.sum format requested by bacteria contains only five items which are the same
+			# for either fileid.sum or seqid.sum. The 4th item in the sum4is4all created from fileid.sum
+			# format is the total length of all sequences with IS elments in the fasta file named by 
+			# fileid, and the 6th item is the total length of all sequences in the fasta file, and the
+			# fasta file contains one or more sequences. So, the 4th item is same as 6th item in 
+			# sum4is4all for the fasta file with one sequence, for example, the fasta file for bactieral 
+			# complete genome sequence. The fasta file for whole genome shotgun sequence usually contains
+			# more than one contig sequences, for example, the fasta file for HMP metagenome data.
+			if len(sum4is4all) == 1:
+				# process file created by outputIS4multipleSeqOneFile() in pred.py
+				print(file, 'is created by outputIS4multipleSeqOneFile and we hence use getSumByOrg4hmp() to process.')
+				sum4is4all = getSumByOrg4hmp(file, seqid)
+				sum4is4all = sum4is4all[:5]
 
 			genome = 0
 			genome4is = 0

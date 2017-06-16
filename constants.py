@@ -366,10 +366,10 @@ gene2pepTable = {'11': table11}
 
 # default number of processes to use in calculation if it is not given
 #nproc = 32
-nproc = 16
+#nproc = 16
 #nproc = 8
-#nproc = 2
+nproc = 2
 # default number of threads to use in calculation if it is not given
-#nthread = 8
-nthread = 16
+nthread = 8
+#nthread = 16
 #nthread = 32
