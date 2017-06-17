@@ -1176,6 +1176,7 @@ def getBlastResult4dnaOnStream(filec):
 		#if orfLen > maxLen4orf and intersect >= orfLen*0.5:
 		#if orfLen > maxLen4orf and intersect >= minLen4orf:
 
+		# coverage criteria used to identify the copies of both partial and full-length ISs
 		if orfLen >= minLen4orf4pep:
 			if intersect >= minLen4orf4pep:
 				copy = True
