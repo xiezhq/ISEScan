@@ -4,8 +4,12 @@
 # bash submitjob.bash.omics ../bacteria.fna.list.omics.new
 # Here, bacteria.fna.list.omics.new is the file holding a list of fasta file
 
-path2proteome='/home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5'
-path2hmm='/home/data/insertion_sequence/output4hmmsearch_illumina_5_cdhit30.bacteria.aclame.v5'
+# for bacteria
+#path2proteome='/nfs/darwin/data2/zhiqxie/insertion_sequence/output4FragGeneScan1.19_illumina_5.bacteria'
+#path2hmm='/nfs/darwin/data2/zhiqxie/insertion_sequence/output4hmmsearch_illumina_5_cdhit30.bacteria.aclame.v5'
+# for hmp
+path2proteome='/nfs/darwin/data2/zhiqxie/insertion_sequence/output4FragGeneScan1.19_illumina_5.hmp'
+path2hmm='/nfs/darwin/data2/zhiqxie/insertion_sequence/output4hmmsearch_illumina_5_cdhit30.hmp.aclame.v5'
 path2log='log'
 
 #filelist="$1"
