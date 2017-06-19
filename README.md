@@ -58,6 +58,24 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.4
+  * Add removeFalsePositive() to remove the potentail false positive in the 'new' family: 1) single-copy hits with e-value > e-50 or no tir or nGaps > 0 or irId < 20 or irId/irLen < 0.75; 2) multi-copy hits with evalue > e-50 and (irId < 13 or (irId < 20 and ngaps > 0))
+  * Modify refineHits() to remove the single-copy partial IS elements: 1) if evalue > e-50 or (irId < 13 or (irId < 20 and ngaps > 0 for familys other than IS200/IS605)
+  * Modify refineHits() to remove the multi-copy partial IS elements: 1) if evalue > e-50 for IS200/IS605 family; 2) if irId < 10 for familys other than ten familys which could have the full IS without perfect TIR (irId < 10), IS110, IS4, IS5, IS6, ISAS1, ISH3, ISNCY.
+  * Change irSim4singleCopy in constants.py from 0.85 to 0.75, for the use in removeFalsePositive()
+* 1.5.3
+  * Fix bug in getFullIS4seqOnStream() for genome sequence with long multi-copy fregments containing the common IS element
+  * Use 'average' instead of 'single' method in fastcluster.linkage()
+  * Fix bug in removeOverlappedOrfhits() to correctly count single-copy IS elements for genome sequence without multi-copy IS elements
+* 1.5.2
+  * Fix bug for genome sequence without multi-copy IS elements
+* 1.5.1
+  * Change: changed consensusBoundaryByCutoff() to consensusBoundaryByCutoffBySeparated()
+  * Change: added consensusBoundaryByCutoffByCombined() and getbds4opt4start(), to determine the left and right boundaries of multi-copy pro-IS element simultaneously, namely, to determine the optimal combined left and right boundaries instead of separated left and right boundaries.
+* 1.5
+  * Change: add consensusBoundaryByCutoff() and ncopyByCutoff() in tools.py, to determine the optimal boundary of multi-copy pro-IS element.
+* 1.4
+  * Change: recruit the IS copies without predicted Tpase when search for multi-copy IS elements
 * 1.3
   * Remove buildHMM.py from ISEScan
 * 1.2

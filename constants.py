@@ -29,7 +29,7 @@ makeblastdb = 'makeblastdb'
 #
 # If removeShortIS is True, ISEScan will remove partial IS elements which include 
 # IS element with length < 400 or single copy IS element without perfect TIR.
-# If removeShortIS is False, ISEScan will only report partial IS element as well as full-length IS element.
+# If removeShortIS is False, ISEScan will report partial IS element as well as full-length IS element.
 # The default is True.
 removeShortIS = True
 #removeShortIS = False
@@ -54,7 +54,10 @@ translateGenome = True
 path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
-dir4prediction = os.path.join(path2results, 'prediction.ncbi')
+
+dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.4')
+#dir4prediction = os.path.join(path2results, 'prediction.ncbi')
+#dir4prediction = os.path.join(path2results, 'prediction.test')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
 file4clusterSeqFile4phmmer = 'clusters.single.faa'
@@ -160,7 +163,7 @@ minMax4tir = {
 		'IS1595': (10, 43, 15, 1),
 		'IS1634': (11, 32, 12, 1),
 		'IS200/IS605': (10000, 0, 10000, 0), # prevent program from finding any tir with irLen > 0
-		'IS200/IS605_8': (11, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
+		#'IS200/IS605_8': (11, 11, 11, 1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
 		#'IS200/IS605': (11, 11, 11, -1), # cluster 8 (cdhit30) of IS200/IS605 has tir with irLen == 0 or irLen == 11
 		'IS21': (8, 76, 10, 1),
 		'IS256': (8, 48, 15, 1),
@@ -270,11 +273,32 @@ min4evalue = 1e-10
 
 # more strict evalue and tir are required for single copy hits
 evalue4singleCopy = 1e-50
-irSim4singleCopy = 0.85 # irId/irLen
+#irSim4singleCopy = 0.85 # irId/irLen
+irSim4singleCopy = 0.75 # irId/irLen
 
 # E-value cutoff for filtering hits returned by HMM search
 evalue2filterHMMhits = min4evalue
 #evalue2filterHMMhits = 10 # do not filter out any hits returned by HMM search
+
+# Paramter for removing potential falsely discovered novel IS elements (family 'new') and partial IS elements
+#
+# {excludedFamilys:(full,partial,no)}:
+#	{'IS110':(54,19,3), 'IS4':(2,3,1), 'IS5':(2,1,1), 'IS6':(2,0,0), 'IS630':(1,1,7), 
+#	'IS66':(1,0,2), 'IS91':(1,1,2), 'ISAS1':(2,0,0), 'ISH3':(8,1,3), 'ISNCY':(3,1,4)}
+# The full IS elements in the familys above might exist without perfect TIR with irId < 10. 
+# We should hence exclude these familys when filtering out the partial IS elements without perfect TIR.
+#excludedFamilys = ['IS110', 'IS4', 'IS5', 'IS6', 'IS630', 'IS66', 'IS91', 'ISAS1', 'ISH3', 'ISNCY']
+excludedFamilys = ['IS110', 'IS4', 'IS5', 'IS6', 'ISAS1', 'ISH3', 'ISNCY']
+#
+# number of matches in tir alignment, 
+# which are used for removing the potential falsely discovered IS elements (false positive) and partial IS elements without perfect TIR.
+# Refer to removeFalsePositive() and refineHits() in pred.py for more details.
+cutoff4irId4short = 13
+cutoff4irId4long = 20
+cutoff4irId4multicopy = 10
+#
+# Paramter for removing potential falsely discovered novel IS elements (family 'new') and partial IS elements
+
 
 # width of line in fasta file created by us
 fastaLineWidth = 60
@@ -341,8 +365,11 @@ table11 = {
 gene2pepTable = {'11': table11}
 
 # default number of processes to use in calculation if it is not given
-nproc = 16
-#nproc = 1
+#nproc = 32
+#nproc = 16
+#nproc = 8
+nproc = 2
 # default number of threads to use in calculation if it is not given
-#nthread = 2
-nthread = 16
+nthread = 8
+#nthread = 16
+#nthread = 32

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # ISEScan version
-version = '1.3'
+version = '1.4'
 
 import argparse
 import os
@@ -10,10 +10,11 @@ import os
 import isPredict
 
 def isPredictSingle(args):
-	seqfile = args['seqfile']
+	seqfile = args['seqfile'].strip()
 	path2proteome = args['path2proteome']
 	path2hmm = args['path2hmm']
-	filelist = seqfile.strip()+'.list'
+	seqfilename = os.path.basename(seqfile)
+	filelist = os.path.join('/tmp', seqfilename+'.list')
 	with open(filelist, 'w') as fp:
 		fp.write(seqfile+'\n')
 

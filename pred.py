@@ -1,7 +1,6 @@
 import sys
 import argparse
 import operator
-import csv
 import time
 import random
 import os
@@ -20,6 +19,12 @@ import tools
 import is_analysis
 import constants
 
+# cutoff for boundary window when searching for the optimal consensus boundaries of the multi-copy IS element
+# boundary window: (boundary-cutoff, boundary+cutoff)
+# In our calculations, we require boundary-cutoff >= 1.
+#CUTOFF4WINDOW = 0
+#CUTOFF4WINDOW = 1
+CUTOFF4WINDOW = 3
 
 # re-rank hmmsearch hits by 4 (full sequence E-value, default ranking of hmmsearch results) or 0 (best 1 domain E-value)
 SORT_BY = 4
@@ -253,30 +258,41 @@ def clusterIntersect(hits, ids):
 		data.append(hits[id]['bd'])
 
 	Y = numpy.array(data, int)
-	print('data: {}\n{}'.format(Y.shape, Y))
+	#print('data: {}\n{}'.format(Y.shape, Y))
 
-	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
 	#distMatrix = scipy.spatial.distance.pdist(Y, metric='euclidean')
+	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
+	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
 	#print('distMatrix: {}\n{}'.format(distMatrix.shape, distMatrix))
 
 	# fastcluster requires the dissimilarity matrix instead of similarity matrix!
-	hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
 	del distMatrix
 	#cophenet = scipy.cluster.hierarchy.cophenet(hclusters, distMatrix)
 	#print('cophenetCorrelation = {}'.format(cophenet[0]))
 	#nids = len(ids)
 	#print('nids={} timesOfMergingCluster={}'.format(nids, len(hclusters)))
 	#for i, cluster in enumerate(hclusters):
-	#	print('cluster {:>3} {:>6} {:>6} {:>9.2g} {:>6}'.format(i, int(cluster[0]), int(cluster[1]), cluster[2], int(cluster[3])))
-	for i, id in enumerate(idsList):
-		print('intersected hits', i, hits[id]['bd'], hits[id]['orf'], hits[id]['occurence'], hits[id]['hmmhit'], hits[id]['tirs'])
+	#	print('cluster {:>3} {:>6} {:>6} {:>9.2g} {:>6}'.format(
+	#	i, int(cluster[0]), int(cluster[1]), cluster[2], int(cluster[3])))
+	#for i, id in enumerate(idsList):
+	#	print('intersected hits', i, hits[id]['bd'], hits[id]['orf'], hits[id]['occurence'], hits[id]['hmmhit'], hits[id]['tirs'])
 
 	# dengrogram of hierachical clustering
 	#scipy.cluster.hierarchy.dendrogram(hclusters)
 
 	# form flat clusters from the hierarchical clustering
 	# Note: t=1.1 instead of 1.0 ensures that the intersected hits with only 1 bp intersect are included in same cluster. 
-	t = 1.1
+	#t = 1.1
+	#
+	# When tools.distFunctionByoverlap_min() is used:
+	# use t=0.5 (50%) to ensure that the orfhits with the overlap of 50% or less  will not be included
+	# in the same cluster.
+	# Refer to tools.distFunctionByoverlap_min for definition of distance between two vectors.
+	t = 0.5
+
 	clusters = scipy.cluster.hierarchy.fcluster(hclusters, t, criterion='distance')
 
 	# determine the representative hit in each cluster
@@ -289,7 +305,6 @@ def clusterIntersect(hits, ids):
 			clustersDic[clusterid].append(i)
 		else:
 			clustersDic[clusterid] = [i]
-	print(clustersDic)
 
 	# determine the representative hit for each cluster and append the representative hits to hitsNew
 	for cluster in clustersDic.values():
@@ -308,33 +323,58 @@ def clusterIntersect(hits, ids):
 		repid = g[0]
 		hit = hits[idsList[repid]]
 		hitsNew.append(hit)
-		print('representative hit: repid={} hitid={} hitbd={} cluster={}'.format(
-			repid, idsList[repid], hit['bd'], cluster))
+		#print('representative hit: repid={} hitid={} hitbd={} cluster={}'.format(
+		#	repid, idsList[repid], hit['bd'], cluster))
 	hitsNew.sort(key = lambda x: x['bd'][0])
+	return hitsNew
+
+def parallel4overlappedHits(args):
+	accid, hits = args
+	ids = set()
+	for pair in itertools.combinations(range(len(hits)), 2):
+		#if hits[pair[0]]['orf'][3] != hits[pair[1]]['orf'][3]:
+		#	continue # count hits with orf on different strands as different IS
+
+		bd1 = hits[pair[0]]['bd']
+		bd2 = hits[pair[1]]['bd']
+		measure, threshold = tools.chooseMeasure(bd1, bd2)
+		if measure < threshold:
+			continue
+
+		ids.update(pair)
+	if len(ids) > 0:
+		print('{}: {} intersected hits found, do clustering to pick the representative hit for each cluster'.format(accid, len(ids)))
+		hitsNew = clusterIntersect(hits, ids)
+	else:
+		print('{}: no intersected hits found'.format(accid))
+		hitsNew = hits[:]
 	return hitsNew
 
 def removeOverlappedHits(mhits):
 	mhitsNew = {}
+	margs = []
 	for accid, hits in mhits.items():
-		ids = set()
-		for pair in itertools.combinations(range(len(hits)), 2):
-			#if hits[pair[0]]['orf'][3] != hits[pair[1]]['orf'][3]:
-			#	continue # count hits with orf on different strands as different IS
-
-			bd1 = hits[pair[0]]['bd']
-			bd2 = hits[pair[1]]['bd']
-			measure, threshold = tools.chooseMeasure(bd1, bd2)
-			if measure < threshold:
-				continue
-
-			ids.update(pair)
-		if len(ids) > 0:
-			print('{}: {} intersected hits found, clustering them to pick the representative for each cluster'.format(accid, len(ids)))
-			hitsNew = clusterIntersect(hits, ids)
-		else:
-			hitsNew = hits[:]
-
-		mhitsNew[accid] = hitsNew
+		args = (accid, hits)
+		margs.append(args)
+	for args in margs:
+		mhitsNew[args[0]] = parallel4overlappedHits(args)
+	'''
+	nseq = len(margs)
+	if nseq > constants.nproc:
+		nproc = constants.nproc
+	else:
+		nproc = nseq
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
+		future2args = {executor.submit(parallel4overlappedHits, args): args for args in margs}
+		for future in concurrent.futures.as_completed(future2args):
+			args = future2args[future]
+			try:
+				hitsNew = future.result()
+			except Exception as e:
+				print('{} generated an exception: {} in parallel4overlappedHits'.format(args[0], e))
+			else: 
+				mhitsNew[args[0]] = hitsNew
+	'''
 	return mhitsNew
 
 	
@@ -375,10 +415,11 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 	#		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 	#		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 	#		'E-value', 'ov', # hmmhit: evalue4best1domain, overlap number output by hmmer
+	#		'tir', # tir
 	#		
 	#
-	fmtStrTitlePredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2}'
-	fmtStrPredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2}'
+	fmtStrTitlePredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
+	fmtStrPredictionNoSeq = '{:<30} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
 
 	#print(fmtStrTitlePrediction.format(
 	# sort keys of dictionary
@@ -437,6 +478,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 			'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 			'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 			'E-value', 'ov', # hmmhit: best1domain e-value and overlap number output by hmmer
+			'tir', # tir, seq1:seq2
 			), 
 			file = fp)
 		print('#', '-' * 139, file = fp)
@@ -520,6 +562,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 				score, irId, irLen, nGaps, # characteristics of tir 
 				orfBegin, orfEnd, strand, len4orf, # orf, probably virtual ORF
 				best1domE, ov, # hmmhit
+				':'.join([seq1,seq2]), # tir
 				),
 				file = fp)
 
@@ -580,7 +623,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 					fasta4fna4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
 						head4fna4orf1, orf1str, orfStr), fna4orf1)
 					fp4orffna.write(fasta4fna4orf1)
-			else:
+			elif head4fna4orf in proteins.keys():
 				# amino acid sequence
 				faa4orf = proteins[head4fna4orf]
 				fasta4faa4orf = tools.fasta_format(head4fna4orf, faa4orf)
@@ -593,6 +636,8 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 					fna4orf = seq[orfBegin-1: orfEnd]
 				fasta4fna4orf = tools.fasta_format(head4fna4orf, fna4orf)
 				fp4orffna.write(fasta4fna4orf)
+			else:
+				print('IS element without predicted Tpase ORF is found:', head4fna4orf)
 
 		fp4isfna.close()
 		fp4orffna.close()
@@ -658,10 +703,11 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	#		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 	#		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 	#		'E-value', 'ov', # hmmhit: evalue4best1domain, overlap number output by hmmer
+	#		'tir', # tir, seq1:seq2
 	#		
 	#
-	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2}'
-	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2}'
+	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
+	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
 
 	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
 	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
@@ -684,6 +730,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
 		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
 		'E-value', 'ov', # hmmhit: best1domain e-value and overlap number output by hmmer
+		'tir', # tir: seq1 and seq2 in tir, including gaps
 		), 
 		file = fp)
 	print('#', '-' * 139, file = fp)
@@ -716,8 +763,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 		org, fileid, seq = mDNA[seqid]
 
 		# proteomes: {seqid: (filename, genes), ..., seqid: (filename, genes)}
-		#	genes: {orfseqid: faa, ..., orfseqid: faa}
-		#	orfseqid: 'seqid_orfid', orfid = 'begin_end_strand'
+		# genes: {orfseqid: faa, ..., orfseqid: faa}
+		# orfseqid: 'seqid_orfid', orfid = 'begin_end_strand'
 
 		if seqid not in proteomes.keys():
 			continue
@@ -820,6 +867,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 				score, irId, irLen, nGaps, # characteristics of tir 
 				orfBegin, orfEnd, strand, len4orf, # orf, probably virtual ORF
 				best1domE, ov, # hmmhit
+				':'.join([seq1,seq2]), # tir
 				),
 				file = fp)
 
@@ -880,7 +928,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					fasta4fna4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
 						head4fna4orf1, orf1str, orfStr), fna4orf1)
 					fp4orffna.write(fasta4fna4orf1)
-			else:
+			elif head4fna4orf in proteins.keys():
 				# amino acid sequence
 				faa4orf = proteins[head4fna4orf]
 				fasta4faa4orf = tools.fasta_format(head4fna4orf, faa4orf)
@@ -893,6 +941,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					fna4orf = seq[orfBegin-1: orfEnd]
 				fasta4fna4orf = tools.fasta_format(head4fna4orf, fna4orf)
 				fp4orffna.write(fasta4fna4orf)
+			else:
+				print('IS elements without annotated Tpase:', head4fna4orf)
 
 		#print('>'+seqid, file=fp4sum)
 		#print('-' * 18, file=fp4sum)
@@ -1072,7 +1122,6 @@ def hitNeighors(morfhits):
 			orfhitsNeighbors[orfhits[0][0]] = [None, orfhits[1]] # first orfhit
 			orfhitsNeighbors[orfhits[-1][0]] = [orfhits[-2], None] # last orfhit
 		morfhitsNeighbors[seqid] = orfhitsNeighbors
-		#print('hello, neighbors', orfhitsNeighbors)
 
 	return morfhitsNeighbors
 
@@ -1299,19 +1348,31 @@ def getFullIS4seqOnStream(args):
 		e = 'Blastn ISs in {} against {}: {}'.format(seqid, seqid, err)
 		raise RuntimeError(e)
 
-	# get copy number of ORF extended sequence and copies (the Tpases of some IS copies might not be predicted/annotated by 
-	#	gene prediction tools, e.g., IS1I (257908, 258675, -) which is annotated by NCBI but no CDS is annotated by NCBI) 
-	#	missed by querying pHMM against proteome
-	# PLEASE DO ADD ALL COPIES INTO THE HITS BECAUSE THERE MIGHT BE SOME IS COPIES WITHOUT THE CORRECT TPASE ORF PREDICTED BY GENE PREDICTION
-	# TOOL SUCH AS FRAGGENESCAN AND NCBI GENE ANNOTATION.
+	# get copies of IS elements from ORF extended sequence (query) and genome sequence (subject)
 	ispairs = {}
-	# ispairs: {qseqid:[hit, ...]}
+	# ispairs: {qseqid:[hit, ...], ...}
 	# hit: {'qseqid':qseqid, 'sseqid':sseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'length':length, ...}
 	for k, g in itertools.groupby(
 			sorted(tools.getBlastResult4dnaOnStream(blastOut4orfExt), key=lambda x: x['qseqid']), 
 			key=lambda x: x['qseqid']):
 		ispairs[k] = list(g)
 		ispairs[k].sort(key = lambda x: x['length'], reverse = True)
+
+		# Let the first element in g the self-alignment hit. It ensure that the codes in other places
+		# can function correctly when they assume the first element of g is the self-alignment. One such
+		# codes is in addNonORFcopy().
+		for i,hit in enumerate(ispairs[k]):
+			qbd = [hit['qstart'], hit['qend']]
+			qbd.sort()
+			sbd = [hit['sstart'], hit['send']]
+			sbd.sort()
+			if qbd == sbd:
+				break
+		# if the self-alignment is not the first element in g, move the first i+1 elements,
+		# else do nothing.
+		if i > 0:
+			ispairs[k][1:i+1] = ispairs[k][:i]
+			ispairs[k][0] = hit
 	
 	# orfhits: [orfhit, ..., orfhit]
 	# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
@@ -1322,8 +1383,9 @@ def getFullIS4seqOnStream(args):
 			orfstr = '_'.join([str(item) for item in orfhit[0][1:]])
 			if orfstr == orfstr4is:
 				break
-		for ispair in g:
-			ispair['orfhit'] = orfhit
+		for i,hit in enumerate(g):
+			g[i]['orfhit'] = orfhit
+		ispairs[qseqid] = g
 	return ispairs
 
 # Return mhits:
@@ -1336,48 +1398,46 @@ def getFullIS4seqOnStream(args):
 # hmmhit: (familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
 # bd: [start, end], boundary of hit (IS element)
 # 
-# mispairs: {seqid: ispairs, ..., seqid: ispairs}
-# ispairs: {qseqid: g, ..., qseqid: g}
-# g: [ispair, ..., ispair]
-# ispair: {'qseqid':qseqid, 'length':length, 'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
-#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident,
-#		'orfBegin':orfBegin, 'orfEnd':orfEnd, 'orfhit':orfhit, ...}
+# morfhits: {seqid: orfhits, ...}
+# orfhits: [orfhit, ...]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orf: (seqid, begin, end, strand)
+#
 # 1. define IS boundary by TIR if TIR is available in an IS element
 # 2.1 define IS boundary by alignment if no TIR is available in a multiple-copy IS element and alignment 
 #	does not span/intersect multiple Tpase ORFs; else
 # 2.2 define IS boundary by ORF
 # 3. define IS boundary by ORF if no TIR is available in a single-copy IS element
-def mTIR2hits4ispair(mispairs, mTIR, morfhitsNeighbors):
+def mTIR2hits4orfhit(morfhits, mTIR, morfhitsNeighbors):
 	mhits = {}
-	for seqid, ispairs in mispairs.items():
-		if len(ispairs) == 0:
+	for seqid, orfhits in morfhits.items():
+		if len(orfhits) == 0:
 			continue
 		hits = []
-		for qseqid, g in ispairs.items():
-			orfhitsNeighbors = morfhitsNeighbors[seqid]
+		orfhitsNeighbors = morfhitsNeighbors[seqid]
+		for orfhit in orfhits:
 			hit = {}
-			orfhit = g[0]['orfhit']
 			orf = orfhit[0]
 			orfStr = '_'.join([str(item) for item in orf])
 			hit['orf'] = orf
 			hit['hmmhit'] = orfhit[1:]
+			ncopy4tpase = orfhit[4]
 			if orfStr not in mTIR:
 				hit['tirs'] = []
 			else:
 				hit['tirs'] = mTIR[orfStr][2]
 
-			ncopy = len(g)
+			ncopy = ncopy4tpase
 
-			# IS element with TIR, with boundary defined by the first TIR
+			# IS element with TIR, with boundary defined by the first TIR with the best irScore
+			# calculated by tools.isScore().
 			if len(hit['tirs']) > 0 and len(hit['tirs'][0]) > 0:
 				tir = hit['tirs'][0]
 				hit['bd'] = [tir[-6], tir[-3]]
 			# multiple-copy IS element without TIR, with boundary defined by 
-			# the longest blast alignment, namely, g[1] because g[0] is the 
-			# alignment of query and itself.
+			# the blast alignment.
 			elif ncopy > 1:
-				#hit['bd'] = [g[1]['qstart'], g[1]['qend']]
-				qstart, qend = g[1]['qstart'], g[1]['qend']
+				qstart, qend = orf[1:3]
 
 				# if aligned region spans two or more Tpases, eg. composite transposon, 
 				# the current hit in the aligned region is trimmed to the tpase ORF.
@@ -1400,17 +1460,22 @@ def mTIR2hits4ispair(mispairs, mTIR, morfhitsNeighbors):
 			# add copy number info to hit (IS element)
 			hit['occurence'] = {}
 			hit['occurence']['ncopy4is'] = ncopy
-			hit['occurence']['ncopy4orf'] = 0
+			hit['occurence']['ncopy4orf'] = ncopy
 			hit['occurence']['sim4orf'] = 0.0
 			hit['occurence']['sim4is'] = 0.0
-
 			hits.append(hit)
 		if len(hits) > 0:
 			hits.sort(key = lambda x: x['bd'][0])
 			mhits[seqid] = hits
 	return mhits
 
-def getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors):
+
+# mispairs: {seqid:ispairs, ...}
+# ispairs: {qseqid:[hit, ...], ...}
+# hit: {'qseqid':qseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'sseqid':sseqid, 'length':length, 
+#		'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
+#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident}
+def getCopy(mOrfHits, mDNA):
 	mispairs = {}
 	margs = []
 	for seqid, orfHits in mOrfHits.items():
@@ -1425,10 +1490,12 @@ def getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbor
 	'''
 
 	nseq = len(margs)
-	#if nseq > constants.nproc:
-	#	nproc = constants.nproc
-	#else:
-	#	nproc = nseq
+	'''
+	if nseq > constants.nproc:
+		nproc = constants.nproc
+	else:
+		nproc = nseq
+	'''
 	if nseq > constants.nthread:
 		nthread = constants.nthread
 	else:
@@ -1445,16 +1512,294 @@ def getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbor
 				print('{} generated an exception: {}'.format(args[0], e))
 			else:
 				mispairs[args[0]] = ispairs
+	return mispairs
 
-	mInput4ssw, mboundary = is_analysis.prepare4ssw2findIRbyDNAbyFar4ispair(
-			mispairs, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+# Return maxgs
+# maxgs: the group of groups with the largest number of items in the original group
+def largeGroup(gs):
+	gslist = []
+	for k,g in gs:
+		g = list(g)
+		gslist.append((k,g, len(g)))
+	# sort by number of items in group
+	gslist.sort(key = operator.itemgetter(2), reverse = True)
+	# group by number of items in group
+	# gss: groups of groups
+	gss = itertools.groupby(gslist, key = operator.itemgetter(2))
 
-	#filters = constants.filters4ssw4flankingAndISmax
-	#filters = constants.filters4ssw4flanking
+	# Get the largest groups
+	#
+	# next(gss) to get the first item (a tuple) in gss, (n, gs)
+	# n: number of groups in gs
+	n_gs = next(gss)
+	maxgs = n_gs[1]
+	# maxgs: the group of groups with the largest number of items in the original group
+	# list(maxgs): [g, ...]
+	# g: (k, group, n)
+
+	return maxgs
+
+# orfHits: [orfhit, ..., orfhit]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+# orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
+def clusterIntersect4orf(orfhits, ids):
+	# get the non-intersected/-overlapped orfhits
+	orfhitsNew = [orfhit for i,orfhit in enumerate(orfhits) if i not in ids]
+
+	# Replace ov with ncopy4tpase which is 1 in case of orfhits with single-copy Tpase
+	for i,orfhit in enumerate(orfhitsNew):
+		orf, clusterName, evalue4domain, evalue4fullseq, ov = orfhit
+		# single-copy Tpase
+		ncopy4tpase = 1
+		orfhitsNew[i] = (orf, clusterName, evalue4domain, evalue4fullseq, ncopy4tpase)
+
+	# We now begin to get multi-copy Tpases by clustering overlapped orfhits and 
+	# retrieving the representative orfhit of each cluster of overlapped orfhits.
+
+	idsList = sorted(ids)
+	data = []
+	for id in idsList:
+		data.append(orfhits[id][0][1:3])
+	Y = numpy.array(data, int)
+	#print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
+	#distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunction)
+	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
+	#hclusters = fastcluster.linkage(distMatrix, method='single', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
+	#hclusters = fastcluster.linkage(distMatrix, method='complete', preserve_input='False')
+	del distMatrix
+	#for i, id in enumerate(idsList):
+	#	print('intersected orfhits', i, orfhits[id])
+
+	# form flat clusters from the hierarchical clustering
+	# Note: t=1.1 instead of 1 ensures that the intersected orfhits with only 1 bp intersect are 
+	# included in the same cluster.
+	#t = 1.1
+	#
+	# When tools.distFunctionByoverlap_min() is used:
+	# use t=0.5 (50%) to ensure that the orfhits with the overlap of 50% or less  will not be included
+	# in the same cluster.
+	# Refer to tools.distFunctionByoverlap_min for definition of distance between two vectors.
+	t = 0.5
+	clusters = scipy.cluster.hierarchy.fcluster(hclusters, t, criterion='distance')
+
+	# determine the representative orfhit in each cluster
+	# 1) The orfhit with lower e-value has priority
+	# 2) With the same e-value, the longer orfhit has priority
+	clustersDic = {}
+	for i, clusterid in enumerate(clusters):
+		if clusterid in clustersDic.keys():
+			clustersDic[clusterid].append(i)
+		else:
+			clustersDic[clusterid] = [i]
+	# determine the representative orfhit for each cluster and append the representative orfhits to orfhitsNew
+	for cluster in clustersDic.values():
+		'''
+		print('hello, size of cluster:', len(cluster))
+		for id in cluster:
+			print('hello clustered orfhits:', orfhits[idsList[id]])
+		'''
+
+		# sort by full_sequence_E-value
+		cluster.sort(key = lambda x: orfhits[idsList[x]][3])
+
+		# sort and group by (strand, clusterName)
+		#cluster.sort(key = lambda x: (orfhits[idsList[x]][0][3], orfhits[idsList[x]][1]))
+		#gs = itertools.groupby(cluster, key = lambda x: (orfhits[idsList[x]][0][3], orfhits[idsList[x]][1]))
+
+		# sort and group by clusterName
+		cluster.sort(key = lambda x: orfhits[idsList[x]][1])
+		gs = itertools.groupby(cluster, key = lambda x: orfhits[idsList[x]][1])
+
+		# Get the largest group with the most number of items.
+		# If more than one largest groups exist, we only keep the group containing the item with 
+		# the smallest evalue.
+		#
+		# gs: groups of items, the items in the same group are sorted by evalue
+		# maxgs: iterator, group of groups grouped by clusterName
+		maxgs = largeGroup(gs)
+		maxgs = list(maxgs)
+		# maxgs: [gnew, ...]
+		# gnew: (clusterName, g, n4items)
+		# g: [index, ...]
+		#
+		# Get the group containing item with smallest evalue
+		maxgs.sort(key = lambda x: orfhits[idsList[x[1][0]]][3]) # x[1][0]: the first item of group sorted by evalue
+		g = maxgs[0][1]
+
+		ncopy4tpase = len(g)
+		'''
+		if ncopy4tpase > 1:
+			for id in g:
+				print('hello overlapped orfhits', orfhits[idsList[id]])
+		'''
+
+		bds = []
+		for id in g:
+			orf = orfhits[idsList[id]][0]
+			bds.append(orf[1:3])
+		# get representative boundary for the overlapped orfhits
+		if len(bds) > 1:
+			bd = tools.consensusBoundaryByCutoffBySeparated(bds)
+			#bd = tools.consensusBoundaryByCutoffByCombined(bds, cutoff=CUTOFF4WINDOW)
+		else:
+			bd = bds[0]
+
+		# Get meta information such as seqid and evalue of the representative orfhit
+		#
+		# Here, we simply use the first orfhit in group of orfhits with same evalue to
+		# retrieve the seqid, clusterName, evalue for the representative orfhit.
+		orf, clusterName, evalue4domain, evalue4fullseq, ov = orfhits[idsList[g[0]]]
+		seqid = orf[0]
+		strand = orf[3]
+		# build the representative orfhit but replacing ov with ncopy4tpase
+		orfhit = ((seqid, bd[0], bd[1], strand), clusterName, evalue4domain, evalue4fullseq, ncopy4tpase)
+
+		# Add the multi-copy orfhit into the orfhitsNew
+		orfhitsNew.append(orfhit)
+		#print('representative orfhit:', orfhit)
+
+	# sort by begin of ORF
+	orfhitsNew.sort(key = lambda x: x[0][1])
+	return orfhitsNew
+
+def parall4orfhits(args):
+	seqid, orfhits = args
+	ids = set()
+	for pair in itertools.combinations(range(len(orfhits)), 2):
+		bd1 = orfhits[pair[0]][0][1:3]
+		bd2 = orfhits[pair[1]][0][1:3]
+		measure, threshold = tools.chooseMeasure(bd1, bd2)
+		if measure < threshold:
+			continue
+		ids.update(pair)
+	# replace ov with ncopy4tpase and remove the overlapped orfhits if the genome sequence
+	# contains multi-copy tpase
+	if len(ids) > 0:
+		orfhitsNew = clusterIntersect4orf(orfhits, ids)
+	# replace ov with ncopy4tpase if the genome sequence contains only single-copy tpase
+	else:
+		orfhitsNew = []
+		for orfhit in orfhits:
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+			ncopy4tpase = 1 # for single-copy hits
+			orfhitNew = (orfhit[0], orfhit[1], orfhit[2], orfhit[3], ncopy4tpase)
+			# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase), 
+			orfhitsNew.append(orfhitNew)
+	return orfhitsNew
+
+# Remove the redundant Tpase ORFs
+def removeOverlappedOrfhits(mOrfHits):
+	mOrfHitsNew = {}
+	margs = []
+	for seqid, orfhits in mOrfHits.items():
+		args = (seqid, orfhits)
+		margs.append(args)
+	'''
+	for args in margs:
+		mOrfHitsNew[args[0]] = parall4orfhits(args)
+	'''
+	nseq = len(margs)
+	if nseq > constants.nproc:
+		nproc = constants.nproc
+	else:
+		nproc = nseq
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
+		future2args = {executor.submit(parall4orfhits, args): args for args in margs}
+		for future in concurrent.futures.as_completed(future2args):
+			args = future2args[future]
+			try:
+				orfhitsNew = future.result()
+			except Exception as e:
+				print('{} generated an exception: {} in parall4orfhits'.format(args[0], e))
+			else:
+				mOrfHitsNew[args[0]] = orfhitsNew
+	return mOrfHitsNew
+
+# Add the IS copies without predicted ORF into the list of hits, and consider those copies as the 
+# virtual ORF with the boundary of copy being the boundary of virtual ORF.
+#
+# mispairs: {seqid:ispairs, ...}
+# ispairs: {qseqid:[hit, ...]}
+# hit: {'qseqid':qseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'sseqid':sseqid, 'length':length, 
+#		'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
+#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident}
+#
+# morfHits: {seqid: orfHits, ...}
+# orfHits: [orfhit, ..., orfhit]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+# orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
+#
+# Return mOrfHitsNew
+# mOrfHitsNew: {seqid: orfHits, ...}
+# orfHits: [orfhit, ..., orfhit]
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orf: (seqid, begin, end, strand), example, ('gi|556503834|ref|NC_000913.3|', 20, 303, '+')
+#
+def addNonORFcopy(mispairs, mOrfHits):
+	# Find the new copies without qseqid (namely, the copy without predicted Tpase ORF),
+	#       which is missed by querying pHMM against proteome.
+	# For example, IS1I (257908, 258675, -) in NC_000913.gbk, which is annotated by NCBI but no CDS 
+	#	is annotated by NCBI.
+	# Such copy only appears in subject, namely, it will not appear in the list of query sequences because
+	# it has no predicted Tpase ORF (query sequences are extended ORF sequences in our method).
+	# copypairs: {seqid:pairs, ...}, dictionary for multi-copy hits
+	# pairs: [hit, ...], one multi-copy hit with the additional subject seqs which are the the additional
+	#	copies of the query seq.
+	copypairs = {}
+	for seqid,ispairs in mispairs.items():
+		copypairs[seqid] = []
+		for qseqid,hits in ispairs.items():
+			# single-copy hit, namely, single-copy extended tpase ORF
+			if len(hits) < 2:
+				continue
+			# hit[0] is the self of query sequence, hit[1:] are the additional copies of qeury sequence
+			copypairs[seqid].extend(hits[1:])
+
+	# Add the new copies without Tpase ORF to mOrfHits
+	mOrfHitsNew = {}
+	for seqid,orfhits in mOrfHits.items():
+		mOrfHitsNew[seqid] = orfhits
+		if len(copypairs[seqid]) == 0:
+			continue
+		for hit in copypairs[seqid]:
+			begin, end, strand = hit['sstart'], hit['send'], '+'
+			if begin > end:
+				begin, end, strand = hit['send'], hit['sstart'], '-'
+			orf = (seqid, begin, end, strand)
+
+			# To find the orfhit corresponding to the query and assign pHMM hit info (familyName, 
+			# best_1_domain_Evalue, full_sequence_Evalue, overlap_number) to the aditional copy 
+			# (virtual Tpase ORF) of query.
+			# hit['qseqid'] example, 'gi|556503834|ref|NC_000913.3|_IS1_7_15990_24293_19693_20590_-'
+			queryOrf = hit['qseqid'].rsplit(sep='_', maxsplit=3)[1:]
+			queryOrf = (int(queryOrf[0]), int(queryOrf[1]), queryOrf[2])
+			for orfhit in orfhits:
+				if orfhit[0][1:] == queryOrf:
+					familyName, best_1_domain_Evalue, full_sequence_Evalue, overlap_number = orfhit[1:]
+					break
+			else:
+				# queryOrf is not found in orfhits
+				e = 'queryOrf ({}) is not found in orfhits ({})'.format(queryOrf, [orfhit[0][1:] for orfhit in orfhits])
+				raise RuntimeError(e)
+			orfhit4copy = (orf, familyName, best_1_domain_Evalue, full_sequence_Evalue, overlap_number)
+			orfhits.append(orfhit4copy)
+
+	# remove redundant orfhits by clustering the overlaped/intersected copies
+	mOrfHitsNew = removeOverlappedOrfhits(mOrfHitsNew)
+	return mOrfHitsNew
+
+def getFullIS(morfhits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors):
+	mInput4ssw, mboundary = is_analysis.prepare4ssw2findIRbyDNAbyFar4orfhits(
+			morfhits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbors)
+
 	filters = constants.filters4ssw4trial
-	#filters = constants.filters4ssw4oasis
-	#filters = constants.filters4ssw_default
 	TIRfilters = []
+	# TIRs: [TIR, ...]
+	# ir4orf: [familyName, orfStr, ir], both familyName and orfStr are from pHMM hit.
+	# orfStr: string, e.g., 'gi|256374160|ref|NC_013093.1|_20_303_+' which is the orfStr of
+	#       orf('gi|256374160|ref|NC_013093.1|', 20, 303, '+')
+	# ir: [] or [score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2]
 	for filter in filters:
 		TIRs = is_analysis.findIRbySSW(mInput4ssw, filter)
 		TIRfilters.extend([(TIR, filter) for TIR in TIRs])
@@ -1473,7 +1818,7 @@ def getFullIS(mOrfHits, mDNA, maxDist4ter2orf, minDist4ter2orf, morfhitsNeighbor
 	#	does not span/intersect multiple Tpase ORFs; else
 	# 2.2 define IS boundary by ORF
 	# 3. define IS boundary by ORF if no TIR is available in a single-copy IS element
-	mHits = mTIR2hits4ispair(mispairs, mTIR, morfhitsNeighbors)
+	mHits = mTIR2hits4orfhit(morfhits, mTIR, morfhitsNeighbors)
 
 	return mHits
 
@@ -1519,11 +1864,76 @@ def chooseHits(mHitsByNear, mHitsByFar):
 		mhits[accid] = hits
 	return mhits
 
+# Remove the potential false positive hits which are neither complete or partial IS elements.
+# mhits: {seqid: hits, ..., seqid: hits}
+# hits: [hit, ..., hit]
+# hit: {'orf': orf, 'tirs': tirs, 'hmmhit': hmmhit, 'bd': bd, 'occurence': occurence}
+# orf: (seqid, begin, end, strand)
+# tirs: [tir, ..., tir]
+# tir: (score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2)
+# hmmhit: (familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
+# bd: [start, end], boundary of hit (IS element)
+# occurence: {'ncopy4orf': ncopy4orf, 'sim4orf': sim4orf, 'ncopy4is': ncopy4is, 'sim4is': sim4is}
+#
+def removeFalsePositive(mhits):
+	cutoff4irId4short = constants.cutoff4irId4short # 13 by default
+	cutoff4irId4long = constants.cutoff4irId4long # 20 by default
+	irSim4singleCopy = constants.irSim4singleCopy # 0.75 by default, namely, 75%
+	evalue4singleCopy = constants.evalue4singleCopy # e-50 by default
+	mhitsNew = {}
+	for accid,hits in mhits.items():
+		hitsNew = []
+		for hit in hits:
+			familyName = hit['hmmhit'][0]
+			if '|' in familyName:
+				familyCluster = familyName.split('|',1)[0]
+			else:
+				familyCluster = familyName
+			family, cluster = familyCluster.rsplit('_', 1)
+			# deal with family 'new'
+			if family == 'new':
+				# single-copy hits
+				if hit['occurence']['ncopy4is'] < 2:
+					# The hits with evalue > cutoff are thrown away.
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						continue
+					# remove hits without tir
+					elif len(hit['tirs']) == 0:
+						continue
+					# remove hits with tir sequence pair aligned with gap
+					elif hit['tirs'][0][3] > 0:
+						continue
+					# remove hits with irId < 20
+					elif hit['tirs'][0][1] < cutoff4irId4long:
+						continue
+					# remove hits with irId/irLen < 75%
+					elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
+						continue
+				# multi-copy hits
+				else:
+					# evalue > cutoff
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						# remove hits with irId < 13
+						if len(hit['tirs']) == 0 or hit['tirs'][0][1] < cutoff4irId4short:
+							continue
+						# remove hits with gaps in TIR and irId < 20
+						elif hit['tirs'][0][1] < cutoff4irId4long and hit['tirs'][0][3] > 0:
+							continue
+			# familys other than 'new'
+			else:
+				pass
+			hitsNew.append(hit)
+		mhitsNew[accid] = hitsNew
+	return mhitsNew
+
 # Remove short hit
 def refineHits(mHits):
-	evalue_cutoff = constants.min4evalue
-	evalue4singleCopy = constants.evalue4singleCopy
-	irSim4singleCopy = constants.irSim4singleCopy
+	evalue4singleCopy = constants.evalue4singleCopy # e-50 by default
+	cutoff4irId4short = constants.cutoff4irId4short # 13 by default
+	cutoff4irId4long = constants.cutoff4irId4long # 20 by default
+	cutoff4irId4multicopy = constants.cutoff4irId4multicopy # 10 by default
+	excludedFamilys = constants.excludedFamilys
+
 	mhitsCopy = {}
 	for accid in mHits.keys():
 		hitsCopy = []
@@ -1542,38 +1952,47 @@ def refineHits(mHits):
 					minLen4is, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 				continue
 
-			#if hit['hmmhit'][2] > evalue_cutoff:
-			#	continue
-
-			# test evalue and number of Tpase copies (IS copies)
-			# filter out hits with non-significant e-value and without TIR
-			if hit['hmmhit'][2] > evalue4singleCopy and len(hit['tirs']) == 0:
-				print('remove partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
-					isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
-				continue
-			elif hit['hmmhit'][2] > evalue4singleCopy and hit['occurence']['ncopy4is'] < 2:
-				# filter out hits without TIR
-				if len(hit['tirs']) == 0:
-					print('remove single-copy partial IS element without tir: isLen={} bd={} orf{} evalue={}'.format(
-						isLen, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+			# single-copy hits
+			if hit['occurence']['ncopy4is'] < 2:
+				# filter out hits with evalue > cutoff
+				if hit['hmmhit'][2] > evalue4singleCopy:
 					continue
-				# filter out hits with gaps in TIR (alignment of left hand rigth hand TIR sequences)
-				elif hit['tirs'][0][3] > 0:
-					print('remove single-copy partial IS element with gap in tir: nGaps={} bd={} orf{} evalue={}'.format(
-						hit['tirs'][0][3], hit['bd'], hit['orf'], hit['hmmhit'][2]))
-					continue
-				# filter out hits with irId/irLen < irSim4singleCopy (default 0.85)
-				elif hit['tirs'][0][1]/hit['tirs'][0][2] < irSim4singleCopy:
-					print('remove single-copy partial IS element with irId/irLen < {}: irId/irLen={} bd={} orf{} evalue={}'.format(
-						irSim4singleCopy, hit['tirs'][0][1]/hit['tirs'][0][2], hit['bd'], hit['orf'], hit['hmmhit'][2]))
-					continue
-
+				# familys other than IS200/IS605
+				elif family != 'IS200/IS605':
+					# filter out hits without tir
+					if len(hit['tirs']) == 0:
+						continue
+					# filter out hits with irId < 13
+					elif hit['tirs'][0][1] < cutoff4irId4short:
+						continue
+					# filter out hits with gaps in TIR and irId < 20
+					elif hit['tirs'][0][1] < cutoff4irId4long and hit['tirs'][0][3] > 0:
+						continue
+				# family IS200/IS605
+				else:
+					pass
+			# multi-copy hits
+			else:
+				# IS200/IS605
+				if family == 'IS200/IS605':
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						continue
+				elif family not in excludedFamilys:
+					# filter out hits without tir
+					if len(hit['tirs']) == 0:
+						continue
+					# filter out hits with irId < 10
+					elif hit['tirs'][0][1] < cutoff4irId4multicopy:
+						continue
+				else:
+					pass
 			hitsCopy.append(hit)
 		if len(hitsCopy) == 0:
 			print('Warning: no valid hit found for {}'.format(accid))
 			continue
 		# sort hit by begin of orf
 		#hitsCopy.sort(key=lambda x: x['orf'][1])
+		# sort hit by begin of boundary 
 		hitsCopy.sort(key=lambda x: x['bd'][0])
 		mhitsCopy[accid] = hitsCopy
 	
@@ -1765,9 +2184,11 @@ def pred(args):
 	# mDNA:	{seqid: (org, fileid, sequence), ..., seqid: (org, fileid, sequence)}
 	mDNA = {}
 	dnaFiles = tools.rdDNAlist(args['dna_list'])
+	
 	for item in dnaFiles:
 		file, org = item
 		filename = os.path.basename(file)
+
 		#fileid = filename.rsplit('.', 1)[0]
 		fileid = filename
 		fileids.append((fileid, org))
@@ -1792,7 +2213,8 @@ def pred(args):
 		tblout_list = prepare4tblout_list(hmm_path, fileids)
 	if len(tblout_list) == 0:
 		print('No results returned by HMM search was found for sequences in', args['dna_list'])
-		return None
+		print('End in pred', datetime.datetime.now().ctime())
+		return 0
 
 	#print('Processing tblout files at', datetime.datetime.now().ctime())	
 	mtblout_hits_sorted = []
@@ -1911,21 +2333,24 @@ def pred(args):
 		# IS family HMM searches.
 		hits_sorted = refine_hmm_hits(hits_sorted)
 
-		# remove non-significant hits with E-value > cutoff
 		if hits_sorted == None or len(hits_sorted) == 0:
 			e = 'No hit was found for {} {}'.format(seqid, seqid_hits)
 			print(e)
-			return 0
+			continue	
 
+		# remove non-significant hits with E-value > cutoff
 		hits_sorted_refined = refine_hmm_hits_evalue(hits_sorted, e_value)
 		if len(hits_sorted_refined) == 0:
 			print('Warning: no significant hit with E-value <= {} found for {}'.format(
 				e_value, seqid))
 			continue
 		mtblout_hits_sorted_refined.append((seqid, hits_sorted_refined))
-	#print('Finish refining hits for each DNA sequence', datetime.datetime.now().ctime())
 	if len(mtblout_hits_sorted_refined) == 0:
-		return None
+		seqids = [item[0] for item in mtblout_hits_sorted]
+		print('Warning: no significant hit with E-value <= {} found for {}'.format(
+			e_value, ','.join(seqids)))
+		print('End in pred', datetime.datetime.now().ctime())
+		return 0
 
 	mtblout_hits_sorted = mtblout_hits_sorted_refined
 
@@ -1956,11 +2381,37 @@ def pred(args):
 	mOrfHits, morfsMerged = mergeOrfs(mOrfHits, maxDistBetweenOrfs)
 
 
+	# Get copies of the IS elements in a sequence
+	#
+	# mispairs: {seqid:ispairs, ...}
+	# ispairs: {qseqid:[hit, ...]}
+	# hit: {'qseqid':qseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'sseqid':sseqid, 'length':length, 
+	#		'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
+	#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident}
+	# Search for copies of IS elements and create mispairs data structure
+	mispairs = getCopy(mOrfHits, mDNA)
+	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of 
+	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.) 
+	# into the list of hits, the mOrfHits is updated in place.
+	print('Begin addNonORFcopy at', datetime.datetime.now().ctime())
+	mOrfHits = addNonORFcopy(mispairs, mOrfHits)
+	print('Finish addNonORFcopy at', datetime.datetime.now().ctime())
+	#
+	# Update mispairs data structure with the updated mOrfHits
+	mispairs = getCopy(mOrfHits, mDNA)
+	#
+	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of
+	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.)
+	# into the list of hits, the mOrfHits is updated in place.
+	print('Begin addNonORFcopy1 at', datetime.datetime.now().ctime())
+	mOrfHits = addNonORFcopy(mispairs, mOrfHits)
+	print('Finish addNonORFcopy1 at', datetime.datetime.now().ctime())
+
 	#print('hitNeighors() begins at', datetime.datetime.now().ctime())
-	# search TIR for multiple-copy IS element candidate and single-copy IS element candidate
 	minDist4ter2orf = constants.minDist4ter2orf
 	morfhitsNeighbors = hitNeighors(mOrfHits)
 
+	# search TIR for multiple-copy IS element candidate and single-copy IS element candidate
 	print('getFullIS() begins at', datetime.datetime.now().ctime())
 	# look for tir in the neighboring region of Tpase ORF in case of single-copy IS
 	maxDist4ter2orf = constants.outerDist4ter2tpase[0]
@@ -1974,11 +2425,13 @@ def pred(args):
 	# rule: keep tir near Tpase ORF if tir found in mHitsByNear, else use
 	#       tir found in mHitsByFar.
 	mHits = chooseHits(mHitsByNear, mHitsByFar)
-	#mHits = mHitsByFar
 
 	#for hits in mHits.values():
 	#	for hit in hits:
 	#		print('raw hit', hit['bd'], hit['orf'], hit['hmmhit'], hit['occurence'], hit['tirs'])
+
+	# remove the potential false positive hits
+	mHits = removeFalsePositive(mHits)
 
 	# remove hits that are partial IS elements identified by length, evalue and irId/irLen
 	if constants.removeShortIS == True:
@@ -1988,7 +2441,9 @@ def pred(args):
 
 	# remove redundant IS elements with same boundary and same TIR
 	mHits = removeRedundantIS(mHits)
+	print('Begin removeOverlappedHits at', datetime.datetime.now().ctime())
 	mHits = removeOverlappedHits(mHits)
+	print('Finish removeOverlappedHits at', datetime.datetime.now().ctime())
 
 	# Calculate socore for each hit and then attach score to hit
 	#print('Begin scoring hits at', datetime.datetime.now().ctime())
