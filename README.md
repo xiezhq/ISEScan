@@ -58,6 +58,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.4.1-ncbi
+  * Switch ISEScan to use NCBI gene annotation instead of the genes predicted by FragGeneScan as the Tpase candidates. It is useful when you believe the NCBI gene annotaion is better than FragGeneScan prediction for genome you are interested in.
 * 1.5.4.1
   * fix bug for batch4bacteria.py when *.sum files were created by either outputIndividual() or outputIS4multipleSeqOneFile() in pred.py
 * 1.5.4
