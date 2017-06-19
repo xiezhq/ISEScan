@@ -39,11 +39,11 @@ removeShortIS = True
 # When translateGenome is True, pipepline will predict and translate genes 
 # from genome sequence into protein database (file in fasta format) 
 # using FragGeneScan program.
-translateGenome = True
+#translateGenome = True
 # When translateGenome is False, pipeline will use the protein database (.faa file)
 # from ncbi genome database, and the corresponding .fna and .ptt files in the same folder
 # are required to map proteins to genome locations.
-#translateGenome = False
+translateGenome = False
 
 # set temporary directory used by ISEScan
 #tmpdir = 'tmpdir'
@@ -55,8 +55,8 @@ path2results = ''
 # for HPC system
 #path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
 
-dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.4')
-#dir4prediction = os.path.join(path2results, 'prediction.ncbi')
+#dir4prediction = os.path.join(path2results, 'prediction.v5.isescan1.5.4')
+dir4prediction = os.path.join(path2results, 'prediction.ncbi')
 #dir4prediction = os.path.join(path2results, 'prediction.test')
 
 # peptide sequences of single-member clusters, which is used by phmmer in hmmer
