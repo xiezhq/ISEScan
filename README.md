@@ -58,6 +58,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.2
+  * Swith options in constants.py to disable the translation of genome and instead use the NCBI gene annotaion in the calculations.  
 * 1.5.4
   * Add removeFalsePositive() to remove the potentail false positive in the 'new' family: 1) single-copy hits with e-value > e-50 or no tir or nGaps > 0 or irId < 20 or irId/irLen < 0.75; 2) multi-copy hits with evalue > e-50 and (irId < 13 or (irId < 20 and ngaps > 0))
   * Modify refineHits() to remove the single-copy partial IS elements: 1) if evalue > e-50 or (irId < 13 or (irId < 20 and ngaps > 0 for familys other than IS200/IS605)
