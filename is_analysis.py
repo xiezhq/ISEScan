@@ -88,7 +88,7 @@ def prepare4ssw2findIRbyDNAbyFar(mOrfHits, mDna):
 #
 # orfhitsNeighbors: {orf: orfhitneighbors, ..., orfhitneighbors}
 # orfhitneighbors: [before, orfhit, after], before/after is None or orfhit
-# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase, raworfhits)
 # orf: (seqid, begin, end, strand)
 def tirwindowIntersectORF(start1, end1, start2, end2, 
 		orfhit,
@@ -117,8 +117,11 @@ def tirwindowIntersectORF(start1, end1, start2, end2,
 #
 # morfhits: {seqid: orfhits, ...}
 # orfhits: [orfhit, ...]
-# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase, raworfhits)
 # orf: (seqid, begin, end, strand)
+# raworfhits: {'orfhits4tpase':orfhits4tpase}
+# orfhits4tpase: [] or [orfhit4tpase, ...]
+# orfhit4tpase: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
 #
 # orfhitsNeighbors: {orf: orfhitneighbors, ..., orfhitneighbors}
 # orfhitneighbors: [before, orfhit, after], before/after is None or orfhit
@@ -236,7 +239,6 @@ def prepare4ssw2findIRbyDNAbyFar4orfhits(morfhits, mDna, maxDist4ter2orf, minDis
 			orfStr = '_'.join((orf[0], str(orf[1]), str(orf[2]), orf[3]))
 			mInput4ssw.append((familyName, orfStr, lSeq, rSeq, minScore, minLen))
 			mboundary[orfStr] = (start1, end1, start2, end2)
-		#mInput4ssw.append(input4orfHits)
 	return (mInput4ssw, mboundary)
 
 		
@@ -1084,10 +1086,16 @@ def findIR4elementBySSW(args):
 
 
 # Find best IR for each element, and return all best IRs with one IR per element
+#
+# Input:
 # mInput4ssw: [input4IS1, .., input4ISn]
 # input4ISn: (familyName, isName, seq1, seq2, minScore, minLen)
 # minScore, minLen: the minimal score and length for the alignment to be reported
 # filter: (gapopen, gapextend, match, mismatch)
+# 
+# Return:
+# mBestIR: [TIR, ...]
+# TIR: [familyName, isName, ir]
 # ir: [] or [score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2]
 # seq1, seq2: inverted repeat sequences
 def findIRbySSW(mInput4ssw, filter):
@@ -1111,7 +1119,7 @@ def findIRbySSW(mInput4ssw, filter):
 			mBestIR.append([args[0][0], args[0][1], ir])
 	'''
 	for input4IS in mInput4ssw:
-		# familyName, isName, seq1, seq2, minScore, minLen = input4IS
+		# input4IS: (familyName, isName, seq1, seq2, minScore, minLen)
 		ir = findIR4elementBySSW((input4IS, filter))
 
 		#if len(ir) > 0 and (ir[3] > 0 or ir[1]/ir[2] < constants.irSim4singleCopy):

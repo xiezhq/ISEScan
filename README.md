@@ -58,6 +58,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+# 1.5.4.3
+  * Fix the bug which failed to report ORFs located in the multi-copy IS elements
 * 1.5.4.1
   * fix bug for batch4bacteria.py when *.sum files were created by either outputIndividual() or outputIS4multipleSeqOneFile() in pred.py
 * 1.5.4
