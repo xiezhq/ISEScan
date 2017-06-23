@@ -608,7 +608,8 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 					# amino acid sequence
 					head4faa4orf1 = '_'.join([orf1[0], orf1str])
 					faa4orf1 = proteins[head4faa4orf1]
-					fasta4faa4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
+					#fasta4faa4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
+					fasta4faa4orf1 = tools.fasta_format('{} {} assinged to {}'.format(
 						head4faa4orf1, orf1str, orfStr), faa4orf1)
 					fp4orffaa.write(fasta4faa4orf1)
 
@@ -618,7 +619,8 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 						fna4orf1 = tools.complementDNA(seq[orf1[1]-1: orf1[2]], '1')[::-1]
 					else:
 						fna4orf1 = seq[orf1[1]-1: orf1[2]]
-					fasta4fna4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
+					#fasta4fna4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
+					fasta4faa4orf1 = tools.fasta_format('{} {} assinged to {}'.format(
 						head4fna4orf1, orf1str, orfStr), fna4orf1)
 					fp4orffna.write(fasta4fna4orf1)
 			elif head4fna4orf in proteins.keys():
@@ -685,56 +687,165 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 #
 # orgfileid: org/fileid, character string, e.g. HMASM/SRS078176.scaffolds.fa
 def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
-	#fmtStrPrediction = '{:<60} # NCBI sequence ID
-	#		{:<11} # family
-	#		{:<59} # subgroup (cluster) ID
-	#		{:>12} {:>12} {:>6} # boundary and length of IS element
-	#		{:>8} # copy number of IS element
-	#		{:>12} {:>12} {:>12} {:>12} # boundary of tir: start1, end1, start2, end2
-	#		{:>5} {:>4} {:>5} {:>5} # characteristics of tir: score, irId, irLen, nGaps 
-	#		{:>12} {:>12} {:>6} {:>7} # orf: orfBegin, orfEnd, strand, length
-	#		{:>9.2g} {:>2}  # hmmhit
-	#
-	#		'seqID', # NCBI sequence ID
-	#		'family', # family name 
-	#		'cluster', # subgroup, cluster ID created by CD-hit clustering
-	#		'isBegin', 'isEnd', 'len4is', # boundary and length of IS element
-	#		'ncopy4is', # copy number of IS element
-	#		'start1', 'end1', 'start2', 'end2', # boundary of tir
-	#		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
-	#		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
-	#		'E-value', 'ov', # hmmhit: evalue4best1domain, overlap number output by hmmer
-	#		'tir', # tir, seq1:seq2
-	#		
-	#
-	fmtStrTitlePredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
-	fmtStrPredictionNoSeq = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
+	fmt4seqID = '{:<60}' # NCBI sequence ID
+	fmt4family = '{:<11}' # family
+	fmt4cluster = '{:<59}' # subgroup (cluster) ID
+	fmt4isBegin = '{:>12}' # left boundary of IS
+	fmt4isEnd = '{:>12}' # right boundary of IS
+	fmt4isLen = '{:>6}' # length of IS
+	fmt4ncopy4is = '{:>8}' # copy number of IS element
+	fmt4start1 = '{:>12}' # boundary of tir: start1
+	fmt4end1 = '{:>12}' # boundary of tir: end1
+	fmt4start2 = '{:>12}' # boundary of tir: start2
+	fmt4end2 = '{:>12}' # boundary of tir: end2
+	fmt4score4tir = '{:>5}' # characteristics of tir: score
+	fmt4irId = '{:>4}' # characteristics of tir: irId
+	fmt4irLen = '{:>5}' # characteristics of tir: irLen
+	fmt4nGaps4tir = '{:>5}' # characteristics of tir: nGaps 
+	fmt4orfBein = '{:>12}' # orfBegin
+	fmt4orfEnd = '{:>12}' # orfEnd
+	fmt4strand = '{:>6}' # strand
+	fmt4orfLen = '{:>7}' # orf: length of orf
+	fmt4evalue = '{:>9.2g}' # the best E-value of multiple copies
+	fmt4evalue4copy = '{:>12.2g}' # E-value of IS copy
+	fmt4evalue4title = '{:>9}' # format to print E-value in title line
+	fmt4evalue4copy4title = '{:>12}' # format to print E-value in title line
+	fmt4ov = '{:>2}'  # ov number of hmmsearch
+	fmt4tir = '{}' # terminal inverted repeat sequences, seq1:seq2
+
+	
+	title4seqID = 'seqID' # NCBI sequence ID
+	title4family = 'family' # family name 
+	title4cluster = 'cluster' # subgroup, cluster ID created by CD-hit clustering
+	title4isBegin = 'isBegin' # boundary of IS
+	title4isEnd = 'isEnd' # boundary of IS
+	title4isLen = 'isLen' # length of IS element
+	title4ncopy4is = 'ncopy4is' # copy number of IS
+	title4start1 = 'start1' 
+	title4end1 = 'end1' 
+	title44start2 = 'start2' 
+	title4end2 = 'end2' # boundary of tir
+	title4score = 'score' 
+	title4irId = 'irId' 
+	title4irLen = 'irLen' 
+	title4nGaps = 'nGaps' # characteristics of tir: 
+	title4orfBegin = 'orfBegin'
+	title4orfEnd = 'orfEnd' 
+	title4strand = 'strand' 
+	title4orfLen = 'orfLen' # tpase ORF: orfBegin, orfEnd, strand, length
+	title4evalue = 'E-value' # the best E-value of IS element with multiple copies, namely, 
+			# the E-value of the IS copy with the best E-vluae among all copies of the same IS element in a genome sequence
+	title4evalue4copy = 'E-value4copy' # E-value of the IS copy
+	title4ov = 'ov' # hmmhit: evalue, overlap number output by hmmer
+	title4tir = 'tir' # tir, seq1:seq2
+
+	titleLine = [
+			title4seqID ,  # NCBI sequence ID
+			title4family ,  # family name 
+			title4cluster ,  # subgroup, cluster ID created by CD-hit clustering
+			title4isBegin ,  # boundary of IS
+			title4isEnd ,  # boundary of IS
+			title4isLen ,  # length of IS element
+			title4ncopy4is ,  # copy number of IS
+			title4start1 ,  
+			title4end1 ,  
+			title44start2 ,  
+			title4end2 ,  # boundary of tir
+			title4score ,  
+			title4irId ,  
+			title4irLen ,  
+			title4nGaps ,  # characteristics of tir: 
+			title4orfBegin , 
+			title4orfEnd ,  
+			title4strand ,  
+			title4orfLen ,  # tpase ORF: orfBegin, orfEnd, strand, length
+			title4evalue ,  
+			title4ov ,  # hmmhit: evalue, overlap number output by hmmer
+			title4tir  # tir, seq1:seq2
+			]
+	titleLine4raw = titleLine[:len(titleLine)-2]
+	titleLine4raw.append(title4evalue4copy)
+	titleLine4raw.extend(titleLine[-2:])
+
+	fmtTitlePrediction = [
+			fmt4seqID ,  # NCBI sequence ID
+			fmt4family ,  # family
+			fmt4cluster ,  # subgroup (cluster) ID
+			fmt4isBegin ,  # left boundary of IS
+			fmt4isEnd ,  # right boundary of IS
+			fmt4isLen ,  # length of IS
+			fmt4ncopy4is ,  # copy number of IS element
+			fmt4start1 ,  # boundary of tir: start1
+			fmt4end1 ,  # boundary of tir: end1
+			fmt4start2 ,  # boundary of tir: start2
+			fmt4end2 ,  # boundary of tir: end2
+			fmt4score4tir ,  # characteristics of tir: score
+			fmt4irId ,  # characteristics of tir: irId
+			fmt4irLen ,  # characteristics of tir: irLen
+			fmt4nGaps4tir ,  # characteristics of tir: nGaps 
+			fmt4orfBein ,  # orfBegin
+			fmt4orfEnd ,  # orfEnd
+			fmt4strand ,  # strand
+			fmt4orfLen ,  # orf: length of orf
+			fmt4evalue4title ,  # format to print E-value of hmmsearch in title line
+			fmt4ov , # ov number of hmmsearch
+			fmt4tir , # terminal inverted repeat sequences, seq1:seq2
+			]
+	fmtTitlePrediction4raw = fmtTitlePrediction[:len(fmtTitlePrediction)-2]
+	fmtTitlePrediction4raw.append(fmt4evalue4copy4title)
+	fmtTitlePrediction4raw.extend(fmtTitlePrediction[-2:])
+	fmtStrTitlePrediction = ' '.join(fmtTitlePrediction)
+	fmtStrTitlePrediction4raw = ' '.join(fmtTitlePrediction4raw)
+	fmtPrediction = [
+			fmt4seqID ,  # NCBI sequence ID
+			fmt4family ,  # family
+			fmt4cluster ,  # subgroup (cluster) ID
+			fmt4isBegin ,  # left boundary of IS
+			fmt4isEnd ,  # right boundary of IS
+			fmt4isLen ,  # length of IS
+			fmt4ncopy4is ,  # copy number of IS element
+			fmt4start1 ,  # boundary of tir: start1
+			fmt4end1 ,  # boundary of tir: end1
+			fmt4start2 ,  # boundary of tir: start2
+			fmt4end2 ,  # boundary of tir: end2
+			fmt4score4tir ,  # characteristics of tir: score
+			fmt4irId ,  # characteristics of tir: irId
+			fmt4irLen ,  # characteristics of tir: irLen
+			fmt4nGaps4tir ,  # characteristics of tir: nGaps 
+			fmt4orfBein ,  # orfBegin
+			fmt4orfEnd ,  # orfEnd
+			fmt4strand ,  # strand
+			fmt4orfLen ,  # orf: length of orf
+			fmt4evalue ,  # format to print E-value of hmmsearch
+			fmt4ov , # ov number of hmmsearch
+			fmt4tir , # terminal inverted repeat sequences, seq1:seq2
+			]
+	fmtPrediction4raw = fmtPrediction[:len(fmtPrediction)-2]
+	fmtPrediction4raw.append(fmt4evalue4copy)
+	fmtPrediction4raw.extend(fmtPrediction[-2:])
+	fmtStrPrediction = ' '.join(fmtPrediction)
+	fmtStrPrediction4raw = ' '.join(fmtPrediction4raw)
+
+	#fmtStrTitlePrediction = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
+	#fmtStrPrediction      = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
 
 	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
 	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
 
 	common4output = os.path.join(constants.dir4prediction, orgfileid)
 	outFile = '.'.join([common4output, 'out'])
+	outFile4raw = '.'.join([common4output, 'raw'])
 	sumFile = '.'.join([common4output, 'sum'])
 	gffFile =  '.'.join([common4output, 'gff'])
 
 	tools.makedir(os.path.dirname(outFile))
 
 	fp = open(outFile, 'w')
-	print(fmtStrTitlePredictionNoSeq.format(
-		'seqID', # sequence ID
-		'family', # family name
-		'cluster', # cluster ID created by CD-hit clustering
-		'isBegin', 'isEnd', 'len4is', # boundary and length of IS element
-		'ncopy4is', # copy number of IS element
-		'start1', 'end1', 'start2', 'end2', # boundary of tir
-		'score', 'irId', 'irLen', 'nGaps', # characteristics of tir: 
-		'orfBegin', 'orfEnd', 'strand', 'len4orf', # tpase ORF: orfBegin, orfEnd, strand, length
-		'E-value', 'ov', # hmmhit: best1domain e-value and overlap number output by hmmer
-		'tir', # tir: seq1 and seq2 in tir, including gaps
-		), 
-		file = fp)
+	fp4raw = open(outFile4raw, 'w')
+	print(fmtStrTitlePrediction.format(*titleLine), file = fp)
+	print(fmtStrTitlePrediction4raw.format(*titleLine4raw), file = fp4raw)
 	print('#', '-' * 139, file = fp)
+	print('#', '-' * 139, file = fp4raw)
 
 	fp4sum = open(sumFile, 'w')
 	print(fmtStrTitleSum.format(
@@ -754,7 +865,6 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fp4orffaa = open(outFile4orffaa, 'w')
 
 
-	#print(fmtStrTitlePrediction.format(
 	# sort keys of dictionary
 	for seqid in sorted(mhits.keys()):
 		hits = mhits[seqid]
@@ -789,19 +899,27 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 		IDnum = 0 
 		#for hit in hits:
 		for hitID, hit in enumerate(hits):
-			#orfBegin, orfEnd, strand = hit['orf'][1:]
-			raworfhits = hit['hmmhit'][4]
+			# The value of ov was replaced by ncopy4tpase in previous steps.
+			cluster, best1domE, fullSeqE, ov, raworfhits = hit['hmmhit'][:5]
+			evalue = fullSeqE
 			orfhits4tpase = raworfhits['orfhits4tpase']
 			# for IS with Tpase
 			if len(orfhits4tpase) > 0:
-				orfBegin, orfEnd, strand = orfhits4tpase[0][0][1:]
+				# orfhits4tpase: [orfhit4tpase, ...]
+				# orfhit4tpase: (orf, ..., ov)
+				# We simply use the first Tpase orf with the best e-value in orfhits4tpase.
+				orfhit4tpase = orfhits4tpase[0]
+				evalue4copy = orfhit4tpase[3]
+				orf4tpase = orfhit4tpase[0]
+				orfBegin, orfEnd, strand = orf4tpase[1:]
 			# for IS without Tpase identified
 			else:
+				evalue4copy = -1
+				orf4tpase = ()
 				orfBegin, orfEnd, strand = 0, 0, ''
 
 
 			len4orf = orfEnd - orfBegin + 1
-			cluster, best1domE, fullSeqE, ov, = hit['hmmhit']
 			if 'IS200_IS605_' in cluster:
 				family = 'IS200/IS605'
 			else:
@@ -867,8 +985,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					), file = fp4gff)
 
 			# output .out file
-			#print(fmtStrPrediction.format(
-			print(fmtStrPredictionNoSeq.format(
+			args4out = [
 				seqid, # NCBI sequence ID
 				family, # family name
 				cluster, # cluster id
@@ -877,19 +994,26 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 				start1, end1, start2, end2, # tir boundary
 				score, irId, irLen, nGaps, # characteristics of tir 
 				orfBegin, orfEnd, strand, len4orf, # orf
-				best1domE, ov, # Warning for multi-copy IS elements: 
-						# It is actually the hmmhit of the best hit among all copies of the IS,
-						# not the hmmhit of the hit predicted in the current genome location
-						# because we assign the hmm attributes of the hit with best evalue to 
-						# the representative boundary of the multi-copy IS at the specific 
-						# genome location when we cluster and remove overlapped orfs by
-						# clusterIntersect4orf(). Basically, all copies of an IS element in a
-						# genome sequence will have the same hmm attribute such as evalue.
-						# We can try match the boundary of IS to the original orf and assign
-						# the right hmm attribute back to the current IS copies.
+				evalue, # Warning for multi-copy IS elements: 
+					# It is the hmm attributes of the best orfhit (with the best evalue)
+					# among all copies of the reference IS, not the hmm attributes of the 
+					# original orfhit predicted in the current genome location.
+					# We once assigned the hmm attributes of the hit with best evalue to 
+					# the representative boundary of the multi-copy IS at the current 
+					# genome location when we get the representative (optimal) boundary 
+					# of the IS copy found at the specific genome location.
+					# Basically, all copies of an IS element in a
+					# genome sequence will have the same hmm attributes such as evalue.
+					# We can try match the boundary of IS to the original orf and assign
+					# the right hmm attributes back to the current IS copy.
+				ov, 
 				':'.join([seq1,seq2]), # tir
-				),
-				file = fp)
+				]
+			args4raw = args4out[:len(args4out)-2]
+			args4raw.append(evalue4copy)
+			args4raw.extend(args4out[-2:])
+			print(fmtStrPrediction.format(*args4out), file = fp)
+			print(fmtStrPrediction4raw.format(*args4raw), file = fp4raw)
 
 			# summarize
 			if family in familySumBySeq.keys():
@@ -913,14 +1037,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 			fp4isfna.write(fasta4fna4is)
 
 			# ORF
-			#orfStr = '_'.join([str(x) for x in hit['orf'][1:]])
-			#head4fna4orf = '_'.join([hit['orf'][0], orfStr])
-			if len(orfhits4tpase) > 0:
-				orf4tpase = orfhits4tpase[0][0]
-				orfStr = '_'.join([str(x) for x in orf4tpase[1:]])
-				head4fna4orf = '_'.join([orf4tpase[0], orfStr])
-			else:
-				head4fna4orf = ''
+			head4fna4orf = '_'.join([str(x) for x in orf4tpase])
 
 			orfs4merged = []
 			# Find the merged orfs in a sequence, which are within the range of the orf of hit.
@@ -938,8 +1055,10 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					# more than two ORFs merged in the current large virtual ORF.
 					#if len(orfs4merged) == 2:
 					#	break
+			'''
 			# The hit has the large virtual ORF created by merging multiple original orfs.
 			if len(orfs4merged) > 0:
+				isStr = '_'.join([str(isBegin), str(isEnd), strand])
 				# sort by start coordinate of ORF
 				orfs4merged.sort(key = operator.itemgetter(1))
 				for orf1 in orfs4merged:
@@ -947,8 +1066,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					# amino acid sequence
 					head4faa4orf1 = '_'.join([orf1[0], orf1str])
 					faa4orf1 = proteins[head4faa4orf1]
-					fasta4faa4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
-						head4faa4orf1, orf1str, orfStr), faa4orf1)
+					fasta4faa4orf1 = tools.fasta_format('{} {} assinged to {}'.format(
+						head4faa4orf1, orf1str, isStr), faa4orf1)
 					fp4orffaa.write(fasta4faa4orf1)
 
 					# nucleic acid sequence
@@ -957,11 +1076,13 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 						fna4orf1 = tools.complementDNA(seq[orf1[1]-1: orf1[2]], '1')[::-1]
 					else:
 						fna4orf1 = seq[orf1[1]-1: orf1[2]]
-					fasta4fna4orf1 = tools.fasta_format('{} {} merged in virtual ORF {}'.format(
-						head4fna4orf1, orf1str, orfStr), fna4orf1)
+					fasta4fna4orf1 = tools.fasta_format('{} {} assinged to {}'.format(
+						head4fna4orf1, orf1str, isStr), fna4orf1)
 					fp4orffna.write(fasta4fna4orf1)
-			# The hit does not include any oringial orfs merged into a large virtual ORF.
+			# The hit does not include any oringial orfs assigned to a large virtual ORF.
 			elif head4fna4orf in proteins.keys():
+			'''
+			if head4fna4orf in proteins.keys():
 				# amino acid sequence
 				faa4orf = proteins[head4fna4orf]
 				fasta4faa4orf = tools.fasta_format(head4fna4orf, faa4orf)
@@ -1050,7 +1171,9 @@ def convertHit2orfHit(hit):
 	#orf = (orfStr[0].rstrip('|').rsplit('|',1)[-1], int(orfStr[-3]), int(orfStr[-2]), orfStr[-1])
 	orf = (orfStr[0], int(orfStr[-3]), int(orfStr[-2]), orfStr[-1])
 	familyName = queryName.split('.', 1)[0]
-	raworfhits = (orf, familyName, best1domainEvalue, fullSequenceEvalue, overlapNumber)
+	orfhit4tpase = (orf, familyName, best1domainEvalue, fullSequenceEvalue, overlapNumber)
+	orfhits4tpase = [orfhit4tpase]
+	raworfhits = {'orfhits4tpase':orfhits4tpase}
 	return (orf, familyName, best1domainEvalue, fullSequenceEvalue, overlapNumber, raworfhits)
 
 
@@ -1114,19 +1237,7 @@ def mergeOrfs(mOrfHits, maxDistBetweenOrfs):
 			# orfhitMerged inherits the properties of the orfhit with smaller full_sequence_E-value
 			orfMerged = (accid, beginMerged, endMerged, x[0][0][3])
 			orfhitMerged = [orfMerged]
-			orfhitMerged.extend(x[0][1:5])
-			#
-			# Append raworfhits to the merged orfhit
-			#
-			# raworfhits: {'orfhits4tpase':orfhits4tpase}
-			# orfhits4tpase: [orfhit4tpase, ...]
-			# orfhit4tpase: (orf4tpase, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number), 
-			# orf4tpase: (accid, begin, end, strand), ORF of tpase gene in IS element
-			orfhits4tpase = [x[0][:5], x[1][:5]]
-			raworfhits = {'orfhits4tpase':orfhits4tpase}
-			orfhitMerged.append(raworfhits)
-			#
-			# Append raworfhits to the merged orfhit
+			orfhitMerged.extend(x[0][1:])
 			#
 			# orfhitMerged: [orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number,
 			#		raworfhits], it is now the extended orfhit with raworfhits appended
@@ -1135,11 +1246,7 @@ def mergeOrfs(mOrfHits, maxDistBetweenOrfs):
 			if x[1][3] < x[0][3]:
 				orfMerged = (accid, beginMerged, endMerged, x[1][0][3])
 				orfhitMerged = [orfMerged]
-				orfhitMerged.extend(x[1][1:5])
-				# append raworfhits to the merged orfhit
-				orfhits4tpase = [x[1][:5], x[0][:5]]
-				raworfhits = {'orfhits4tpase':orfhits4tpase}
-				orfhitMerged.append(raworfhits)
+				orfhitMerged.extend(x[1][1:])
 
 			orfHitsMerged.append(tuple(orfhitMerged))
 
@@ -1681,25 +1788,39 @@ def clusterIntersect4orf(orfhits, ids):
 		# maxgs: iterator, group of groups grouped by clusterName
 		maxgs = largeGroup(gs)
 		maxgs = list(maxgs)
-		# maxgs: [gnew, ...]
-		# gnew: (clusterName, g, n4items)
-		# g: [index, ...]
+		# maxgs: [gnew, ...], the different gnews have the same number of items but the different clusterName.
+		# gnew: (clusterName, g, n4items), n4items is the number of items in g.
+		# g: [index, ...], the hits mapped by indice in g have already been sorted by evalue.
+
+		# Get the group containing item with the smallest evalue.
 		#
-		# Get the group containing item with smallest evalue
-		maxgs.sort(key = lambda x: orfhits[idsList[x[1][0]]][3]) # x[1][0]: the first item of group sorted by evalue
+		# First sort maxgs by evalue of the first item in each group sorted by evalue.
+		# x[1][0]: the first item of the group sorted by evalue
+		maxgs.sort(key = lambda x: orfhits[idsList[x[1][0]]][3])
+		# Then get the group containing the item with the smallest evalue.
 		g = maxgs[0][1]
 
 		ncopy4tpase = len(g)
-		'''
 		if ncopy4tpase > 1:
 			for id in g:
 				print('hello overlapped orfhits', orfhits[idsList[id]])
-		'''
 
 		bds = []
+		raworf = False
 		for id in g:
-			orf = orfhits[idsList[id]][0]
+			#orf = orfhits[idsList[id]][0]
+			orfhit = orfhits[idsList[id]]
+			orf = orfhit[0]
 			bds.append(orf[1:3])
+			# Get the raw Tpase orfhit for the IS copy defined by the representative bds.
+			#
+			# raworfhits4tpase == [] for the additional IS copies captured by Blast querying extended 
+			# Tpase orf against the genome sequence.
+			# raworfhits4tpase = [orfhit4tpase, ...] for the query sequence (extended Tpase orf) in the
+			# same Blast search.
+			if raworf == False and len(orfhit[5]['orfhits4tpase']) > 0:
+				raworfhits = orfhit[5]
+				raworf = True
 		# get representative boundary for the overlapped orfhits
 		if len(bds) > 1:
 			bd = tools.consensusBoundaryByCutoffBySeparated(bds)
@@ -1709,18 +1830,25 @@ def clusterIntersect4orf(orfhits, ids):
 
 		# Get meta information such as seqid and evalue of the representative orfhit
 		#
-		# Here, we simply use the first orfhit in group of orfhits with same evalue to
-		# retrieve the seqid, clusterName, evalue for the representative orfhit.
-		orf, clusterName, evalue4domain, evalue4fullseq, ov, raworfhits = orfhits[idsList[g[0]]]
+		# Here, we simply use the first orfhit in group of orfhits with the same clusterName but sorted by
+		# evalue, and assign the seqid, clusterName, evalue of such orfhit to the representative boundary
+		# at the current genome location. So, the hmm attribute assinged to the IS with the representative 
+		# boundary is from the IS copy (full or partial) with tpase with the best evalue among all copies
+		# in the group g. Therefore, the evalue of the most significant one (with the best evalue) of 
+		# the multiple IS copies with same Tpase will be used to late post-processing such as defining
+		# potential false positives and partial IS copies, but ISEScan will output the right Tpase gene 
+		# and protein sequence in fasta file by outputIS4multipleSeqOneFile().
+		# orfhit (tpase orf) identified at the current genome location.
+		orf, clusterName, evalue4domain, evalue4fullseq, ov, raworfhits4bestEvalue = orfhits[idsList[g[0]]]
 		seqid = orf[0]
 		strand = orf[3]
 		# build the representative orfhit but replacing ov with ncopy4tpase
 		orfhit = ((seqid, bd[0], bd[1], strand), clusterName, evalue4domain, evalue4fullseq, ncopy4tpase,
 				raworfhits)
 
-		# Add the multi-copy orfhit into the orfhitsNew
+		# Add the multi-copy orfhit to the orfhitsNew
 		orfhitsNew.append(orfhit)
-		#print('representative orfhit:', orfhit)
+		print('representative orfhit:', orfhit)
 
 	# sort by begin of ORF
 	orfhitsNew.sort(key = lambda x: x[0][1])
@@ -1841,16 +1969,17 @@ def addNonORFcopy(mispairs, mOrfHits):
 			queryOrf = (int(queryOrf[0]), int(queryOrf[1]), queryOrf[2])
 			for orfhit in orfhits:
 				if orfhit[0][1:] == queryOrf:
-					familyName, best_1_domain_Evalue, full_sequence_Evalue, overlap_number = orfhit[1:]
+					familyName, best_1_domain_Evalue, full_sequence_Evalue, overlap_number = orfhit[1:5]
 					break
 			else:
 				# queryOrf is not found in orfhits
 				e = 'queryOrf ({}) is not found in orfhits ({})'.format(
 						queryOrf, [orfhit[0][1:] for orfhit in orfhits])
 				raise RuntimeError(e)
-			# The orfhit of Tpase (query ORF) is not assigned to the identified IS copy (partial or 
-			# full copy) without predicted Tpase.
-			orfhits4tpase = [] # No orfhit of Tpase is assigned for IS copy without Tpase identified.
+			# The additional IS copies (partial or full copy represented by hit['sstart'], hit['send'], 
+			# namely, orf) captured by Blast search of the extended ORFs against genome sequence would
+			# have no raworfhits.
+			orfhits4tpase = [] # No orfhit of Tpase for the additional IS copies.
 			raworfhits = {'orfhits4tpase':orfhits4tpase}
 			orfhit4copy = (orf, familyName, best_1_domain_Evalue, full_sequence_Evalue, overlap_number, 
 					raworfhits)
