@@ -53,10 +53,10 @@ python3 isescan.py NC_012624.fna proteome hmm
 * After ISEScan finish running, you can find some important files in prediction directory: 
   * NC_012624.fna.sum: the summarization of IS copies for each IS family
   * NC_012624.fna.raw: details about IS copies in NC_012624, one copy per line
-* NC_012624.fna.gff: listing each IS copy and its TIR
-* NC_012624.fna.is.fna: the nucleic acid sequence of each IS copy
-* NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy
-* NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
+  * NC_012624.fna.gff: listing each IS copy and its TIR
+  * NC_012624.fna.is.fna: the nucleic acid sequence of each IS copy
+  * NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy
+  * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
 
 ### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
