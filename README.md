@@ -2,6 +2,8 @@
 > ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome.
 
 ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fasta format; 2) predicts/translates (using FragGeneScan) genome into proteome; 3) searches the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identifies the transposase gene in genome; 4) then extends the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (a list of IS elements, sequences of IS elements in fasta format, annotation file in GFF3 format).
+## References:
+Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. Bioinformatics, 2017. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433))
 
 ## Installation
 
@@ -50,7 +52,47 @@ python3 isescan.py NC_012624.fna proteome hmm
 
 * Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
 
-* After ISEScan finish running, you can find three important files in prediction directory, NC_012624.fna.sum, NC_012624.fna.gff, NC_012624.fna.is.fna. The summarization of IS copies for each IS family is in NC_012624.fna.sum, NC_012624.fna.gff list each IS element copy and its TIR. NC_012624.fna.is.fna holds the nucleic acid sequence of each IS element copy.
+* After ISEScan finish running, you can find the output files in prediction directory: 
+  * NC_012624.fna.sum: the summarization of IS copies for each IS family
+  * NC_012624.fna.raw: details about IS copies in NC_012624, one copy per line
+  * NC_012624.fna.gff: listing each IS copy and its TIR, gff3 format
+  * NC_012624.fna.is.fna: the nucleic acid sequence of each IS copy, fasta format
+  * NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy, fasta format
+  * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy, fasta format
+
+* Details about NC_012624.fna.sum:
+  * The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
+  * Summarization of IS content for each sequence in NC_012624:
+    * seqid: sequence identifier, extracted from head lines begining with `>` in NC_012624.fna, usuall the texts between `>` and the first blank character in a head line
+    * family: family name of IS element
+    * nIS: number of IS copies assigned to the specific family in a sequence
+    * %Genome: percentage of genome sequence content spaned by IS elements in a sequence, calculated by bps4IS/dnaLen (see the following columns)
+    * bps4IS: length of sequence segments spaned by IS elements in a sequence
+    * dnaLen: length of the specific sequence
+
+* Details about NC_012624.fna.raw:
+  * The first line is title line with the column identifier for each column.
+  * The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
+  * Columns in NC_012624.fna.raw:
+    * seqID: sequence identifier
+    * family: family name of IS element
+    * cluster: Tpase cluster
+    * isBegin and isEnd: genome coordinates of the predicted IS element
+    * isLen: length of the predicted IS element
+    * ncopy4is: number of predicted IS copies including full-length and partial IS copies
+    * start1, end1, start2, end2: genome coordinates of the IRs
+    * score: score of the IRs
+    * irId: number of identical matches in pairwise alignment of left and righ hand invered repeats
+    * irLen, length of inverted repeats
+    * nGaps: number of gaps in IRs
+    * orfBegin, orfEnd: genome coordinates of the predicted Tpase ORF
+    * strand: strand where the Tpase is
+    * orfLen: length of predicted Tpase ORF
+    * E-value: the best E-value among all IS copies for the same IS element, the smaller the better
+    * E-value4copy: the E-value of the reported IS copy, the smaller the better
+      * Note: the E-value is the E-value returned by hmmer when searching profile HMMs against proteome translated from a genome sequence
+    * ov: ov number returned by hmmer search
+    * tir: terminal inverted repeat sequences
 
 ### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
