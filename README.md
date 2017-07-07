@@ -51,7 +51,7 @@ python3 isescan.py NC_012624.fna proteome hmm
 * Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 496 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
 
 * After ISEScan finish running, you can find some important files in prediction directory: 
-`NC_012624.fna.sum: the summarization of IS copies for each IS family`
+`NC_012624.fna.sum\: the summarization of IS copies for each IS family`
 
 `NC_012624.fna.raw: details about IS copies in NC_012624, one copy per line`
 `NC_012624.fna.gff: listing each IS copy and its TIR` 
