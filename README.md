@@ -68,6 +68,7 @@ Details about NC_012624.fna.sum:
   * %Genome: percentage of genome sequence content spaned by IS elements, calculated by bps4IS/dnaLen (see the following columns)
   * bps4IS: length of sequence segments spaned by IS elements
   * dnaLen: length of sequence
+
 Details about Columns in NC_012624.fna.raw:
 
 ### Tips:
