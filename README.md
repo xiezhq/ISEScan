@@ -61,9 +61,8 @@ python3 isescan.py NC_012624.fna proteome hmm
   * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
 
 * Details about NC_012624.fna.sum:
-
-* The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
-* Summarization of IS content for each sequence in NC_012624:
+ * The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
+ * Summarization of IS content for each sequence in NC_012624:
   * seqid: sequence identifier, extracted from head lines begining with `>` in NC_012624.fna, usuall the texts between `>` and the first blank character in a head line
   * family: family name of IS element
   * nIS: number of IS copies
@@ -72,10 +71,9 @@ python3 isescan.py NC_012624.fna proteome hmm
   * dnaLen: length of sequence
 
 * Details about NC_012624.fna.raw:
-
-* The first line is title line with the column identifier for each column.
-* The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
-* Columns in NC_012624.fna.raw:
+ * The first line is title line with the column identifier for each column.
+ * The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
+ * Columns in NC_012624.fna.raw:
   * seqID: sequence identifier
   * family: family name of IS element
   * cluster: Tpase cluster
