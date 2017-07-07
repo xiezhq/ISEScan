@@ -58,6 +58,18 @@ python3 isescan.py NC_012624.fna proteome hmm
   * NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy
   * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
 
+Details about NC_012624.fna.sum:
+
+* The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
+* Summarization of IS content for each sequence in NC_012624:
+  * seqid: sequence identifier, extracted from head lines begining with `>` in NC_012624.fna, usuall the texts between `>` and the first blank character in a head line
+  * family: family name of IS element
+  * nIS: number of IS copies
+  * %Genome: percentage of genome sequence content spaned by IS elements, calculated by bps4IS/dnaLen (see the following columns)
+  * bps4IS: length of sequence segments spaned by IS elements
+  * dnaLen: length of sequence
+Details about Columns in NC_012624.fna.raw:
+
 ### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
 * If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:   
