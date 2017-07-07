@@ -65,10 +65,10 @@ python3 isescan.py NC_012624.fna proteome hmm
   * Summarization of IS content for each sequence in NC_012624:
     * seqid: sequence identifier, extracted from head lines begining with `>` in NC_012624.fna, usuall the texts between `>` and the first blank character in a head line
     * family: family name of IS element
-    * nIS: number of IS copies
-    * %Genome: percentage of genome sequence content spaned by IS elements, calculated by bps4IS/dnaLen (see the following columns)
-    * bps4IS: length of sequence segments spaned by IS elements
-    * dnaLen: length of sequence
+    * nIS: number of IS copies assigned to the specific family in a sequence
+    * %Genome: percentage of genome sequence content spaned by IS elements in a sequence, calculated by bps4IS/dnaLen (see the following columns)
+    * bps4IS: length of sequence segments spaned by IS elements in a sequence
+    * dnaLen: length of the specific sequence
 
 * Details about NC_012624.fna.raw:
   * The first line is title line with the column identifier for each column.
