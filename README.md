@@ -61,38 +61,38 @@ python3 isescan.py NC_012624.fna proteome hmm
   * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
 
 * Details about NC_012624.fna.sum:
- * The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
- * Summarization of IS content for each sequence in NC_012624:
-  * seqid: sequence identifier, extracted from head lines begining with `>` in NC_012624.fna, usuall the texts between `>` and the first blank character in a head line
-  * family: family name of IS element
-  * nIS: number of IS copies
-  * %Genome: percentage of genome sequence content spaned by IS elements, calculated by bps4IS/dnaLen (see the following columns)
-  * bps4IS: length of sequence segments spaned by IS elements
-  * dnaLen: length of sequence
+  * The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
+  * Summarization of IS content for each sequence in NC_012624:
+    * seqid: sequence identifier, extracted from head lines begining with `>` in NC_012624.fna, usuall the texts between `>` and the first blank character in a head line
+    * family: family name of IS element
+    * nIS: number of IS copies
+    * %Genome: percentage of genome sequence content spaned by IS elements, calculated by bps4IS/dnaLen (see the following columns)
+    * bps4IS: length of sequence segments spaned by IS elements
+    * dnaLen: length of sequence
 
 * Details about NC_012624.fna.raw:
- ** The first line is title line with the column identifier for each column.
- ** The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
- ** Columns in NC_012624.fna.raw:
-  * seqID: sequence identifier
-  * family: family name of IS element
-  * cluster: Tpase cluster
-  * isBegin and isEnd: genome coordinates of the predicted IS element
-  * isLen: length of the predicted IS element
-  * ncopy4is: number of predicted IS copies including full-length and partial IS copies
-  * start1, end1, start2, end2: genome coordinates of the IRs
-  * score: score of the IRs
-  * irId: number of identical matches in pairwise alignment of left and righ hand invered repeats
-  * irLen, length of inverted repeats
-  * nGaps: number of gaps in IRs
-  * orfBegin, orfEnd: genome coordinates of the predicted Tpase ORF
-  * strand: strand where the Tpase is
-  * orfLen: length of predicted Tpase ORF
-  * E-value: the best E-value among all IS copies for the same IS element, the smaller the better
-  * E-value4copy: the E-value of the reported IS copy, the smaller the better
-    * Note: the E-value is the E-value returned by hmmer when searching profile HMMs against proteome translated from a genome sequence
-  * ov: ov number returned by hmmer search
-  * tir: terminal inverted repeat sequences
+  * The first line is title line with the column identifier for each column.
+  * The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
+  * Columns in NC_012624.fna.raw:
+    * seqID: sequence identifier
+    * family: family name of IS element
+    * cluster: Tpase cluster
+    * isBegin and isEnd: genome coordinates of the predicted IS element
+    * isLen: length of the predicted IS element
+    * ncopy4is: number of predicted IS copies including full-length and partial IS copies
+    * start1, end1, start2, end2: genome coordinates of the IRs
+    * score: score of the IRs
+    * irId: number of identical matches in pairwise alignment of left and righ hand invered repeats
+    * irLen, length of inverted repeats
+    * nGaps: number of gaps in IRs
+    * orfBegin, orfEnd: genome coordinates of the predicted Tpase ORF
+    * strand: strand where the Tpase is
+    * orfLen: length of predicted Tpase ORF
+    * E-value: the best E-value among all IS copies for the same IS element, the smaller the better
+    * E-value4copy: the E-value of the reported IS copy, the smaller the better
+      * Note: the E-value is the E-value returned by hmmer when searching profile HMMs against proteome translated from a genome sequence
+    * ov: ov number returned by hmmer search
+    * tir: terminal inverted repeat sequences
 
 ### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
