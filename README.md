@@ -71,6 +71,29 @@ Details about NC_012624.fna.sum:
 
 Details about Columns in NC_012624.fna.raw:
 
+* The first line is title line with the column identifier for each column.
+* The lines starting from the 3rd line is the main content of NC_012624.fna.raw file, one IS copy per line.
+* Columns in each line:
+  * seqID: sequence identifier
+  * family: family name of IS element
+  * cluster: Tpase cluster
+  * isBegin and isEnd: genome coordinates of the predicted IS element
+  * isLen: length of the predicted IS element
+  * ncopy4is: number of predicted IS copies including full-length and partial IS copies
+  * start1, end1, start2, end2: genome coordinates of the IRs
+  * score: score of the IRs
+  * irId: number of identical matches in pairwise alignment of left and righ hand invered repeats
+  * irLen, length of inverted repeats
+  * nGaps: number of gaps in IRs
+  * orfBegin, orfEnd: genome coordinates of the predicted Tpase ORF
+  * strand: strand where the Tpase is
+  * orfLen: length of predicted Tpase ORF
+  * E-value: the best E-value among all IS copies for the same IS element, the smaller the better
+  * E-value4copy: the E-value of the reported IS copy, the smaller the better
+    * Note: the E-value is the E-value returned by hmmer when searching profile HMMs against proteome translated from a genome sequence
+  * ov: ov number returned by hmmer search
+  * tir: terminal inverted repeat sequences
+
 ### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
 * If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:   
