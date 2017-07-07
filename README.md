@@ -55,10 +55,10 @@ python3 isescan.py NC_012624.fna proteome hmm
 * After ISEScan finish running, you can find the output files in prediction directory: 
   * NC_012624.fna.sum: the summarization of IS copies for each IS family
   * NC_012624.fna.raw: details about IS copies in NC_012624, one copy per line
-  * NC_012624.fna.gff: listing each IS copy and its TIR
-  * NC_012624.fna.is.fna: the nucleic acid sequence of each IS copy
-  * NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy
-  * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
+  * NC_012624.fna.gff: listing each IS copy and its TIR, gff3 format
+  * NC_012624.fna.is.fna: the nucleic acid sequence of each IS copy, fasta format
+  * NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy, fasta format
+  * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy, fasta format
 
 * Details about NC_012624.fna.sum:
   * The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
