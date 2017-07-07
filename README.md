@@ -72,8 +72,8 @@ Details about NC_012624.fna.sum:
 Details about Columns in NC_012624.fna.raw:
 
 * The first line is title line with the column identifier for each column.
-* The lines starting from the 3rd line is the main content of NC_012624.fna.raw file, one IS copy per line.
-* Columns in each line:
+* The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
+* Columns:
   * seqID: sequence identifier
   * family: family name of IS element
   * cluster: Tpase cluster
