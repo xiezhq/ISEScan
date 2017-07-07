@@ -71,9 +71,9 @@ python3 isescan.py NC_012624.fna proteome hmm
   * dnaLen: length of sequence
 
 * Details about NC_012624.fna.raw:
- * The first line is title line with the column identifier for each column.
- * The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
- * Columns in NC_012624.fna.raw:
+ ** The first line is title line with the column identifier for each column.
+ ** The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
+ ** Columns in NC_012624.fna.raw:
   * seqID: sequence identifier
   * family: family name of IS element
   * cluster: Tpase cluster
