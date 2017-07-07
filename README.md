@@ -71,7 +71,7 @@ python3 isescan.py NC_012624.fna proteome hmm
   * bps4IS: length of sequence segments spaned by IS elements
   * dnaLen: length of sequence
 
-### Details about NC_012624.fna.raw:
+#### Details about NC_012624.fna.raw:
 
 * The first line is title line with the column identifier for each column.
 * The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
