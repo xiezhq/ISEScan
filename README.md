@@ -60,7 +60,7 @@ python3 isescan.py NC_012624.fna proteome hmm
   * NC_012624.fna.orf.fna: the nucleic acid sequence of the Tpase gene in each IS copy
   * NC_012624.fna.orf.faa: the amino acid sequence of the Tpase in each IS copy
 
-### Details about NC_012624.fna.sum:
+#### Details about NC_012624.fna.sum:
 
 * The title line starts with `#`, followed by the summarization of IS content for each sequence in NC_012624. The last line is the summarization of IS content for all sequences in NC_012624.
 * Summarization of IS content for each sequence in NC_012624:
