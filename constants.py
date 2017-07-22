@@ -6,7 +6,8 @@ import os.path
 # on your computer.
 # 
 # FragGeneScan
-FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+#FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.30/run_FragGeneScan.pl'
 # Hmmer
 phmmer = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer'
 hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
@@ -15,7 +16,8 @@ blastn = '/l/ncbi-blast/bin/blastn'
 blastp = '/l/ncbi-blast/bin/blastp'
 makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
 '''
-FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+#FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.30/run_FragGeneScan.pl'
 phmmer = '/N/u/zhiqxie/Mason/informatics/inst/hmmer-3.1b2/bin/phmmer'
 hmmsearch = '/N/u/zhiqxie/Mason/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
 blastn = 'blastn'
@@ -368,7 +370,7 @@ gene2pepTable = {'11': table11}
 #nproc = 32
 #nproc = 16
 #nproc = 8
-nproc = 2
+nproc = 1
 # default number of threads to use in calculation if it is not given
 nthread = 8
 #nthread = 16

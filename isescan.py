@@ -14,7 +14,8 @@ def isPredictSingle(args):
 	path2proteome = args['path2proteome']
 	path2hmm = args['path2hmm']
 	seqfilename = os.path.basename(seqfile)
-	filelist = os.path.join('/tmp', seqfilename+'.list')
+	org = os.path.basename(os.path.dirname(seqfile))
+	filelist = os.path.join('/tmp', org+'_'+seqfilename+'.list')
 	with open(filelist, 'w') as fp:
 		fp.write(seqfile+'\n')
 
