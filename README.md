@@ -30,7 +30,7 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
   `
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
   `
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:path_of_libssw.so
   `
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)

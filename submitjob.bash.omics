@@ -23,11 +23,9 @@ while read seqfile; do
 	dirname=$(dirname "$seqfile")
 	orgname=$(basename "$dirname")
 	seqfilename=$(basename "$seqfile")
-	#echo qsub -d "$dir4job" -N "$seqfilename" -o "$dir4job/$seqfilename".log -v seqfile="$seqfile",path2proteome="$path2proteome",path2hmm="$path2hmm" "$jobscript"
-	#qsub -d "$dir4job" -N "$seqfilename" -o "$dir4job/$seqfilename".log -v seqfile="$seqfile",path2proteome="$path2proteome",path2hmm="$path2hmm" "$jobscript"
 
-	echo "nohup python3 isescan.py $seqfile $path2proteome $path2hmm > "$path2log"/watch."$seqfilename".1.5.4 &"
-	nohup python3 isescan.py $seqfile $path2proteome $path2hmm > "$path2log"/watch."$orgname"."$seqfilename".1.5.4 &
+	echo "nohup python3 isescan.py $seqfile $path2proteome $path2hmm > "$path2log"/watch."$orgname"."$seqfilename" &"
+	nohup python3 isescan.py $seqfile $path2proteome $path2hmm > "$path2log"/watch."$orgname"."$seqfilename" &
 	let c+=1
 	if [ $c == 10 ]; then
 		echo $c jobs was submitted, sleep 3600 seconds
