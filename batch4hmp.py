@@ -70,6 +70,17 @@ def batch(args):
 	# write 'organism.sum' in each organism directory
 	tools.sum4org4hmp(file4orgs, dir4prediction=dir4prediction)
 
+	# prepare and write 'is.sum' in current directory
+	sum4is = {}
+	for org in file4orgs.keys():
+		sumFileByOrg = os.path.join(dir4prediction, org, 'organism.sum')
+		if os.path.isfile(sumFileByOrg) and os.stat(sumFileByOrg).st_size > 0:
+			sum4is[org] = tools.getSumFull(sumFileByOrg, org)
+		#if org in sum4is.keys() and len(sum4is[org]) > 0:
+		#	print(org, 'will be integrated into total summarization')
+	if len(sum4is) > 0:
+		tools.output4sumFull(sum4is, 'is.sum')
+
 	print('Batch running finishes at', datetime.datetime.now().ctime())
 	
 if __name__ == "__main__":

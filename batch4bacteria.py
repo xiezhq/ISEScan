@@ -19,7 +19,6 @@ python3 = '/usr/local/bin/python3'
 #cmd = 'isPredict.py'
 cmd = 'pred.py'
 
-#taxfile = 'tax.dat'
 
 def batch(args):
 	dnaListFile4orgs = args['fileList']
@@ -64,20 +63,11 @@ def batch(args):
 	# get summarization of IS elements for each organism and write summarization 
 	# for all organisms into file 'is.sum'.
 
-	# get taxonomy for each genome sequence
-	# return tax
-	# tax: [seq2tax, ..., seq2tax]
-	# seq2tax: {'accid':accid, 'taxp':p}
-	# p: [tax-parent1-id, ..., tax-parentn-id, tax-id], p1 and pn are the farthest and the closest (immediate) parents of taxid
-	#tax = tools.seq2tax(taxfile)
-	tax = []
-
 	dir4prediction = args['dir2prediction']
 	# write 'organism.sum' in each organism directory
 	mDNA, dir4data = tools.fnaFileList2mDNA(dnaListFile4orgs)
-	tools.sum4org(mDNA, dir4data, tax, dir4prediction=dir4prediction)
+	tools.sum4org(mDNA, dir4data, dir4prediction=dir4prediction)
 
-	dir4prediction = args['dir2prediction']
 	# prepare and write 'is.sum' in current directory
 	sum4is = {}
 	for org in file4orgs.keys():

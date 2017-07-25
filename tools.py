@@ -1998,25 +1998,8 @@ def fnaFileList2mDNA(filelist):
 	dir4data = os.path.dirname(os.path.dirname(dnafile))
 	return [mDNA, dir4data]
 
-# check if there are two or more tax IDs in one organism
-# sum4is4genome: {seqid: sum4seq, ..., seqid: sum4seq}
-def checkTax(org, sum4is4genome, tax):
-	acc2tax = {}
-	for seqid in sum4is4genome.keys():
-		accver = seqid.rstrip('|').split('|', maxsplit=1)[-1]
-		acc = accver.split('.', maxsplit=1)[0]
-		for seq2tax in tax:
-			if seq2tax['accid'] == acc:
-				taxid = int(seq2tax['taxp'][-1])
-				break
-		else:
-			taxid = -1
-		acc2tax[acc] = taxid
-	if min(acc2tax.values()) != max(acc2tax.values()):
-		print('Warning: one organism has more than one taxid', org, acc2tax)
-		
 
-def sum4org(mDNA, dir4data, tax, dir4prediction=constants.dir4prediction):
+def sum4org(mDNA, dir4data, dir4prediction=constants.dir4prediction):
 	orgid = {}
 	for seqid in sorted(mDNA.keys()):
 		org, fileid, seq = mDNA[seqid]
@@ -2108,12 +2091,6 @@ def sum4org(mDNA, dir4data, tax, dir4prediction=constants.dir4prediction):
 					sum4is4genome[seqid][5+1] = genome4is
 			sum4is[seqid] = sum4is4all + [dnaLen, genome4is, genome, plasmid4is, plasmid, phage4is, phage]
 
-		# check chromosome DNA and taxonomy
-		#data4seqid = sum4is4genome
-		data4seqid = sum4is
-		# check all DNAs in organism and taxonomy
-		#checkTax(org, data4seqid, tax)
-
 		# output summarization for all DNAs from organism even there is no IS element found 
 		# in the organism.
 		sumfile4org = os.path.join(path, 'organism.sum')
@@ -2125,42 +2102,6 @@ def sum4org(mDNA, dir4data, tax, dir4prediction=constants.dir4prediction):
 		sumfile4org = os.path.join(path, 'organism4phage.sum')
 		output4sumFull(sum4is4phage, sumfile4org)
 	
-# return tax
-# tax: [seq2tax, ..., seq2tax]
-# seq2tax: {'accid':accid, 'taxp':p}
-# p: [tax-parent1-id, ..., tax-parentn-id, tax-id], p1 and pn are the farthest and the closest (immediate) parents of taxid
-def seq2tax(taxfile):
-	fp = open(taxfile)
-	tax = []
-	for line in fp:
-		line = line.strip()
-		items = line.split()
-		seq2tax = {}
-		seq2tax['accid'] = items[0]
-		seq2tax['taxp'] = []
-		for item in items[1:]:
-			seq2tax['taxp'].append(item)
-		tax.append(seq2tax)
-	fp.close()
-
-	return tax
-
-# return tax
-# tax: {accid:taxp, ...}
-# taxp: [tax-parent1-id, ..., tax-parentn-id, tax-id], p1 and pn are the farthest and the closest (immediate) parents of taxid
-def acc2tax(taxfile):
-	fp = open(taxfile, 'r')
-	tax = {}
-	for line in fp:
-		line = line.strip()
-		items = line.split()
-		accid = items[0]
-		taxp = []
-		for item in items[1:]:
-			taxp.append(int(item))
-		tax[accid] = taxp
-	fp.close()
-	return tax
 
 # compute distance between vectors u and v
 def distFunction(u, v):
