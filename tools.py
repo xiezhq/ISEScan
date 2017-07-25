@@ -1767,9 +1767,10 @@ def output4sum(sum4is, outfile):
 #	or [nis, %genome, bps4is, dnaLen4is, familySum, dnaLen, ngenome4is, ngenome, nplasmid4is, nplasmid, nphage4is, nphage]
 # familySum: {family: [nis, %genome, bps4is, norg4is], ..., family: [nis, %genome, bps4is, norg4is]}
 def output4sumFull(sum4is, outfile):
-	#fmt4title4families = ' {:>11} {:>11} {:>10}'
-	fmt4title4families = ' {:>11} {:>13} {:>15} {:>13}'
-	fmt4families = ' {:>11} {:>13.2g} {:>15} {:>13}'
+	#fmt4title4families = ' {:>11} {:>13} {:>15} {:>13}'
+	fmt4title4families = ' {:>11}'
+	#fmt4families = ' {:>11} {:>13.2g} {:>15} {:>13}'
+	fmt4families = ' {:>11}'
 	fp = open(outfile, 'w')
 	fmt4title = '{:<90} {:>6} {:>7} {:>15} {:>15} {:>15} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}'
 	fmt = '{:<90} {:>6} {:>7.2g} {:>15} {:>15} {:>15} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}' 
@@ -1791,12 +1792,11 @@ def output4sumFull(sum4is, outfile):
 		))
 	familyNames.sort()
 	for family in familyNames:
-		#fp.write(fmt4title4families.format(family, '%genome', 'bps4is'))
 		fp.write(fmt4title4families.format(
 			family, # family name
-			family+'_%', # family_bps / dnaLen4is
-			family+'_bps', # bps covered by the specific family
-			family+'_s' # number of species where the specific family occurs
+			#family+'_%', # family_bps / dnaLen4is
+			#family+'_bps', # bps covered by the specific family
+			#family+'_s' # number of species where the specific family occurs
 			))
 	fp.write('\n')
 
@@ -1852,7 +1852,9 @@ def output4sumFull(sum4is, outfile):
 				status = 1
 			else:
 				status = 0
-			fp.write(fmt4families.format(nis, percent, bps4is, status))
+			fp.write(fmt4families.format(nis, 
+				#percent, bps4is, status
+				))
 			nis4family2sum[family] += nis
 			bps4is4family2sum[family] += bps4is
 			nstatus4is4family2sum[family] += status
@@ -1871,9 +1873,10 @@ def output4sumFull(sum4is, outfile):
 		else:
 			percentByBps2sum = (bps4is4family2sum[family]/dnaLen4is2sum)*100
 		fp.write(fmt4families.format(nis4family2sum[family], 
-			percentByBps2sum, 
-			bps4is4family2sum[family],
-			nstatus4is4family2sum[family]))
+			#percentByBps2sum, 
+			#bps4is4family2sum[family],
+			#nstatus4is4family2sum[family]
+			))
 	fp.write('\n')
 
 	fp.close()
