@@ -1767,10 +1767,8 @@ def output4sum(sum4is, outfile):
 #	or [nis, %genome, bps4is, dnaLen4is, familySum, dnaLen, ngenome4is, ngenome, nplasmid4is, nplasmid, nphage4is, nphage]
 # familySum: {family: [nis, %genome, bps4is, norg4is], ..., family: [nis, %genome, bps4is, norg4is]}
 def output4sumFull(sum4is, outfile):
-	#fmt4title4families = ' {:>11} {:>13} {:>15} {:>13}'
-	fmt4title4families = ' {:>11}'
-	#fmt4families = ' {:>11} {:>13.2g} {:>15} {:>13}'
-	fmt4families = ' {:>11}'
+	fmt4title4families = ' {:>11} {:>13} {:>15} {:>13}'
+	fmt4families = ' {:>11} {:>13.2g} {:>15} {:>13}'
 	fp = open(outfile, 'w')
 	fmt4title = '{:<90} {:>6} {:>7} {:>15} {:>15} {:>15} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}'
 	fmt = '{:<90} {:>6} {:>7.2g} {:>15} {:>15} {:>15} {:>10} {:>7} {:>11} {:>8} {:>9} {:>6}' 
@@ -1779,7 +1777,7 @@ def output4sumFull(sum4is, outfile):
 	fp.write(fmt4title.format(
 		'organism', # name of species
 		'nIS', # number of ISs occuring in the specific species
-		'%genome', # bps4is / dnaLen4is
+		'%genome', # bps4is / dnaLen
 		'bps4is', # bps covered by IS
 		'dnaLen4is', # bps of DNA sequence where IS occurs
 		'dnaLen', # bps of DNA sequences in the specific species
@@ -1794,9 +1792,9 @@ def output4sumFull(sum4is, outfile):
 	for family in familyNames:
 		fp.write(fmt4title4families.format(
 			family, # family name
-			#family+'_%', # family_bps / dnaLen4is
-			#family+'_bps', # bps covered by the specific family
-			#family+'_s' # number of species where the specific family occurs
+			family+'_%', # family_bps / dnaLen
+			family+'_bps', # bps covered by the specific family
+			family+'_s' # number of species where the specific family occurs
 			))
 	fp.write('\n')
 
@@ -1930,7 +1928,6 @@ def getSumFull(sumFileByOrg, org):
 			sumByAll = line.split()
 			break
 		if line[:8] == 'organism':
-			#familys = line.split()[12:][0::3] # get IS family names
 			familys = line.split()[12:][0::4] # get IS family names
 	familySum = {}
 	if len(sumByAll) > 0:
@@ -1947,7 +1944,6 @@ def getSumFull(sumFileByOrg, org):
 		nphage = int(sumByAll[11])
 		data4familys = sumByAll[12:]
 		for i, family in enumerate(familys):
-			#familySum[family] = [int(data4familys[i*3]), float(data4familys[i*3+1]), int(data4familys[i*3+2])]
 			familySum[family] = [int(data4familys[i*4]), float(data4familys[i*4+1]), int(data4familys[i*4+2])]
 		return [nis, percent, bps4is, dnaLen4is, familySum, dnaLen, ngenome4is, ngenome, nplasmid4is, nplasmid, nphage4is, nphage]
 	else:
