@@ -1859,17 +1859,17 @@ def output4sumFull(sum4is, outfile):
 		fp.write('\n')
 	
 	# print total summary in table
-	if dnaLen4is2sum == 0:
+	if dnaLen2sum == 0:
 		percentByBps = 0
 	else:
 		percentByBps = (bps4is2sum/dnaLen2sum)*100
 	fp.write(fmt.format('total', nis2sum, percentByBps, bps4is2sum, dnaLen4is2sum,
 		dnaLen2sum, ngenome4is2sum, ngenome2sum, nplasmid4is2sum, nplasmid2sum, nphage4is2sum, nphage2sum))
 	for family in sorted(familySum.keys()):
-		if dnaLen4is2sum == 0:
+		if dnaLen2sum == 0:
 			percentByBps2sum = 0
 		else:
-			percentByBps2sum = (bps4is4family2sum[family]/dnaLen4is2sum)*100
+			percentByBps2sum = (bps4is4family2sum[family]/dnaLen2sum)*100
 		fp.write(fmt4families.format(nis4family2sum[family], 
 			percentByBps2sum, 
 			bps4is4family2sum[family],
