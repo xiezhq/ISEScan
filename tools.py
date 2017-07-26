@@ -1851,7 +1851,7 @@ def output4sumFull(sum4is, outfile):
 			else:
 				status = 0
 			fp.write(fmt4families.format(nis, 
-				#percent, bps4is, status
+				percent, bps4is, status
 				))
 			nis4family2sum[family] += nis
 			bps4is4family2sum[family] += bps4is
@@ -1871,9 +1871,9 @@ def output4sumFull(sum4is, outfile):
 		else:
 			percentByBps2sum = (bps4is4family2sum[family]/dnaLen2sum)*100
 		fp.write(fmt4families.format(nis4family2sum[family], 
-			#percentByBps2sum, 
-			#bps4is4family2sum[family],
-			#nstatus4is4family2sum[family]
+			percentByBps2sum, 
+			bps4is4family2sum[family],
+			nstatus4is4family2sum[family]
 			))
 	fp.write('\n')
 
