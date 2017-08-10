@@ -847,6 +847,22 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	print('#', '-' * 139, file = fp)
 	print('#', '-' * 139, file = fp4raw)
 
+	# character string to hold the content of csv file with the same content as raw file except
+	# one 'sn' collumn is inserted and becomes the first collumn and the last 'tir' collumn in 
+	# raw file is splitted into two collumns, 'seq1' and 'seq2' and the last second collumn 'ov' 
+	# in raw file is removed in csv file. The 'sn' collumn is the sequential 
+	# number of the specific IS copy in the sequences in a fasta file, starting from 1 to n which is 
+	# the total number of the IS copies in all sequecnes in a fasta file.
+	#
+	# orgfileid: org/fileid, examples: 
+	#	Shigella_dysenteriae_Sd197_uid58213/NC_007606.fna, NGT10/final.contigs.fa
+	sn = 0
+	islist4csv = []
+	titleLine4csv = ['sn']
+	titleLine4csv.extend(titleLine4raw[:len(titleLine4raw)-2])
+	titleLine4csv.extend(['seq1', 'seq2'])
+	islist4csv.append(titleLine4csv)
+
 	fp4sum = open(sumFile, 'w')
 	print(fmtStrTitleSum.format(
 		'# seqid', 'family', 'nIS', '%Genome', 'bps4IS', 'dnaLen'), file=fp4sum)
@@ -984,7 +1000,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					';'.join(['ID='+tirid, 'parent='+isid])
 					), file = fp4gff)
 
-			# output .out file
+			# output .out and .raw files as well as .csv file
+			# for .out file
 			args4out = [
 				seqid, # NCBI sequence ID
 				family, # family name
@@ -1009,13 +1026,20 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 				ov, 
 				':'.join([seq1,seq2]), # tir
 				]
+			print(fmtStrPrediction.format(*args4out), file = fp)
+			# for .raw file
 			args4raw = args4out[:len(args4out)-2]
 			args4raw.append(evalue4copy)
 			args4raw.extend(args4out[-2:])
-			print(fmtStrPrediction.format(*args4out), file = fp)
 			print(fmtStrPrediction4raw.format(*args4raw), file = fp4raw)
+			# for csv file
+			sn += 1
+			args4csv = [sn]
+			args4csv.extend(args4raw[:len(args4raw)-2])
+			args4csv.extend([seq1,seq2])
+			islist4csv.append(args4csv)
 
-			# summarize
+			# summarization for .sum file
 			if family in familySumBySeq.keys():
 				familySumBySeq[family] += 1
 				bpsBySeq[family] += len4is
@@ -1130,6 +1154,10 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fp4gff.close()
 	fp.close()
 	fp4sum.close()
+
+	# write csv file
+	outFile4csv = '.'.join([common4output, 'csv'])
+	tools.output_csv(outFile4csv, islist4csv)
 
 
 # mtblout_hits:		[(accid, hits_sorted_refined), ..., (accid, hits_sorted_refined)]
@@ -2696,7 +2724,11 @@ def pred(args):
 	norgfiles = len(orgfiles)
 	# mHits: {accid: hits, ..., accid: hits}
 	# hits: [hit, ..., hit]
-	if sum([len(hits) for hits in mHits.values()]) == 0:
+	if len(mHits) == 0:
+		print('No IS element was identified for sequences', fileids)
+		print('End in pred', datetime.datetime.now().ctime())
+		return 0
+	elif sum([len(hits) for hits in mHits.values()]) == 0:
 		print('No IS element was identified for', sorted(mHits.keys()))
 		print('End in pred', datetime.datetime.now().ctime())
 		return 0

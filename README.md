@@ -3,7 +3,7 @@
 
 ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fasta format; 2) predicts/translates (using FragGeneScan) genome into proteome; 3) searches the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identifies the transposase gene in genome; 4) then extends the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (e.g. a file containing a list of IS elements, a file containing sequences of IS elements in fasta format, an annotation file in GFF3 format).
 ## References:
-Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. Bioinformatics, 2017. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433))
+Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. Bioinformatics, 2017. ([pdf])(btx433.pdf)(https://doi.org/10.1093/bioinformatics/btx433))
 
 ## Installation
 
@@ -100,6 +100,8 @@ python3 isescan.py NC_012624.fna proteome hmm
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.5.4.4
+  * Modify outputIS4multipleSeqOneFile() in pred.py to let ISEScan produce a csv files with the same content as .raw file except that one 'sn' collumn is inserted and becomes the first collumn and the last 'tir' collumn in raw file is splitted into two collumns, 'seq1' and 'seq2'. The 'sn' collumn is the sequential number of the specific IS copy in the sequences in a fasta file, starting from 1 to n which is the total number of the IS copies in all sequecnes in a fasta file.
 * 1.5.4.3
   * Fix the bug which failed to report the Tpase ORFs in multi-copy IS elements, and ISEScan now output a .raw file with one additional column E-value4copy which is the E-value of the reported IS copy while the column E-value is the best E-value among all IS copies for the same IS element.
 * 1.5.4.1
