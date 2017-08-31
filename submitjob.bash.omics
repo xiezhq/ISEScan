@@ -28,8 +28,8 @@ while read seqfile; do
 	nohup python3 isescan.py $seqfile $path2proteome $path2hmm > "$path2log"/watch."$orgname"."$seqfilename" &
 	let c+=1
 	if [ $c == 10 ]; then
-		echo $c jobs was submitted, sleep 3600 seconds
-		sleep 3600
+		echo $c jobs was submitted, sleep 600 seconds
+		sleep 600
 		let c=0
 		printf '\n'
 	fi
