@@ -11,10 +11,11 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 
 1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as v1.5.4.3.zip (Source code (zip)) or v1.5.4.3.tar.gz (Source code (zip)).
 
-2. Use unzip command to uncompress the zip file:  
-`unzip v1.5.4.3.zip`
-   Or use tar -zxvf to uncompress the tar.gz file:
-`tar -zvxf v1.5.4.3.tar.gz`
+2. Uncompress the .zip (or .tar.gz) file.
+   * Use unzip command to uncompress the zip file:  
+   `unzip v1.5.4.3.zip`
+   * Use tar command to uncompress the tar.gz file:  
+   `tar -zvxf v1.5.4.3.tar.gz`
 
 ## Pre-required packages and libraries
 
@@ -27,13 +28,9 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 * BLAST 2.2.31 or later
 * SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
   * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
-  `
-  cc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
-  `
+  `cc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h`
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
-  `
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:path_of_libssw.so
-  `
+  `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so`
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
 
@@ -48,9 +45,7 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 Let's try an example, NC_012624.fna.
 
 * The command below scans NC_012624.fna (the genome sequence from Sulfolobus_islandicus_Y_N_15_51), and outputs all results in prediction directory:   
-`
-python3 isescan.py NC_012624.fna proteome hmm
-`
+`python3 isescan.py NC_012624.fna proteome hmm`
 
 * Wait for its finishing. It may take a while as ISEScan uses the HMMER to scan the genome sequences and it will use 621 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs.
 
@@ -98,7 +93,7 @@ python3 isescan.py NC_012624.fna proteome hmm
 
 ### Tips:
 * ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
-* If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:   
+* If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:  
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
