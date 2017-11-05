@@ -11,9 +11,10 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 
 1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as v1.5.4.3.zip (Source code (zip)) or v1.5.4.3.tar.gz (Source code (zip)).
 
-2. Use unzip command to uncompress the zip file:  
+2. Uncompress the .zip (or .tar.gz) file.
+* Use unzip command to uncompress the zip file:  
 `unzip v1.5.4.3.zip`
-   Or use tar -zxvf to uncompress the tar.gz file:
+* use tar -zxvf to uncompress the tar.gz file:
 `tar -zvxf v1.5.4.3.tar.gz`
 
 ## Pre-required packages and libraries
