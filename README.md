@@ -13,9 +13,13 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 
 2. Uncompress the .zip (or .tar.gz) file.
    * Use unzip command to uncompress the zip file:  
-   `unzip v1.5.4.3.zip`
+   `
+   unzip v1.5.4.3.zip
+   `
    * Use tar -zxvf to uncompress the tar.gz file:
-   `tar -zvxf v1.5.4.3.tar.gz`
+   `
+   tar -zvxf v1.5.4.3.tar.gz
+   `
 
 ## Pre-required packages and libraries
 
