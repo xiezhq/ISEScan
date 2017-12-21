@@ -3,7 +3,7 @@
 
 ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fasta format; 2) predicts/translates (using FragGeneScan) genome into proteome; 3) searches the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identifies the transposase gene in genome; 4) then extends the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (e.g. a file containing a list of IS elements, a file containing sequences of IS elements in fasta format, an annotation file in GFF3 format).
 ## References:
-Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. Bioinformatics, 2017. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433))
+Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. Bioinformatics, 2017. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433), [pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](SupplementaryMaterials.xlsx))
 
 ## Installation
 
