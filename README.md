@@ -9,13 +9,13 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 
 ### Linux:
 
-1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as v1.5.4.3.zip (Source code (zip)) or v1.5.4.3.tar.gz (Source code (zip)).
+1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as v1.6.zip (Source code (zip)) or v1.6.tar.gz (Source code (zip)).
 
 2. Uncompress the .zip (or .tar.gz) file.
    * Use unzip command to uncompress the zip file:  
-   `unzip v1.5.4.3.zip`
+   `unzip v1.6.zip`
    * Use tar command to uncompress the tar.gz file:  
-   `tar -zvxf v1.5.4.3.tar.gz`
+   `tar -zvxf v1.6.tar.gz`
 
 ## Pre-required packages and libraries
 
@@ -37,7 +37,7 @@ Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence 
 ## Configure ISEScan
 
 1. Open constants.py, and find two lines marked with 'Config packages'
-2. Modify the paths to FragGeneScan (and phmmer, hmmsearch, blastn, makeblastdb)
+2. Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb, file4clusterSeqFile4phmmer and file4clusterHMM) to specify the correct paths of the required packages and data files on your computer.
 3. Save and close constants.py
 
 ## Usage example
@@ -97,6 +97,8 @@ Let's try an example, NC_012624.fna.
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.6
+  * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (I appreciated Ania Gorska's help for it.).
 * 1.5.4.3
   * Fix the bug which failed to report the Tpase ORFs in multi-copy IS elements, and ISEScan now output a .raw file with one additional column E-value4copy which is the E-value of the reported IS copy while the column E-value is the best E-value among all IS copies for the same IS element.
 * 1.5.4.1

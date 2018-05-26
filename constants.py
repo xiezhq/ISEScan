@@ -1,13 +1,12 @@
 import os.path
 
-# Config packages
+## Config packages
 #
-# Config the paths of required packages in order that ISEScan can find the right commands
+# Set the path variables pointing to the required packages in order that ISEScan can find the required packages
 # on your computer.
 # 
 # FragGeneScan
-#FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
-FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.30/run_FragGeneScan.pl'
+FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
 # Hmmer
 phmmer = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer'
 hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
@@ -15,16 +14,17 @@ hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
 blastn = '/l/ncbi-blast/bin/blastn'
 blastp = '/l/ncbi-blast/bin/blastp'
 makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
-'''
-#FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
-FragGeneScan = '/N/u/zhiqxie/Mason/informatics/inst/FragGeneScan1.30/run_FragGeneScan.pl'
-phmmer = '/N/u/zhiqxie/Mason/informatics/inst/hmmer-3.1b2/bin/phmmer'
-hmmsearch = '/N/u/zhiqxie/Mason/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
-blastn = 'blastn'
-makeblastdb = 'makeblastdb'
-'''
+
+# Set the path variables pointing to the profile HMM files (clusters.single.faa and clusters.faa.hmm).
 #
-# Config packages
+# The peptide sequences of single-member clusters, which is used by phmmer in hmmer
+file4clusterSeqFile4phmmer = 'clusters.single.faa'
+#file4clusterSeqFile4phmmer = '/N/u/zhiqxie/Karst/is/isescan/clusters.single.faa'
+# The profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
+file4clusterHMM = 'clusters.faa.hmm'
+#file4clusterHMM = '/N/u/zhiqxie/Karst/is/isescan/clusters.faa.hmm'
+#
+## Config packages
 
 
 # Option switch to report partial IS element
@@ -59,13 +59,6 @@ path2results = ''
 
 dir4prediction = os.path.join(path2results, 'prediction')
 #dir4prediction = os.path.join(path2results, 'prediction.ncbi')
-
-# peptide sequences of single-member clusters, which is used by phmmer in hmmer
-file4clusterSeqFile4phmmer = 'clusters.single.faa'
-#file4clusterSeqFile4phmmer = '/N/u/zhiqxie/Karst/is/isescan/clusters.single.faa'
-# profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
-file4clusterHMM = 'clusters.faa.hmm'
-#file4clusterHMM = '/N/u/zhiqxie/Karst/is/isescan/clusters.faa.hmm'
 
 # blast database will be put here
 dir4blastout = os.path.join(path2results, 'blastout')
@@ -369,8 +362,8 @@ gene2pepTable = {'11': table11}
 #nproc = 32
 #nproc = 16
 #nproc = 8
-nproc = 1
+nproc = 2
 # default number of threads to use in calculation if it is not given
-#nthread = 8
-nthread = 16
+nthread = 8
+#nthread = 16
 #nthread = 32
