@@ -119,7 +119,7 @@ Let's try an example, NC_012624.fna.
 
 ## Release History 
 * 1.6
-  * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (I appreciated Ania Gorska's help for it.).
+  * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (Thank Ania Gorska for her efforts).
 * 1.5.4.3
   * Fix the bug which failed to report the Tpase ORFs in multi-copy IS elements, and ISEScan now output a .raw file with one additional column E-value4copy which is the E-value of the reported IS copy while the column E-value is the best E-value among all IS copies for the same IS element.
 * 1.5.4.1
