@@ -19,6 +19,7 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 ## Citation
 
 Please cite this paper, if you are interested in ISEScan:
+
 Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433)). Download: [pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](SupplementaryMaterials.xlsx).
 
 ## Installation
