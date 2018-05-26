@@ -19,7 +19,12 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 ## Citation
 
 Please cite this paper, if you are interested in ISEScan:
-Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433)). Download: [pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](SupplementaryMaterials.xlsx).
+
+Zhiqun Xie, Haixu Tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. 
+
+URL: [https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433). 
+
+Download: [btx433.pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](SupplementaryMaterials.xlsx).
 
 ## Installation
 
@@ -114,7 +119,7 @@ Let's try an example, NC_012624.fna.
 
 ## Release History 
 * 1.6
-  * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (I appreciated Ania Gorska's help for it.).
+  * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (Thank Ania Gorska for her efforts).
 * 1.5.4.3
   * Fix the bug which failed to report the Tpase ORFs in multi-copy IS elements, and ISEScan now output a .raw file with one additional column E-value4copy which is the E-value of the reported IS copy while the column E-value is the best E-value among all IS copies for the same IS element.
 * 1.5.4.1
