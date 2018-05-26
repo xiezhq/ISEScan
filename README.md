@@ -1,8 +1,24 @@
 # ISEScan
-> ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome. It includes an option in constants.py to report either complete IS elements or both complete and partial IS elements. It might be a good idea to try reporting both complete and partial IS elements when it is used to identify the IS elements in the assemblies of metegenome.
+
+## The automated identification of Insertion Sequence Elements in prokaryotic genomes
+
+Author:
+* Zhiqun Xie
+
+Contact:
+* Zhiqun Xie <xiezhq@hotmail.com>
+
+Last revision: 05/26/2018
+
+## Overview
+
+ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome. It includes an option in constants.py to report either complete IS elements or both complete and partial IS elements. It might be a good idea to try reporting both complete and partial IS elements when it is used to identify the IS elements in the assemblies of metegenome.
 
 ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fasta format; 2) predicts/translates (using FragGeneScan) genome into proteome; 3) searches the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identifies the transposase gene in genome; 4) then extends the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (e.g. a file containing a list of IS elements, a file containing sequences of IS elements in fasta format, an annotation file in GFF3 format).
-## References:
+
+## Citation
+
+Please cite this paper, if you are interested in ISEScan:
 Zhiqun Xie, Haixu tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. ([https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433)). Download: [pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](SupplementaryMaterials.xlsx).
 
 ## Installation
