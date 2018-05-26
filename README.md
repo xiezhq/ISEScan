@@ -1,6 +1,6 @@
 # ISEScan
 
-## The automated identification of Insertion Sequence Elements in prokaryotic genomes
+## The Automated Identification of Insertion Sequence Elements in Genomes
 
 Author:
 * Zhiqun Xie
