@@ -49,7 +49,7 @@ Download: [btx433.pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryM
 * BLAST 2.2.31 or later
 * SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
   * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
-  `cc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h`
+  `gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h`
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
   `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so`
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
