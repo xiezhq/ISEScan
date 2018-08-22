@@ -3,7 +3,7 @@
 ## The Automated Identification of Insertion Sequence Elements in Genomes
 
 Author:
-* Zhiqun Xie
+* Zhiqun Xie, Haixu Tang
 
 Contact:
 * Zhiqun Xie <xiezhq@hotmail.com>
