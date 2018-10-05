@@ -9,8 +9,6 @@ Last revision: 05/26/2018
 
 ## Citation
 
-Please cite this paper, if you are interested in ISEScan:
-
 Zhiqun Xie, Haixu Tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. 
 
 URL: [https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433). 
