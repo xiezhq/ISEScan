@@ -19,10 +19,10 @@ makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
 # Set the path variables pointing to the profile HMM files (clusters.single.faa and clusters.faa.hmm).
 #
 # The peptide sequences of single-member clusters, which is used by phmmer in hmmer
-file4clusterSeqFile4phmmer = 'clusters.single.faa'
+file4clusterSeqFile4phmmer = 'pHMMs/clusters.single.faa'
 #file4clusterSeqFile4phmmer = '/N/u/zhiqxie/Karst/is/isescan/clusters.single.faa'
 # The profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
-file4clusterHMM = 'clusters.faa.hmm'
+file4clusterHMM = 'pHMMs/clusters.faa.hmm'
 #file4clusterHMM = '/N/u/zhiqxie/Karst/is/isescan/clusters.faa.hmm'
 #
 ## Config packages
