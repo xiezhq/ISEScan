@@ -153,9 +153,6 @@ Let's try an example, NC_012624.fna.
 * 1.0
   * The first proper release
 
-## Meta
-Zhiqun Xie – @col-iu](https://col-iu.wikispaces.com/Zhiqun+Xie) – zhiqxie@iu.edu
+## License
 
 Distributed under the GNU General Public License.
-
-[https://github.com/xiezhq](https://github.com/xiezhq)
