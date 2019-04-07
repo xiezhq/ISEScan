@@ -6,7 +6,7 @@ Contact:
 * Zhiqun Xie: xiezhq@hotmail.com
 * Haixu Tang: hatang@indiana.edu
 
-Last revision: 05/26/2018
+Last revision: 04/07/2019
 
 ## Overview
 
@@ -108,6 +108,7 @@ Let's try an example, NC_012624.fna.
     * E-value: the best E-value among all IS copies for the same IS element, the smaller the better
     * E-value4copy: the E-value of the reported IS copy, the smaller the better
       * Note: the E-value is the E-value returned by hmmer when searching profile HMMs against proteome translated from a genome sequence
+    * type: type of IS element copy, 'c' for complete IS element and 'p' for partial IS element
     * ov: ov number returned by hmmer search
     * tir: terminal inverted repeat sequences
 
@@ -117,6 +118,8 @@ Let's try an example, NC_012624.fna.
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.7
+  * add one more column in *.raw among the output files of ISEScan, type, which is the type of IS element copy.
 * 1.6
   * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (Thank Ania Gorska for it).
 * 1.5.4.3
