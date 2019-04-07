@@ -26,13 +26,13 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 
 ### Linux:
 
-1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as v1.6.zip (Source code (zip)) or v1.6.tar.gz (Source code (zip)).
+1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as master.zip (Source code (zip)) or master.tar.gz (Source code (zip)).
 
 2. Uncompress the .zip (or .tar.gz) file.
    * Use unzip command to uncompress the zip file:  
-   `unzip v1.6.zip`
+   `unzip master.zip`
    * Use tar command to uncompress the tar.gz file:  
-   `tar -zvxf v1.6.tar.gz`
+   `tar -zvxf master.tar.gz`
 
 ## Pre-required packages and libraries
 
