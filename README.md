@@ -2,11 +2,9 @@
 
 ## The Automated Identification of Insertion Sequence Elements in Genomes
 
-Author:
-* Zhiqun Xie
-
 Contact:
-* Zhiqun Xie <xiezhq@hotmail.com>
+* Zhiqun Xie: xiezhq@hotmail.com
+* Haixu Tang: hatang@indiana.edu
 
 Last revision: 05/26/2018
 
@@ -24,7 +22,7 @@ Zhiqun Xie, Haixu Tang. ISEScan: automated identification of Insertion Sequence 
 
 URL: [https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433). 
 
-Download: [btx433.pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](SupplementaryMaterials.xlsx).
+Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/SupplementaryMaterials.docx](publication/SupplementaryMaterials.docx), [publication/SupplementaryMaterials.xlsx](publication/SupplementaryMaterials.xlsx).
 
 ## Installation
 
@@ -44,13 +42,14 @@ Download: [btx433.pdf](btx433.pdf), [SupplementaryMaterials.docx](SupplementaryM
 * numpy-1.8.0 or later
 * scipy-0.13.1 or later
 * fastcluster, latest version recommended, https://pypi.python.org/pypi/fastcluster
-* FragGeneScan 1.19 or later, https://github.com/COL-IU/FragGeneScan
+* FragGeneScan1.30 or earlier, (The .faa file output by version1.31 is not compatible with ISEScan!), http://omics.informatics.indiana.edu/FragGeneScan
 * HMMER-3.1b2 or later, http://hmmer.org/download.html
 * BLAST 2.2.31 or later
 * SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
   * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
   `gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h`
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
+  `cp sswlib.so ../`
   `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so`
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)

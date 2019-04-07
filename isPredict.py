@@ -19,19 +19,19 @@ def genome2proteome(args2concurrent):
 	print("\nBegin to translate genome into proteome.")
 
 	nproteome = len(args2concurrent)
-	'''
 	if nproteome < constants.nproc:
 		nproc = nproteome
 	else:
 		nproc = constants.nproc
 	
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 	'''
 	if nproteome < constants.nthread:
 		nthread = nproteome
 	else:
 		nthread = constants.nthread
 	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
+	'''
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 		for arg, outs in zip(args2concurrent, executor.map(is_analysis.translate_genome_dna_v3, args2concurrent)):
 			dna_file = arg[0]
 			if outs == 0:
@@ -121,18 +121,18 @@ def hmmSearch(args2concurrent):
 	print("\nBegin to profile HMM search against proteome database.", datetime.datetime.now().ctime())
 
 	nproteome = len(args2concurrent)
-	'''
 	if nproteome < constants.nproc:
 		nproc = nproteome
 	else:
 		nproc = constants.nproc
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 	'''
 	if nproteome < constants.nthread:
 		nthread = nproteome
 	else:
 		nthread = constants.nthread
 	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
+	'''
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 		for arg, outs in zip(args2concurrent, executor.map(is_analysis.is_hmmsearch_v2, args2concurrent)):
 			hmms_file, proteome_file, hmmHitsFile = arg
 			if outs == 0:
@@ -153,19 +153,20 @@ def phmmerSearch(args2concurrent4phmmer):
 		#outFiles.append(hmmHitsFile)
 
 	'''
+
 	nproteome = len(args2concurrent4phmmer)
-	'''
 	if len(args2concurrent4phmmer) < constants.nproc:
 		nproc = nproteome
 	else:
 		nproc = constants.nproc
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 	'''
 	if nproteome < constants.nthread:
 		nthread = nproteome
 	else:
 		nthread = constants.nthread
 	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
+	'''
+	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
 		for arg, outs in zip(args2concurrent4phmmer, executor.map(is_analysis.is_phmmer, args2concurrent4phmmer)):
 			seqFile, proteome_file, hmmHitsFile = arg
 			if outs == 0:
@@ -269,8 +270,6 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 	if len(args2concurrent4hmmsearch) > 0:
 		hmmSearch(args2concurrent4hmmsearch)
 
-	print('isPredict ends at', datetime.datetime.now().ctime())
-
 	# Select significant ones (predictions) from hits returned by HMM search
 	hitsFile = outFiles4phmmer + outFiles4hmmsearch
 	if len(hitsFile) > 0:
@@ -280,9 +279,15 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 			'hitsFile': hitsFile,
 			}
 		pred.pred(args4pred)
+		if constants.removeShortIS == False:
+			print('Both complete and partial IS elements are reported.')
+		else:
+			print('Only complete IS elements are reported. Please set removeShortIS = False in constants.py if partial IS elements are required.')
 	else:
 		e = 'No hit was returned by HMM search against protein database. ' + datetime.datetime.now().ctime()
 		print(e)
+
+	print('isPredict ends at', datetime.datetime.now().ctime())
 
 
 if __name__ == "__main__":

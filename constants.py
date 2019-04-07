@@ -6,7 +6,8 @@ import os.path
 # on your computer.
 # 
 # FragGeneScan
-FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+#FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
+FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.30/run_FragGeneScan.pl'
 # Hmmer
 phmmer = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer'
 hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
@@ -31,12 +32,12 @@ file4clusterHMM = 'clusters.faa.hmm'
 #
 # If removeShortIS is True, ISEScan will remove partial IS elements which include 
 # IS element with length < 400 or single copy IS element without perfect TIR.
-# If removeShortIS is False, ISEScan will report partial IS element as well as full-length IS element.
-# The default is True.
-removeShortIS = True
-#removeShortIS = False
+# If removeShortIS is False, ISEScan will report both partial IS element and complete (full-lenght) IS elements.
+# The default is False.
+#removeShortIS = True
+removeShortIS = False
 #
-# Option switch to report partial IS element
+# Option switch to report both complete and partial IS elements
 
 # When translateGenome is True, pipepline will predict and translate genes 
 # from genome sequence into protein database (file in fasta format) 
@@ -364,6 +365,6 @@ gene2pepTable = {'11': table11}
 #nproc = 8
 nproc = 2
 # default number of threads to use in calculation if it is not given
-nthread = 8
+nthread = 4
 #nthread = 16
 #nthread = 32

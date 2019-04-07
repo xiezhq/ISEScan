@@ -235,7 +235,7 @@ def removeRedundantIS(mhits):
 			redundantHits = list(g)
 			if len(redundantHits) > 1:
 				redundantHits.sort(key = lambda x: x['hmmhit'][sortby])
-				print('Remove redundant IS elements and keep only one with the least evalue:')
+				print('Remove redundant IS elements and keep only one with the smallest evalue:')
 				for hit in redundantHits:
 					print('redundant hit', hit['bd'], hit['occurence']['ncopy4is'], 
 							hit['orf'], hit['hmmhit'])
@@ -317,7 +317,7 @@ def clusterIntersect(hits, ids):
 		k_g = next(gs) # get the first tuple from gs, (k,g)
 		g = list(k_g[1])
 		g.sort(key = lambda x: hits[idsList[x]]['hmmhit'][1])
-		# id of the representative hit with the least e-value, where hit == hits[idsList[id]]
+		# id of the representative hit with the smallest e-value, where hit == hits[idsList[id]]
 		repid = g[0]
 		hit = hits[idsList[repid]]
 		hitsNew.append(hit)
@@ -669,7 +669,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 # 
 # mhits: {accid: hits, ..., accid: hits}
 # hits: [hit, ..., hit]
-# hit: {'orf': orf, 'tirs': tirs, 'hmmhit': hmmhit, 'occurence': occurence, 'isScore': isScore}
+# hit: {'orf': orf, 'tirs': tirs, 'hmmhit': hmmhit, 'occurence': occurence, 'isScore': isScore, 'type': isType}
 # orf: (accid, begin, end, strand)
 # tirs: [tir, ..., tir]
 # tir: (score, irId, irLen, nGaps, start1, end1, start2, end2, seq1, seq2)
@@ -684,6 +684,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 # raworfhits: {'orfhits4tpase':orfhits4tpase}
 # orfhits4tpase: [], [orfhit4tpase, ...]
 # orfhit4tpase: (orf, clusterName, best_1_domain_E-value, full_sequence_E-value, ncopy4tpase)
+# isType: 'c' or 'p'
 #
 # orgfileid: org/fileid, character string, e.g. HMASM/SRS078176.scaffolds.fa
 def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
@@ -710,6 +711,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fmt4evalue4copy = '{:>12.2g}' # E-value of IS copy
 	fmt4evalue4title = '{:>9}' # format to print E-value in title line
 	fmt4evalue4copy4title = '{:>12}' # format to print E-value in title line
+	fmt4type = '{:>4}'  # type of IS element, 'c' or 'p'
 	fmt4ov = '{:>2}'  # ov number of hmmsearch
 	fmt4tir = '{}' # terminal inverted repeat sequences, seq1:seq2
 
@@ -736,6 +738,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	title4evalue = 'E-value' # the best E-value of IS element with multiple copies, namely, 
 			# the E-value of the IS copy with the best E-vluae among all copies of the same IS element in a genome sequence
 	title4evalue4copy = 'E-value4copy' # E-value of the IS copy
+	title4type = 'type' # type of IS element: 'c' for complete IS or 'p' for partial IS
 	title4ov = 'ov' # hmmhit: evalue, overlap number output by hmmer
 	title4tir = 'tir' # tir, seq1:seq2
 
@@ -765,6 +768,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 			]
 	titleLine4raw = titleLine[:len(titleLine)-2]
 	titleLine4raw.append(title4evalue4copy)
+	titleLine4raw.append(title4type)
 	titleLine4raw.extend(titleLine[-2:])
 
 	fmtTitlePrediction = [
@@ -793,6 +797,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 			]
 	fmtTitlePrediction4raw = fmtTitlePrediction[:len(fmtTitlePrediction)-2]
 	fmtTitlePrediction4raw.append(fmt4evalue4copy4title)
+	fmtTitlePrediction4raw.append(fmt4type)
 	fmtTitlePrediction4raw.extend(fmtTitlePrediction[-2:])
 	fmtStrTitlePrediction = ' '.join(fmtTitlePrediction)
 	fmtStrTitlePrediction4raw = ' '.join(fmtTitlePrediction4raw)
@@ -822,12 +827,13 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 			]
 	fmtPrediction4raw = fmtPrediction[:len(fmtPrediction)-2]
 	fmtPrediction4raw.append(fmt4evalue4copy)
+	fmtPrediction4raw.append(fmt4type)
 	fmtPrediction4raw.extend(fmtPrediction[-2:])
 	fmtStrPrediction = ' '.join(fmtPrediction)
 	fmtStrPrediction4raw = ' '.join(fmtPrediction4raw)
 
-	#fmtStrTitlePrediction = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>2} {:<}'
-	#fmtStrPrediction      = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>2} {:<}'
+	#fmtStrTitlePrediction = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9} {:>4} {:>2} {:<}'
+	#fmtStrPrediction      = '{:<60} {:<11} {:<59} {:>12} {:>12} {:>6} {:>8} {:>12} {:>12} {:>12} {:>12} {:>5} {:>4} {:>5} {:>5} {:>12} {:>12} {:>6} {:>7} {:>9.2g} {:>4} {:>2} {:<}'
 
 	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
 	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
@@ -935,6 +941,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 				#isBegin, isEnd = orfBegin, orfEnd
 			isBegin, isEnd = hit['bd']
 			len4is = isEnd - isBegin + 1
+			isType = hit['type']
 
 			# output .gff file
 			# gff3 format specifications, refer to 
@@ -1004,13 +1011,14 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 					# of the IS copy found at the specific genome location.
 					# Basically, all copies of an IS element in a
 					# genome sequence will have the same hmm attributes such as evalue.
-					# We can try match the boundary of IS to the original orf and assign
+					# We can try matching the boundary of IS with the original orf and then assign
 					# the right hmm attributes back to the current IS copy.
 				ov, 
 				':'.join([seq1,seq2]), # tir
 				]
 			args4raw = args4out[:len(args4out)-2]
 			args4raw.append(evalue4copy)
+			args4raw.append(isType)
 			args4raw.extend(args4out[-2:])
 			print(fmtStrPrediction.format(*args4out), file = fp)
 			print(fmtStrPrediction4raw.format(*args4raw), file = fp4raw)
@@ -2129,7 +2137,7 @@ def removeFalsePositive(mhits):
 		mhitsNew[accid] = hitsNew
 	return mhitsNew
 
-# Remove short hit
+# Remove partial IS elements
 def refineHits(mHits):
 	evalue4singleCopy = constants.evalue4singleCopy # e-50 by default
 	cutoff4irId4short = constants.cutoff4irId4short # 13 by default
@@ -2141,6 +2149,9 @@ def refineHits(mHits):
 	for accid in mHits.keys():
 		hitsCopy = []
 		for hit in mHits[accid]:
+			# Assume every hit is complete IS element.
+			hit['type'] = 'c'
+
 			familyName = hit['hmmhit'][0]
 			if '|' in familyName:
 				familyCluster = familyName.split('|',1)[0]
@@ -2151,7 +2162,7 @@ def refineHits(mHits):
 			begin, end = hit['bd']
 			isLen = end - begin + 1
 			if isLen < minLen4is:
-				print('remove partial IS element with isLen < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+				print('Remove partial IS element with isLen < {}: isLen={} {} bd={} orf{} evalue={}'.format(
 					minLen4is, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 				continue
 
@@ -2159,17 +2170,25 @@ def refineHits(mHits):
 			if hit['occurence']['ncopy4is'] < 2:
 				# filter out hits with evalue > cutoff
 				if hit['hmmhit'][2] > evalue4singleCopy:
+					print('Remove single-copy partial IS element with evalue > {}: isLen={} {} bd={} orf{} evalue={}'.format(
+						evalue4singleCopy, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 					continue
 				# familys other than IS200/IS605
 				elif family != 'IS200/IS605':
 					# filter out hits without tir
 					if len(hit['tirs']) == 0:
+						print('Remove single-copy partial IS element without tir: isLen={} {} bd={} orf{} evalue={}'.format(
+							isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 						continue
 					# filter out hits with irId < 13
 					elif hit['tirs'][0][1] < cutoff4irId4short:
+						print('Remove single-copy partial IS element with irId < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							cutoff4irId4short, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 						continue
 					# filter out hits with gaps in TIR and irId < 20
 					elif hit['tirs'][0][1] < cutoff4irId4long and hit['tirs'][0][3] > 0:
+						print('Remove single-copy partial IS element with gapped tir and irId < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							cutoff4irId4long, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 						continue
 				# family IS200/IS605
 				else:
@@ -2179,16 +2198,135 @@ def refineHits(mHits):
 				# IS200/IS605
 				if family == 'IS200/IS605':
 					if hit['hmmhit'][2] > evalue4singleCopy:
+						print('Remove multi-copy IS200/IS605 partial IS element with evalue > {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							evalue4singleCopy, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 						continue
 				elif family not in excludedFamilys:
 					# filter out hits without tir
 					if len(hit['tirs']) == 0:
+						print('Remove multi-copy excludedFamilys partial IS element without tir: isLen={} {} bd={} orf{} evalue={}'.format(
+							isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 						continue
 					# filter out hits with irId < 10
 					elif hit['tirs'][0][1] < cutoff4irId4multicopy:
+						print('Remove multi-copy excludedFamilys partial IS element with irId < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							cutoff4irId4multicopy, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
 						continue
 				else:
 					pass
+
+			# complete IS element
+			hitsCopy.append(hit)
+		if len(hitsCopy) == 0:
+			print('Warning: no valid hit found for {}'.format(accid))
+			continue
+		# sort hit by begin of orf
+		#hitsCopy.sort(key=lambda x: x['orf'][1])
+		# sort hit by begin of boundary 
+		hitsCopy.sort(key=lambda x: x['bd'][0])
+		mhitsCopy[accid] = hitsCopy
+	
+	newkeys = mhitsCopy.keys()
+	for k in mHits.keys():
+		if k not in newkeys:
+			print('Warning: no valid hit after removing short IS element candidate for', k)
+	return mhitsCopy
+
+# label each IS element as 'c' or 'p', where 'c' for complete IS and 'p' for partial IS
+def typeHits(mHits):
+	evalue4singleCopy = constants.evalue4singleCopy # e-50 by default
+	cutoff4irId4short = constants.cutoff4irId4short # 13 by default
+	cutoff4irId4long = constants.cutoff4irId4long # 20 by default
+	cutoff4irId4multicopy = constants.cutoff4irId4multicopy # 10 by default
+	excludedFamilys = constants.excludedFamilys
+
+	mhitsCopy = {}
+	for accid in mHits.keys():
+		hitsCopy = []
+		for hit in mHits[accid]:
+			# Assume every hit is complete IS element.
+			hit['type'] = 'c'
+
+			familyName = hit['hmmhit'][0]
+			if '|' in familyName:
+				familyCluster = familyName.split('|',1)[0]
+			else:
+				familyCluster = familyName
+			family, cluster = familyCluster.rsplit('_', 1)
+			minLen4is = constants.minMaxLen4is[family][0]
+			begin, end = hit['bd']
+			isLen = end - begin + 1
+			if isLen < minLen4is:
+				print('The partial IS element with isLen < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+					minLen4is, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+				hit['type'] = 'p'
+				hitsCopy.append(hit)
+				continue
+
+			# single-copy hits
+			if hit['occurence']['ncopy4is'] < 2:
+				# filter out hits with evalue > cutoff
+				if hit['hmmhit'][2] > evalue4singleCopy:
+					print('The single-copy partial IS element with evalue > {}: isLen={} {} bd={} orf{} evalue={}'.format(
+						evalue4singleCopy, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+					hit['type'] = 'p'
+					hitsCopy.append(hit)
+					continue
+				# familys other than IS200/IS605
+				elif family != 'IS200/IS605':
+					# filter out hits without tir
+					if len(hit['tirs']) == 0:
+						print('The single-copy partial IS element without tir: isLen={} {} bd={} orf{} evalue={}'.format(
+							isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+						hit['type'] = 'p'
+						hitsCopy.append(hit)
+						continue
+					# filter out hits with irId < 13
+					elif hit['tirs'][0][1] < cutoff4irId4short:
+						print('The single-copy partial IS element with irId < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							cutoff4irId4short, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+						hit['type'] = 'p'
+						hitsCopy.append(hit)
+						continue
+					# filter out hits with gaps in TIR and irId < 20
+					elif hit['tirs'][0][1] < cutoff4irId4long and hit['tirs'][0][3] > 0:
+						print('The single-copy partial IS element with gapped tir and irId < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							cutoff4irId4long, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+						hit['type'] = 'p'
+						hitsCopy.append(hit)
+						continue
+				# family IS200/IS605
+				else:
+					pass
+			# multi-copy hits
+			else:
+				# IS200/IS605
+				if family == 'IS200/IS605':
+					if hit['hmmhit'][2] > evalue4singleCopy:
+						print('The multi-copy IS200/IS605 partial IS element with evalue > {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							evalue4singleCopy, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+						hit['type'] = 'p'
+						hitsCopy.append(hit)
+						continue
+				elif family not in excludedFamilys:
+					# filter out hits without tir
+					if len(hit['tirs']) == 0:
+						print('The multi-copy excludedFamilys partial IS element without tir: isLen={} {} bd={} orf{} evalue={}'.format(
+							isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+						hit['type'] = 'p'
+						hitsCopy.append(hit)
+						continue
+					# filter out hits with irId < 10
+					elif hit['tirs'][0][1] < cutoff4irId4multicopy:
+						print('The multi-copy excludedFamilys partial IS element with irId < {}: isLen={} {} bd={} orf{} evalue={}'.format(
+							cutoff4irId4multicopy, isLen, family, hit['bd'], hit['orf'], hit['hmmhit'][2]))
+						hit['type'] = 'p'
+						hitsCopy.append(hit)
+						continue
+				else:
+					pass
+
+			# complete IS element
 			hitsCopy.append(hit)
 		if len(hitsCopy) == 0:
 			print('Warning: no valid hit found for {}'.format(accid))
@@ -2645,6 +2783,10 @@ def pred(args):
 		print('Start removing partial IS elements')
 		mHits = refineHits(mHits)
 		print('Finish removing partial IS elements')
+	else:
+		print('Start typing IS elements')
+		mHits = typeHits(mHits)
+		print('Finish typing partial IS elements')
 
 	# remove redundant IS elements with same boundary and same TIR
 	mHits = removeRedundantIS(mHits)
