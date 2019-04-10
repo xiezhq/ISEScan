@@ -4,7 +4,6 @@
 
 Contact:
 * Zhiqun Xie: xiezhq@hotmail.com
-* Haixu Tang: hatang@indiana.edu
 
 Last revision: 04/07/2019
 
@@ -117,7 +116,8 @@ Let's try an example, NC_012624.fna.
 
 ## Release History 
 * 1.7
-  * add one more column in *.raw among the output files of ISEScan, type, which is the type of IS element copy.
+  * Set removeShortIS = False in constants.py to report both complete and partial IS elements by default.
+  * Add one more column (type) in .raw output file, which is the type of IS element copy. For details refer to the section 'Details about NC_012624.fna.raw' in Readme.
 * 1.6
   * Update Readme about the configuration of ISEScan where the paths to clusters.faa.hmm and clusters.single.faa should also be correctly specified in constants.py (Thank Ania Gorska for it).
 * 1.5.4.3
