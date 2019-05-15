@@ -5,7 +5,7 @@
 Contact:
 * Zhiqun Xie: xiezhq@hotmail.com
 
-Last revision: 04/2019
+Last revision: 05/2019
 
 ## Overview
 
@@ -115,6 +115,8 @@ Let's try an example, NC_012624.fna.
 `python3 isescan.py NC_012624.fna proteome hmm`
 
 ## Release History 
+* 1.7.1
+  * fix a bug in constants.py, which fails to locate the correct path pointing to profile HMM files (clusters.single.faa and clusters.faa.hmm). Thank giuliodimaria92 for it.
 * 1.7
   * Set removeShortIS = False in constants.py for ISEScan to report both complete and partial IS elements by default. One additional column (type) was added accordingly in .raw output file to label each IS element copy as either complete (c) or partial (p) IS element. For details refer to the section 'Details about NC_012624.fna.raw' in Readme.
 * 1.6
