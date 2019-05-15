@@ -261,6 +261,9 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 		args2concurrent4phmmer,outFiles4phmmer = [], []
 	if len(args2concurrent4phmmer) > 0:
 		phmmerSearch(args2concurrent4phmmer)
+	else:
+		e = 'Error: ' + clusterSeqFile4phmmer + ' is not found or empty!\n'
+		raise RuntimeError(e)
 
 	if os.path.isfile(hmms_file) and os.stat(hmms_file).st_size > 0:
 		args2concurrent4hmmsearch, outFiles4hmmsearch = prepare4hmmsearch(hmms_file, 
@@ -269,6 +272,9 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 		args2concurrent4hmmsearch, outFiles4hmmsearch = [], []
 	if len(args2concurrent4hmmsearch) > 0:
 		hmmSearch(args2concurrent4hmmsearch)
+	else:
+		e = 'Error: ' + hmms_file + ' is not found or empty!\n'
+		raise RuntimeError(e)
 
 	# Select significant ones (predictions) from hits returned by HMM search
 	hitsFile = outFiles4phmmer + outFiles4hmmsearch
