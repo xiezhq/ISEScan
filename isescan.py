@@ -20,7 +20,7 @@ def isPredictSingle(args):
 	with open(filelist, 'w') as fp:
 		fp.write(seqfile+'\n')
 
-	isPredict.isPredict(filelist, path2proteome, path2hmm, args['removeShortIS'])
+	isPredict.isPredict(filelist, path2proteome, path2hmm, args['removeShortIS'], args['translateGenome'])
 	os.remove(filelist)
 
 if __name__ == "__main__":
@@ -40,6 +40,9 @@ if __name__ == "__main__":
 	helpStr= 'remove partial IS elements which include IS element with length < 400 or single copy IS element without perfect TIR.'
 	parser.add_argument('--removeShortIS', action='store_true', help = helpStr)
 
+	helpStr= 'use the protein database from ncbi genome database instead of using FragGeneScan program.'
+	parser.add_argument('--no-FragGeneScan', action='store_false', help = helpStr)
+
 	helpStr = 'sequence file in fasta format'
 	parser.add_argument('seqfile', help = helpStr)
 
@@ -51,12 +54,12 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-
 	args4isPredictSingle = {
 					'seqfile': args.seqfile,
 					'path2proteome': args.path2proteome,
 					'path2hmm': args.path2hmm,
-					'removeShortIS' : args.removeShortIS 
+					'removeShortIS' : args.removeShortIS,
+					'translateGenome' : args.no_FragGeneScan,
 				}
 
 	isPredictSingle(args4isPredictSingle)

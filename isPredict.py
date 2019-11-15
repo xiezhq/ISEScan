@@ -240,13 +240,15 @@ def proteinFromNCBI(dnaFiles, dir2proteome):
 	return proteome_files
 
 #def isPredict(args):
-def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShortIS):
+def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShortIS, translateGenome):
 	print('isPredict begins at', datetime.datetime.now().ctime())
 
 	dnaFiles = tools.rdDNAlist(dna_list)
-	if constants.translateGenome == True:
+	if translateGenome == True:
+		print ("predict and translate genes from genome sequence into protein database using FragGeneScan program")
 		proteome_files = translateGenomeByFGS_v2(dnaFiles, path_to_proteome)
 	else:
+		print ("use NCBI protein database")
 		proteome_files = proteinFromNCBI(dnaFiles, path_to_proteome)
 
 	clusterSeqFile4phmmer = constants.file4clusterSeqFile4phmmer
