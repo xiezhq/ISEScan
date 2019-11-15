@@ -240,7 +240,7 @@ def proteinFromNCBI(dnaFiles, dir2proteome):
 	return proteome_files
 
 #def isPredict(args):
-def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
+def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShortIS):
 	print('isPredict begins at', datetime.datetime.now().ctime())
 
 	dnaFiles = tools.rdDNAlist(dna_list)
@@ -283,12 +283,13 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 			'path_to_proteome': path_to_proteome,
 			'path_to_hmmsearch_results': path_to_hmmsearch_results,
 			'hitsFile': hitsFile,
+			'removeShortIS' : removeShortIS,
 			}
 		pred.pred(args4pred)
-		if constants.removeShortIS == False:
+		if removeShortIS is False:
 			print('Both complete and partial IS elements are reported.')
 		else:
-			print('Only complete IS elements are reported. Please set removeShortIS = False in constants.py if partial IS elements are required.')
+			print('Only complete IS elements are reported.')
 	else:
 		e = 'No hit was returned by HMM search against protein database. ' + datetime.datetime.now().ctime()
 		print(e)

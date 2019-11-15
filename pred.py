@@ -2779,7 +2779,7 @@ def pred(args):
 	mHits = removeFalsePositive(mHits)
 
 	# remove hits that are partial IS elements identified by length, evalue and irId/irLen
-	if constants.removeShortIS == True:
+	if args['removeShortIS'] is True:
 		print('Start removing partial IS elements')
 		mHits = refineHits(mHits)
 		print('Finish removing partial IS elements')
