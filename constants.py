@@ -6,20 +6,15 @@ import os.path
 # on your computer.
 # 
 # FragGeneScan
-#FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl'
-FragGeneScan = '/u/zhiqxie/informatics/inst/FragGeneScan1.30/run_FragGeneScan.pl'
+FragGeneScan = '/apps/inst/FragGeneScan1.30/run_FragGeneScan.pl'
 # Hmmer
-phmmer = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/phmmer'
-hmmsearch = '/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch'
+phmmer = '/apps/inst/hmmer-3.3/bin/phmmer'
+hmmsearch = '/apps/inst/hmmer-3.3/bin/hmmsearch'
 # Blast 
-blastn = '/l/ncbi-blast/bin/blastn'
-blastp = '/l/ncbi-blast/bin/blastp'
-makeblastdb = '/l/ncbi-blast/bin/makeblastdb'
-
-# get path where isescan.py is
-import sys
-path2isescan = os.path.dirname(sys.argv[0])
-
+blastn = '/apps/inst/ncbi-blast-2.10.0+/bin/blastn'
+blastp = '/apps/inst/ncbi-blast-2.10.0+/bin/blastp'
+makeblastdb = '/apps/inst/ncbi-blast-2.10.0+/bin/makeblastdb'
+#
 # Set the path variables pointing to the profile HMM files (clusters.single.faa and clusters.faa.hmm).
 #
 # The peptide sequences of single-member clusters, which is used by phmmer in hmmer
