@@ -5,7 +5,7 @@
 Contact:
 * Zhiqun Xie: xiezhq@hotmail.com
 
-Last revision: 05/2019
+Last revision: 02/2020
 
 ## Overview
 
@@ -51,9 +51,9 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
     export LD_LIBRARY_PATH=Path_to_libssw.so:$LD_LIBRARY_PATH
 	```
     For example
-    ```
+    `
 	export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan:$LD_LIBRARY_PATH
-	```
+	`
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
 
