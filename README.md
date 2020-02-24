@@ -46,8 +46,10 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
   * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
   `gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h`
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
-  `cp sswlib.so ../`
-  `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:libssw.so`
+  `cp libssw.so ../`
+  `export LD_LIBRARY_PATH=Path_to_libssw.so:$LD_LIBRARY_PATH`
+  `# For example
+  export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan:$LD_LIBRARY_PATH`
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
 
