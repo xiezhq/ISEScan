@@ -356,23 +356,6 @@ def removeOverlappedHits(mhits):
 		margs.append(args)
 	for args in margs:
 		mhitsNew[args[0]] = parallel4overlappedHits(args)
-	'''
-	nseq = len(margs)
-	if nseq > constants.nproc:
-		nproc = constants.nproc
-	else:
-		nproc = nseq
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
-		future2args = {executor.submit(parallel4overlappedHits, args): args for args in margs}
-		for future in concurrent.futures.as_completed(future2args):
-			args = future2args[future]
-			try:
-				hitsNew = future.result()
-			except Exception as e:
-				print('{} generated an exception: {} in parallel4overlappedHits'.format(args[0], e))
-			else: 
-				mhitsNew[args[0]] = hitsNew
-	'''
 	return mhitsNew
 
 	
@@ -1476,7 +1459,7 @@ def getFullIS4seq(args):
 	return ispairs
 
 def getFullIS4seqOnStream(args):
-	seqid, orfhits, dna = args
+	seqid, orfhits, dna, nthread = args
 	org, fileid, seq = dna
 
 	# replace non-standard base with 'N'
@@ -1512,13 +1495,8 @@ def getFullIS4seqOnStream(args):
 		os.remove(blastdb+ext)
 	'''
 	query = orfExtSeqFile
-	norfhits = len(orfhits)
-	if constants.nthread < norfhits:
-		nthreads = constants.nthread
-	else:
-		nthreads = norfhits
 	#blastOut4orfExt, err = tools.doBlastnOnStream(query, blastdb, strand='both', task='megablast', 
-	blastOut4orfExt, err = tools.doBlastn2seqOnStream(query, fp.name, strand='both', task='megablast', 
+	blastOut4orfExt, err = tools.doBlastn2seqOnStream(nthread, query, fp.name, strand='both', task='megablast', 
 			perc_ident=constants.SIM4ISO)
 	if len(err) > 0:
 		#e = 'Blastn ISs in {} against {}: {}'.format(seqid, db, err)
@@ -1655,43 +1633,17 @@ def mTIR2hits4orfhit(morfhits, mTIR, morfhitsNeighbors):
 # hit: {'qseqid':qseqid, 'orfBegin':orfBegin, 'orfEnd':orfEnd, 'sseqid':sseqid, 'length':length, 
 #		'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
 #		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident}
-def getCopy(mOrfHits, mDNA):
+def getCopy(mOrfHits, mDNA, nthread):
 	mispairs = {}
 	margs = []
 	for seqid, orfHits in mOrfHits.items():
 		if len(orfHits) == 0:
 			continue
-		args = (seqid, orfHits, mDNA[seqid])
+		args = (seqid, orfHits, mDNA[seqid], nthread)
 		margs.append(args)
-
-	'''
 	for args in margs:
+		seqid = args[0]
 		mispairs[seqid] = getFullIS4seqOnStream(args)
-	'''
-
-	nseq = len(margs)
-	'''
-	if nseq > constants.nproc:
-		nproc = constants.nproc
-	else:
-		nproc = nseq
-	'''
-	if nseq > constants.nthread:
-		nthread = constants.nthread
-	else:
-		nthread = nseq
-
-	#with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
-	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
-		future2args = {executor.submit(getFullIS4seqOnStream, args): args for args in margs}
-		for future in concurrent.futures.as_completed(future2args):
-			args = future2args[future]
-			try:
-				ispairs = future.result()
-			except Exception as e:
-				print('{} generated an exception: {}'.format(args[0], e))
-			else:
-				mispairs[args[0]] = ispairs
 	return mispairs
 
 # Return maxgs
@@ -1896,25 +1848,8 @@ def removeOverlappedOrfhits(mOrfHits):
 	for seqid, orfhits in mOrfHits.items():
 		args = (seqid, orfhits)
 		margs.append(args)
-	'''
 	for args in margs:
 		mOrfHitsNew[args[0]] = parall4orfhits(args)
-	'''
-	nseq = len(margs)
-	if nseq > constants.nproc:
-		nproc = constants.nproc
-	else:
-		nproc = nseq
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
-		future2args = {executor.submit(parall4orfhits, args): args for args in margs}
-		for future in concurrent.futures.as_completed(future2args):
-			args = future2args[future]
-			try:
-				orfhitsNew = future.result()
-			except Exception as e:
-				print('{} generated an exception: {} in parall4orfhits'.format(args[0], e))
-			else:
-				mOrfHitsNew[args[0]] = orfhitsNew
 	return mOrfHitsNew
 
 # Add the IS copies without predicted ORF into the list of hits, and consider those copies as the 
@@ -2734,7 +2669,7 @@ def pred(args):
 	#		'qstart':qstart, 'qend':qend, 'sstart':sstart, 'send':send,
 	#		'nident':nident, 'qlen':qlen, 'slen':slen, 'pident':pident}
 	# Search for copies of IS elements and create mispairs data structure
-	mispairs = getCopy(mOrfHits, mDNA)
+	mispairs = getCopy(mOrfHits, mDNA, args['nthread'])
 	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of 
 	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.) 
 	# into the list of hits, the mOrfHits is updated in place.
@@ -2743,7 +2678,7 @@ def pred(args):
 	print('Finish addNonORFcopy at', datetime.datetime.now().ctime())
 	#
 	# Update mispairs data structure with the updated mOrfHits
-	mispairs = getCopy(mOrfHits, mDNA)
+	mispairs = getCopy(mOrfHits, mDNA, args['nthread'])
 	#
 	# Add the IS copies without predicted ORF (namely, the real Tpase ORF is difficult to predict because of
 	# the uncommon translation from DNA to protein, therefore no Tpase ORF is predicted/annotated here.)
@@ -2859,29 +2794,3 @@ def pred(args):
 	#--------------------------
 
 	print('End in pred', datetime.datetime.now().ctime())
-
-
-if __name__ == "__main__":
-	descriptStr = 'Rerank and filter hits in hmmsearch output produced by --tblout output option, ranked by E-value (increasing E-value). A typical invocaltion would be: python3 pred.py dna.list /home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5 /home/data/insertion_sequence/output4hmmsearch_illumina_5'
-
-	parser = argparse.ArgumentParser(description = descriptStr)
-
-	helpStr = 'input file containing the list of DNA sequence files, one file per line'
-	parser.add_argument('dna_list', help = helpStr)
-
-	helpStr = 'directory holding files produced by FragGeneScan'
-	parser.add_argument('path_to_proteome', help = helpStr)
-
-	helpStr = 'directory holding files produced by hmmsearch with options \'--tblout output option\''
-	parser.add_argument('path_to_hmmsearch_results', help = helpStr)
-
-	args = parser.parse_args()
-
-	args4pred = {
-			'dna_list': args.dna_list,
-			'path_to_proteome': args.path_to_proteome,
-			'path_to_hmmsearch_results': args.path_to_hmmsearch_results,
-			}
-
-	pred(args4pred)
-
