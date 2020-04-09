@@ -18,26 +18,13 @@ import pred
 def genome2proteome(args2concurrent):
 	print("\nBegin to translate genome into proteome.")
 
-	nproteome = len(args2concurrent)
-	if nproteome < constants.nproc:
-		nproc = nproteome
-	else:
-		nproc = constants.nproc
-	
-	'''
-	if nproteome < constants.nthread:
-		nthread = nproteome
-	else:
-		nthread = constants.nthread
-	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
-	'''
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
-		for arg, outs in zip(args2concurrent, executor.map(is_analysis.translate_genome_dna_v3, args2concurrent)):
-			dna_file = arg[0]
-			if outs == 0:
-				print('Translating genome into proteome for', dna_file, ', return ', outs)
-			else:
-				print('Translating genome into proteome for', dna_file, ', return error!')
+	for args in args2concurrent:
+		outs = is_analysis.translate_genome_dna_v3(args)
+		dna_file = args[0]
+		if outs == 0:
+			print('Translating genome into proteome for', dna_file, ', return ', outs)
+		else:
+			print('Translating genome into proteome for', dna_file, ', return error!')
 
 	print("\nFinish translating genome into proteome.", datetime.datetime.now().ctime())
 
@@ -48,7 +35,7 @@ def genome2proteome(args2concurrent):
 # outFiles4phmmer: [output_file, ...]
 # output_file: file, 
 #	hmmer hits file with full path, e.g. /path/output4hmmsearch_illumina_5_cdhit30/HMASM/clusters.single.faa.SRS078176.scaffolds.fa.faa
-def prepare4phmmer(clusterSeqFile4phmmer, proteome_files, path_to_hmmsearch_results):
+def prepare4phmmer(clusterSeqFile4phmmer, proteome_files, path_to_hmmsearch_results, nthread):
 	args2concurrent = []
 	outFiles4phmmer = []
 	query = os.path.basename(clusterSeqFile4phmmer)
@@ -74,7 +61,7 @@ def prepare4phmmer(clusterSeqFile4phmmer, proteome_files, path_to_hmmsearch_resu
 			callhmmer = True
 
 		if callhmmer == True:
-			args2concurrent.append((clusterSeqFile4phmmer, faaFileName, output_file))
+			args2concurrent.append((clusterSeqFile4phmmer, faaFileName, output_file, nthread))
 			tools.makedir(os.path.dirname(output_file))
 		else:
 			print('Skip phmmer {} against {}'.format(clusterSeqFile4phmmer, faaFileName))
@@ -84,7 +71,7 @@ def prepare4phmmer(clusterSeqFile4phmmer, proteome_files, path_to_hmmsearch_resu
 
 # outFiles4hmmsearch: [output_file, ...]
 # output_file: output of hmmsearch, e.g. clusters.faa.hmm.NC_000913.fna.faa, clusters.faa.hmm.SRS014235.scaffolds.fa.faa 
-def prepare4hmmsearch(hmms_file, proteome_files, path_to_hmmsearch_results):
+def prepare4hmmsearch(hmms_file, proteome_files, path_to_hmmsearch_results, nthread):
 	args2concurrent = []
 	outFiles4hmmsearch = []
 	query = os.path.basename(hmms_file)
@@ -109,7 +96,7 @@ def prepare4hmmsearch(hmms_file, proteome_files, path_to_hmmsearch_results):
 		else:
 			callhmmer = True
 		if callhmmer == True:
-			args2concurrent.append((hmms_file, faaFileName, output_file))
+			args2concurrent.append((hmms_file, faaFileName, output_file, nthread))
 			tools.makedir(os.path.dirname(output_file))
 		else:
 			print('Skip hmmsearch {} against {}'.format(hmms_file, faaFileName))
@@ -120,65 +107,34 @@ def prepare4hmmsearch(hmms_file, proteome_files, path_to_hmmsearch_results):
 def hmmSearch(args2concurrent):
 	print("\nBegin to profile HMM search against proteome database.", datetime.datetime.now().ctime())
 
-	nproteome = len(args2concurrent)
-	if nproteome < constants.nproc:
-		nproc = nproteome
-	else:
-		nproc = constants.nproc
-	'''
-	if nproteome < constants.nthread:
-		nthread = nproteome
-	else:
-		nthread = constants.nthread
-	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
-	'''
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
-		for arg, outs in zip(args2concurrent, executor.map(is_analysis.is_hmmsearch_v2, args2concurrent)):
-			hmms_file, proteome_file, hmmHitsFile = arg
-			if outs == 0:
-				print('Finish Profile HMM searching', hmms_file, ' against', proteome_file, ', output', hmmHitsFile)
-			else:
-				e = 'Profile HMM searching ' + hmms_file + ' against ' + proteome_file + ', return error!\n'
-				raise RuntimeError(e)
+	for args in args2concurrent:
+		outs = is_analysis.is_hmmsearch_v2(args)
+		hmms_file, proteome_file, hmmHitsFile, nthread = args
+		if outs == 0:
+			print('Finish Profile HMM searching', hmms_file, ' against', proteome_file, ', output', hmmHitsFile)
+		else:
+			e = 'Profile HMM searching ' + hmms_file + ' against ' + proteome_file + ', return error!\n'
+			raise RuntimeError(e)
 
 	print("\nFinish profile HMM searching against proteome database.", datetime.datetime.now().ctime())
 
 def phmmerSearch(args2concurrent4phmmer):
 	print("\nBegin to phmmer search against proteome database.", datetime.datetime.now().ctime())
 
-	'''
 	for arg in args2concurrent4phmmer:
-		is_analysis.is_phmmer(arg)
-		seqFile, proteome_file, hmmHitsFile = arg
-		#outFiles.append(hmmHitsFile)
+		outs = is_analysis.is_phmmer(arg)
+		seqFile, proteome_file, hmmHitsFile, nthread = arg
+		if outs == 0:
+			print('Finish phmmer searching', seqFile, ' against', proteome_file, ', output', hmmHitsFile)
+		else:
+			e = 'phmmer searching ' + seqFile + ' against ' + proteome_file + ', return error!\n'
+			raise RuntimeError(e)
 
-	'''
-
-	nproteome = len(args2concurrent4phmmer)
-	if len(args2concurrent4phmmer) < constants.nproc:
-		nproc = nproteome
-	else:
-		nproc = constants.nproc
-	'''
-	if nproteome < constants.nthread:
-		nthread = nproteome
-	else:
-		nthread = constants.nthread
-	with concurrent.futures.ThreadPoolExecutor(max_workers = nthread) as executor:
-	'''
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nproc) as executor:
-		for arg, outs in zip(args2concurrent4phmmer, executor.map(is_analysis.is_phmmer, args2concurrent4phmmer)):
-			seqFile, proteome_file, hmmHitsFile = arg
-			if outs == 0:
-				print('Finish phmmer searching', seqFile, ' against', proteome_file, ', output', hmmHitsFile)
-			else:
-				e = 'phmmer searching ' + seqFile + ' against ' + proteome_file + ', return error!\n'
-				raise RuntimeError(e)
 	print("\nFinish phmmer searching against proteome database.", datetime.datetime.now().ctime())
 
 
 # dnaFiles: [(file, org), ..., (file, org)]
-def translateGenomeByFGS_v2(dnaFiles, dir2proteome):
+def translateGenomeByFGS_v2(dnaFiles, dir2proteome, nthread):
 	#seq_type = '1'
 	#train_model = 'complete'
 	seq_type = '0'
@@ -203,7 +159,7 @@ def translateGenomeByFGS_v2(dnaFiles, dir2proteome):
 		update = False
 		if not os.path.isfile(faaFile):
 			tools.makedir(os.path.dirname(faaFile))
-			args2concurrent.append((dna_file, output_file, seq_type, train_model))
+			args2concurrent.append((dna_file, output_file, seq_type, train_model, nthread))
 			update = True
 		elif os.stat(faaFile).st_size > 0:
 			print('Skip translating {} into {}'.format(dna_file, faaFile))
@@ -240,13 +196,16 @@ def proteinFromNCBI(dnaFiles, dir2proteome):
 	return proteome_files
 
 #def isPredict(args):
-def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
+def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShortIS, translateGenome,
+		nthread=1):
 	print('isPredict begins at', datetime.datetime.now().ctime())
 
 	dnaFiles = tools.rdDNAlist(dna_list)
-	if constants.translateGenome == True:
-		proteome_files = translateGenomeByFGS_v2(dnaFiles, path_to_proteome)
+	if translateGenome == True:
+		print ("predict and translate genes from genome sequence into protein database using FragGeneScan program")
+		proteome_files = translateGenomeByFGS_v2(dnaFiles, path_to_proteome, nthread)
 	else:
+		print ("use NCBI protein database")
 		proteome_files = proteinFromNCBI(dnaFiles, path_to_proteome)
 
 	clusterSeqFile4phmmer = constants.file4clusterSeqFile4phmmer
@@ -256,25 +215,23 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 	#
 	if os.path.isfile(clusterSeqFile4phmmer) and os.stat(clusterSeqFile4phmmer).st_size > 0:
 		args2concurrent4phmmer, outFiles4phmmer = prepare4phmmer(clusterSeqFile4phmmer, 
-				proteome_files, path_to_hmmsearch_results)
+				proteome_files, path_to_hmmsearch_results, nthread)
 	else: # no valid clusters.single.faa available
-		args2concurrent4phmmer,outFiles4phmmer = [], []
+		#args2concurrent4phmmer,outFiles4phmmer = [], []
+		e = clusterSeqFile4phmmer + ' is not found or empty!\n'
+		raise RuntimeError(e)
 	if len(args2concurrent4phmmer) > 0:
 		phmmerSearch(args2concurrent4phmmer)
-	else:
-		e = 'Error: ' + clusterSeqFile4phmmer + ' is not found or empty!\n'
-		raise RuntimeError(e)
 
 	if os.path.isfile(hmms_file) and os.stat(hmms_file).st_size > 0:
 		args2concurrent4hmmsearch, outFiles4hmmsearch = prepare4hmmsearch(hmms_file, 
-				proteome_files, path_to_hmmsearch_results)
+				proteome_files, path_to_hmmsearch_results, nthread)
 	else: # no valid clusters.faa.hmm available
-		args2concurrent4hmmsearch, outFiles4hmmsearch = [], []
+		#args2concurrent4hmmsearch, outFiles4hmmsearch = [], []
+		e = hmms_file + ' is not found or empty!\n'
+		raise RuntimeError(e)
 	if len(args2concurrent4hmmsearch) > 0:
 		hmmSearch(args2concurrent4hmmsearch)
-	else:
-		e = 'Error: ' + hmms_file + ' is not found or empty!\n'
-		raise RuntimeError(e)
 
 	# Select significant ones (predictions) from hits returned by HMM search
 	hitsFile = outFiles4phmmer + outFiles4hmmsearch
@@ -283,33 +240,16 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results):
 			'path_to_proteome': path_to_proteome,
 			'path_to_hmmsearch_results': path_to_hmmsearch_results,
 			'hitsFile': hitsFile,
+			'removeShortIS' : removeShortIS,
+			'nthread': nthread,
 			}
 		pred.pred(args4pred)
-		if constants.removeShortIS == False:
+		if removeShortIS is False:
 			print('Both complete and partial IS elements are reported.')
 		else:
-			print('Only complete IS elements are reported. Please set removeShortIS = False in constants.py if partial IS elements are required.')
+			print('Only complete IS elements are reported.')
 	else:
 		e = 'No hit was returned by HMM search against protein database. ' + datetime.datetime.now().ctime()
 		print(e)
 
 	print('isPredict ends at', datetime.datetime.now().ctime())
-
-
-if __name__ == "__main__":
-	# Parse command line arguments
-	descriptStr = 'Search IS Profile HMMs against gene database. A typical invocation would be: python3 isPredict.py dna.list /home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5/ /home/data/insertion_sequence/output4hmmsearch_illumina_5/'
-	parser = argparse.ArgumentParser(description = descriptStr)
-
-	helpStr = 'file holding a list of DNA sequence file names, one DNA sequence file per line in dna_list and the DNA sequence will be translated into protein sequences'
-	parser.add_argument('dna_list', help = helpStr)
-
-	helpStr = 'directory where proteome (each line corresponds to a protein sequence database translated from a genome) files will be placed'
-	parser.add_argument('path_to_proteome', help = helpStr)
-
-	helpStr = 'directory where the results of hmmsearch will be placed'
-	parser.add_argument('path_to_hmmsearch_results', help = helpStr)
-
-	args = parser.parse_args()
-	#isPredict(args)
-	isPredict(args.dna_list, args.path_to_proteome, args.path_to_hmmsearch_results)

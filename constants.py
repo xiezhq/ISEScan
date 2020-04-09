@@ -10,46 +10,27 @@ FragGeneScan = '/apps/inst/FragGeneScan1.30/run_FragGeneScan.pl'
 # Hmmer
 phmmer = '/apps/inst/hmmer-3.3/bin/phmmer'
 hmmsearch = '/apps/inst/hmmer-3.3/bin/hmmsearch'
-# Blast 
+# Blast
 blastn = '/apps/inst/ncbi-blast-2.10.0+/bin/blastn'
 blastp = '/apps/inst/ncbi-blast-2.10.0+/bin/blastp'
 makeblastdb = '/apps/inst/ncbi-blast-2.10.0+/bin/makeblastdb'
-#
+
+# get path where isescan.py is
+import sys
+path2isescan = os.path.dirname(sys.argv[0])
+
 # Set the path variables pointing to the profile HMM files (clusters.single.faa and clusters.faa.hmm).
 #
 # The peptide sequences of single-member clusters, which is used by phmmer in hmmer
-file4clusterSeqFile4phmmer = os.path.join(path2isescan, 'pHMMs', 'clusters.single.faa')
+#file4clusterSeqFile4phmmer = os.path.join(path2isescan, 'pHMMs', 'clusters.single.faa')
+file4clusterSeqFile4phmmer = '/home/xiezhq/projects/isescan/pHMMs/clusters.single.faa'
 #
 # The profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
-file4clusterHMM = os.path.join(path2isescan, 'pHMMs', 'clusters.faa.hmm')
+#file4clusterHMM = os.path.join(path2isescan, 'pHMMs', 'clusters.faa.hmm')
+file4clusterHMM = '/home/xiezhq/projects/isescan/pHMMs/clusters.faa.hmm'
 #
 ## Config packages
 
-
-# Option switch to report partial IS element
-#
-# If removeShortIS is True, ISEScan will remove partial IS elements which include 
-# IS element with length < 400 or single copy IS element without perfect TIR.
-# If removeShortIS is False, ISEScan will report both partial IS element and complete (full-lenght) IS elements.
-# The default is False.
-#removeShortIS = True
-removeShortIS = False
-#
-# Option switch to report both complete and partial IS elements
-
-# When translateGenome is True, pipepline will predict and translate genes 
-# from genome sequence into protein database (file in fasta format) 
-# using FragGeneScan program.
-translateGenome = True
-# When translateGenome is False, pipeline will use the protein database (.faa file)
-# from ncbi genome database, and the corresponding .fna and .ptt files in the same folder
-# are required to map proteins to genome locations.
-#translateGenome = False
-
-# set temporary directory used by ISEScan
-#tmpdir = 'tmpdir'
-#tmpdir = '/N/u/zhiqxie/Karst/is/isescan/tmpdir'
-#tmpdir = '/N/dc2/scratch/zhiqxie/insertion_sequence/tmpdir'
 
 # for local linux machine
 path2results = ''
@@ -356,13 +337,3 @@ table11 = {
 		'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G',
 		}
 gene2pepTable = {'11': table11}
-
-# default number of processes to use in calculation if it is not given
-#nproc = 32
-#nproc = 16
-#nproc = 8
-nproc = 2
-# default number of threads to use in calculation if it is not given
-nthread = 4
-#nthread = 16
-#nthread = 32

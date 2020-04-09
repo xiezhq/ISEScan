@@ -1100,24 +1100,6 @@ def findIR4elementBySSW(args):
 # seq1, seq2: inverted repeat sequences
 def findIRbySSW(mInput4ssw, filter):
 	mBestIR = []
-
-	'''
-	args2concurrent = []
-	for input4IS in mInput4ssw:
-		args2concurrent.append((input4IS, filter))
-
-	if len(args2concurrent) > constants.nproc:
-		nprocess = constants.nproc
-	else:
-		nprocess = len(args2concurrent)
-	with concurrent.futures.ProcessPoolExecutor(max_workers = nprocess) as executor:
-		for args, ir in zip(args2concurrent, executor.map(findIR4elementBySSW, args2concurrent)):
-		# args: (input4IS, filter)
-		# input4IS: (familyName, isName, seq1, seq2, minScore, minLen)
-			#familyName, isName = args[0][:2]
-			#mBestIR.append([familyName, isName, ir])
-			mBestIR.append([args[0][0], args[0][1], ir])
-	'''
 	for input4IS in mInput4ssw:
 		# input4IS: (familyName, isName, seq1, seq2, minScore, minLen)
 		ir = findIR4elementBySSW((input4IS, filter))
@@ -1126,7 +1108,6 @@ def findIRbySSW(mInput4ssw, filter):
 		#	ir = []
 
 		mBestIR.append([input4IS[0], input4IS[1], ir])
-
 	return mBestIR
 
 
@@ -1472,55 +1453,8 @@ def best_element_per_group(family):
 	return family_refined
 
 
-def translate_genome_dna_v1(dna, output_path, seq_type, train_model):
-#./run_FragGeneScan.pl -genome=./example/NC_000913.fna -out=./example/NC_000913.test  -complete=1  -train=complete
-	file_name_index = dna.rfind('/')
-	output_file = output_path + dna[file_name_index:]
-	gene_translate_cmd = "/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl"
-	input = "-genome=" + dna
-	output = "-out=" + output_file
-	seq_type = "-complete=" + seq_type
-	train_model = "-train=" + train_model
-	#nthread = '-thread=8'
-	nthread = '-thread=2'
-	cmd_line = '{0} {1} {2} {3} {4} {5}'.format(gene_translate_cmd, input, output, seq_type, train_model, nthread)
-	do_FragGeneScan = shlex.split(cmd_line)
-	p = subprocess.Popen(do_FragGeneScan, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	try:
-		outs, errs = p.communicate(timeout = 1500)
-	except subprocess.TimeoutExpired:
-		p.kill()
-		outs, errs = p.communicate()
-	return (outs, errs)
-
-def translate_genome_dna_v2(dna, output_file, seq_type, train_model):
-	#./run_FragGeneScan.pl -genome=./example/NC_000913.fna -out=./example/NC_000913.test  -complete=1  -train=complete
-
-	gene_translate_cmd = "/u/zhiqxie/informatics/inst/FragGeneScan1.19/run_FragGeneScan.pl"
-	input = "-genome=" + dna
-	output = "-out=" + output_file
-	seq_type = "-complete=" + seq_type
-	train_model = "-train=" + train_model
-	#nthread = '-thread=8'
-	nthread = '-thread=1'
-	cmd_line = '{0} {1} {2} {3} {4} {5}'.format(gene_translate_cmd, input, output, seq_type, train_model, nthread)
-	do_FragGeneScan = shlex.split(cmd_line)
-
-	#return subprocess.check_call(do_FragGeneScan, shell=False, universal_newlines=False)
-	return subprocess.call(do_FragGeneScan, shell=False, universal_newlines=False)
-	#return subprocess.check_output(do_FragGeneScan, stderr=subprocess.STDOUT, shell=False, universal_newlines=False)
-	'''
-	p = subprocess.Popen(do_FragGeneScan, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	try:
-		outs, errs = p.communicate(timeout = 1500)
-	except subprocess.TimeoutExpired:
-		p.kill()
-		outs, errs = p.communicate()
-	return (outs, errs)
-	'''
-
 def translate_genome_dna_v3(args):
-	dna, output_file, seq_type, train_model = args
+	dna, output_file, seq_type, train_model, nthread = args
 	#./run_FragGeneScan.pl -genome=./example/NC_000913.fna -out=./example/NC_000913.test  -complete=1  -train=complete -thread==4
 
 	gene_translate_cmd = constants.FragGeneScan
@@ -1528,40 +1462,19 @@ def translate_genome_dna_v3(args):
 	output = "-out=" + output_file
 	seq_type = "-complete=" + seq_type
 	train_model = "-train=" + train_model
-	nthread = '-thread='+str(constants.nthread)
+	nthread = '-thread='+str(nthread)
 	cmd_line = '{0} {1} {2} {3} {4} {5}'.format(gene_translate_cmd, input, output, seq_type, train_model, nthread)
-	#cmd_line = '{0} {1} {2} {3} {4}'.format(gene_translate_cmd, input, output, seq_type, train_model)
 	do_FragGeneScan = shlex.split(cmd_line)
 
 	#return subprocess.call(do_FragGeneScan, shell=False, universal_newlines=False)
 	return subprocess.call(cmd_line, shell=True, universal_newlines=False)
 
-def is_hmmsearch(hmm, database, output):
-	hmmsearch_cmd = "/u/zhiqxie/informatics/inst/hmmer-3.1b2/bin/hmmsearch"
-	options = "--tblout " + output + " " + "--max"
-	cmd_line = '{0} {1} {2} {3}'.format(hmmsearch_cmd, options, hmm, database)
-	do_hmmsearch = shlex.split(cmd_line)
-
-	#return subprocess.check_call(do_hmmsearch, shell=False, universal_newlines=False)
-	return subprocess.call(do_hmmsearch, shell=False, universal_newlines=False)
-	#return subprocess.check_output(do_hmmsearch, stderr=subprocess.STDOUT, shell=False, universal_newlines=False)
-	'''
-	p = subprocess.Popen(do_hmmsearch, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	try:
-		outs, errs = p.communicate(timeout = 150)
-	except subprocess.TimeoutExpired:
-		p.kill()
-		outs, errs = p.communicate()
-	return (outs, errs)
-	'''
 
 def is_hmmsearch_v2(args):
-	hmm, database, output = args
+	hmm, database, output, nthread = args
 	hmmsearch_cmd = constants.hmmsearch
 	#dir, output = os.path.split(output)
-	#nthread = constants.nthread
-	nthread = constants.nproc
-	options = ' '.join(["--tblout", output, "--max --noali", "--cpu", str(constants.nthread)])
+	options = ' '.join(["--tblout", output, "--max --noali", "--cpu", str(nthread)])
 	cmd_line = ' '.join([hmmsearch_cmd, options, hmm, database])
 	do_hmmsearch = shlex.split(cmd_line)
 
@@ -1574,12 +1487,10 @@ def is_hmmsearch_v2(args):
 # seqFile: profile HMM models file, created by hmmbuild in HMMer package
 # databaseFile: proteome file in which multiple protein amino acid sequence are placed in FASTA format
 def is_phmmer(args):
-	seqFile, database, output = args
+	seqFile, database, output, nthread = args
 	phmmer_cmd = constants.phmmer
 	#dir, output = os.path.split(output)
-	#nthread = constants.nthread
-	nthread = constants.nproc
-	options = ' '.join(["--tblout", output, "--max --noali", "--cpu", str(constants.nthread)])
+	options = ' '.join(["--tblout", output, "--max --noali", "--cpu", str(nthread)])
 	cmd_line = ' '.join([phmmer_cmd, options, seqFile, database])
 	do_search = shlex.split(cmd_line)
 

@@ -956,7 +956,7 @@ def doBlastpOnStream(query, db, task='blastp', e_value=1e-10, nthreads=1):
 	return (out, err)
 
 # blastn -query query -subject subject ....
-def doBlastn2seqOnStream(query, subject, strand='both', task='megablast', perc_ident=100):
+def doBlastn2seqOnStream(nthread, query, subject, strand='both', task='megablast', perc_ident=100):
 	blast = constants.blastn
 	outfmt = shlex.quote('6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore nident qlen slen')
 	perc_identity = str(perc_ident)
@@ -967,9 +967,12 @@ def doBlastn2seqOnStream(query, subject, strand='both', task='megablast', perc_i
 		wordsize = '28' # default value for megablast
 	else:
 		wordsize = '11' # default value for blastn
+	num_threads = str(nthread)
 	cmd = [blast, 
 		'-subject', subject, '-perc_identity', perc_identity, '-strand', strand, '-dust', 'no', 
 		'-task', task, '-word_size', wordsize, '-outfmt', outfmt
+		#'-task', task, '-word_size', wordsize, '-outfmt', outfmt, '-num_threads', num_threads
+		# 'num_threads' is currently ignored when 'subject' is specified.
 		]
 	do_cmd = shlex.split(' '.join(cmd))
 	blastn = subprocess.Popen(do_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -1429,7 +1432,7 @@ def gbk2fgs4protein(fnaFile, gbkFile, fgsFile):
 	# gbk: {'accver':accver, 'gi':gi, 'prots':prots, 'seq':seq, ...}
 	gbk = rdGbk(gbkFile)
 	if seqid.strip('|').rsplit('|', maxsplit=1)[1] != gbk['accver']:
-		print('{} and {} may not the same sequence'.format(fnaFile, gbkFile))
+		print('Warning: {} and {} may not the same sequence'.format(fnaFile, gbkFile))
 	for prot in gbk['prots']:
 		orfStr = '_'.join([str(x) for x in prot['orf']])
 		header = '_'.join([seqid, orfStr])
