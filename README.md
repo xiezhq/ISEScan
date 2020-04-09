@@ -7,12 +7,27 @@ Contact:
 
 Last revision: 04/08/2020
 
+## 	[Overview](#Overview)
+## 	[Citation](#Citation)
+## 	[Installation](#Installation)
+###	[Linux](#Installation-Linux)
+###	[Pre-required packages and libraries](#Installation-dependency)
+###	[Configure ISEScan](#Installation-Configure)
+##	[Usage example](#Usage)
+##	[Tips to run ISEScan efficiently](#Tips)
+### [How to run a set of genomes in a row](#lots-of-genomes)
+### [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
+##	[Release History](#Release)
+##	[License](#License)
+
+<a name="Overview"></a>
 ## Overview
 
 ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome. It includes an option to report either complete IS elements or both complete and partial IS elements. It might be a good idea to try reporting both complete and partial IS elements when it is used to identify the IS elements in the assemblies of metegenome. ISEScan reports both complete and partial IS elements by default.
 
 ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fasta format; 2) predicts/translates (using FragGeneScan) genome into proteome; 3) searches the pre-built pHMMs (profile Hidden Markov Models) of transposases (two files shipped with ISEScan; clusters.faa.hmm and clusters.single.faa) against the proteome and identifies the transposase gene in genome; 4) then extends the identified transposase gene into the complete IS (Insertion Sequence) elements based on the common characteristics shared by the known IS elements reported by literatures and database; 5) finally reports the identified IS elements in a few result files (e.g. a file containing a list of IS elements, a file containing sequences of IS elements in fasta format, an annotation file in GFF3 format).
 
+<a name="Citation"></a>
 ## Citation
 
 Zhiqun Xie, Haixu Tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. 
@@ -21,8 +36,11 @@ URL: [https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bio
 
 Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/SupplementaryMaterials.docx](publication/SupplementaryMaterials.docx), [publication/SupplementaryMaterials.xlsx](publication/SupplementaryMaterials.xlsx).
 
+<a name="Installation"></a>
 ## Installation
 
+
+<a name="Installation-Linux"></a>
 ### Linux:
 
 1. Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases. The downloaded package is automatically saved as master.zip (Source code (zip)) or master.tar.gz (Source code (zip)).
@@ -37,7 +55,8 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 	tar -zvxf master.tar.gz
 	```
 
-## Pre-required packages and libraries
+<a name="Installation-dependency"></a>
+### Pre-required packages and libraries
 
 * Python 3.3.3 or later
 * numpy-1.8.0 or later
@@ -59,12 +78,14 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
 
-## Configure ISEScan
+<a name="Installation-Configure"></a>
+### Configure ISEScan
 
 1. Open constants.py, and find two lines marked with 'Config packages'
 2. Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb, file4clusterSeqFile4phmmer and file4clusterHMM) to specify the correct paths of the required packages and data files on your computer.
 3. Save and close constants.py
 
+<a name="Usage"></a>
 ## Usage example
 
 Let's try an example, NC_012624.fna.
@@ -119,8 +140,10 @@ Let's try an example, NC_012624.fna.
     * ov: ov number returned by hmmer search
     * tir: terminal inverted repeat sequences
 
-### Tips:
-* How to run a set of genomes in a row
+<a name="Tips"></a>
+## Tips to run ISEScan efficiently:
+<a name="lots-of-genomes"></a>
+### How to run a set of genomes in a row
   Based on a few assumptions:
   - You can successfully run ISEScan on one genome by executing 
 	```
@@ -156,12 +179,15 @@ Let's try an example, NC_012624.fna.
 
   It might take several days or weeks for 200 genomes to complete. It depends on how many CPU cores you have on your computer and how fast each CPU core is. Please do not load too many ISEScan jobs because each ISEScan job will consume part of your RAM on your computer. However, you can always test and estimate how many GB RAM and how many hours are required for a genome.
 
-* ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
+<a name="Re-run"></a>
+### Re-run ISEScan without gene/protein prediction and HMMER searching
+	ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
 * If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:  
 	```
 	python3 isescan.py NC_012624.fna proteome hmm
 	```
 
+<a name="Release"></a>
 ## Release History 
 * 1.7.2.
   * Add command options `--removeShortIS` and `--no-FragGeneScan`, and remove `removeShortIS` and `translateGenome` from constants.py. (Thanks EricDeveaud for his suggestion and codes)
@@ -204,6 +230,7 @@ Let's try an example, NC_012624.fna.
 * 1.0
   * The first proper release
 
+<a name="License"></a>
 ## License
 
 Distributed under the GNU General Public License.
