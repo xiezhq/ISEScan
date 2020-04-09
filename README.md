@@ -29,9 +29,13 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 
 2. Uncompress the .zip (or .tar.gz) file.
    * Use unzip command to uncompress the zip file:  
-   `unzip master.zip`
+	```
+	unzip master.zip
+	```
    * Use tar command to uncompress the tar.gz file:  
-   `tar -zvxf master.tar.gz`
+	```
+	tar -zvxf master.tar.gz
+	```
 
 ## Pre-required packages and libraries
 
@@ -44,10 +48,14 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 * BLAST 2.2.31 or later
 * SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
   * To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
-  `gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h`
+  	```
+	gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
+	```
   * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
-  `cp libssw.so ../`
-  `export LD_LIBRARY_PATH=/path/to/libssw.so:$LD_LIBRARY_PATH # export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan/libssw.so:$LD_LIBRARY_PATH`
+	```
+	cp libssw.so ../
+	export LD_LIBRARY_PATH=/path/to/libssw.so:$LD_LIBRARY_PATH # export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan/libssw.so:$LD_LIBRARY_PATH
+	```
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
 
@@ -62,7 +70,9 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 Let's try an example, NC_012624.fna.
 
 * The command below scans NC_012624.fna (genome sequence of Sulfolobus_islandicus_Y_N_15_51, ~42 kb), and outputs all results in `prediction` directory:   
-`python3 isescan.py NC_012624.fna proteome hmm --nthread 2`
+	```
+	python3 isescan.py NC_012624.fna proteome hmm --nthread 2
+	```
 
 * Wait for its finishing. It may take a while (~40 seconds) as ISEScan uses the HMMER to scan the genome sequences and it will use 621 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs. The running time for larger genome will increase quickly, e.g. about 20 minutes for NC_000913.fna (genome sequence of Escherichia coli str. K-12 substr. MG1655, ~4.6 Mb) with two cpu cores on my virtual machine.
 
@@ -113,9 +123,13 @@ Let's try an example, NC_012624.fna.
 * How to run a set of genomes in a row
   Based on a few assumptions:
   - You can successfully run ISEScan on one genome by executing 
-	`python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm`
+	```
+	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm
+	```
 	 where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. 
-	`python3 isescan.py NC_000913.fna proteome hmm --nthread 2`
+	```
+	python3 isescan.py NC_000913.fna proteome hmm --nthread 2
+	```
   - You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
   - Your Linux computer has **nproc** (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
   - You want to run ISEScan on ngenome (ngenome could be 1 or 2 or 3, ...) fasta file(s) (genome) in parallel on your Linux computer.
