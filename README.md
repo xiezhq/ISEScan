@@ -70,10 +70,9 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
   	```
 	gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
 	```
-  * And then copy sswlib.so to the directory of ISEScan and set the search path as:   
+  * And then set the search path:   
 	```
-	cp libssw.so ../
-	export LD_LIBRARY_PATH=/path/to/libssw.so:$LD_LIBRARY_PATH # export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan/libssw.so:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=/path/to/libssw.so:$LD_LIBRARY_PATH # Example, export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan/ssw201507/libssw.so:$LD_LIBRARY_PATH
 	```
   * The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 * biopython 1.62 or later (required by SSW library)
@@ -144,14 +143,14 @@ Let's try an example, NC_012624.fna.
 ## Tips to run ISEScan efficiently:
 <a name="lots-of-genomes"></a>
 ### How to run a set of genomes in a row
-  Based on a few assumptions:
+  Sometimes, we want to run hundres of genomes in one line of command and then wait for all computing jobs to complete. Before doing it, we assume:
   - You can successfully run ISEScan on one genome by executing 
 	```
 	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm
 	```
 	 where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. 
 	```
-	python3 isescan.py NC_000913.fna proteome hmm --nthread 2
+	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm --nthread 2
 	```
   - You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
   - Your Linux computer has **nproc** (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
