@@ -7,18 +7,18 @@ Contact:
 
 Last revision: 04/08/2020
 
-## 	[Overview](#Overview)
-## 	[Citation](#Citation)
-## 	[Installation](#Installation)
-###	[Linux](#Installation-Linux)
-###	[Pre-required packages and libraries](#Installation-dependency)
-###	[Configure ISEScan](#Installation-Configure)
-##	[Usage example](#Usage)
-##	[Tips to run ISEScan efficiently](#Tips)
-### [How to run a set of genomes in a row](#lots-of-genomes)
-### [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
-##	[Release History](#Release)
-##	[License](#License)
+* [Overview](#Overview)
+* [Citation](#Citation)
+* [Installation](#Installation)
+* [Linux](#Installation-Linux)
+* [Pre-required packages and libraries](#Installation-dependency)
+* [Configure ISEScan](#Installation-Configure)
+* [Usage example](#Usage)
+* [Tips to run ISEScan efficiently](#Tips)
+* [How to run a set of genomes in a row](#lots-of-genomes)
+* [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
+* [Release History](#Release)
+* [License](#License)
 
 <a name="Overview"></a>
 ## Overview
