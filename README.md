@@ -112,28 +112,33 @@ Let's try an example, NC_012624.fna.
 ### Tips:
 * How to run a set of genomes in a row
   Based on a few assumptions:
-  - You can successfully run ISEScan on one genome by executing `python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm` where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. `python3 isescan.py NC_000913.fna proteome hmm --nthread 2`.
+  - You can successfully run ISEScan on one genome by executing 
+	`python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm`
+	 where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. 
+	`python3 isescan.py NC_000913.fna proteome hmm --nthread 2`
   - You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
-  - Your Linux computer has `nproc` (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
+  - Your Linux computer has **nproc** (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
   - You want to run ISEScan on ngenome (ngenome could be 1 or 2 or 3, ...) fasta file(s) (genome) in parallel on your Linux computer.
 
   Now, let's run 200 genomes in one line of command and then wait for all computing jobs to complete (probably several days or weeks, depending on how many hours are required for each of your 200 genomes in average). If your computer has 8 CPU cores and You can execute the command below:
-  `nohup cat test.fna.list | xargs -n 1 -P 4 -I{} python3 /home/qiime2/isescan/isescan.py {} proteome hmm --nthread 2 > log.txt &`
+  ```
+  nohup cat test.fna.list | xargs -n 1 -P 4 -I{} python3 /home/qiime2/ISEScan-1.7/isescan.py {} proteome hmm --nthread 2 > log.txt &
+  ```
 
   In the command line, 
-  - **_test.fna.list_** is a text file which includes 200 fasta files, one fasta file per row, for example:
-  `
+  - **test.fna.list** is a text file which includes 200 fasta files, one fasta file per row, for example:
+  ```
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS014235.scaffolds.fa
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS049959.scaffolds.fa
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS020233.scaffolds.fa
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS022609.scaffolds.fa
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS024132.scaffolds.fa
-  ` 
-  - **_-n 1_** tells your computer to pick only one fasta file from **_test.fna.list_** for each ISEScan computing job.
-  - **_-P 4_** tells your computer to spawn 4 processes at the same time (run 4 ISEScan jobs in parallel, namely, run 4 genomes at the same time). When one job completes with success or exits with error, a new ISEScan job on the next fasta file (e.g. 5th fasta file) in **_test.fna.list_** is spawned. So, the command line will keep 4 ISEScan computing jobs (one fasta file per ISEScan job) running on your computer, and each job utilizes two CPU cores by default. It means all of 8 CPU cores on your computer have been utilized by your 4 ISEScan computing jobs till the last fasta file is processed by ISEScan.
-  - **> log.txt** tells your computer to write the screen messages output by ISEScan to the file `log.txt`.
+  ``` 
+  - **-n 1** tells your computer to pick only one fasta file from **test.fna.list** for each ISEScan computing job.
+  - **-P 4** tells your computer to spawn 4 processes at the same time (run 4 ISEScan jobs in parallel, namely, run 4 genomes at the same time). When one job completes with success or exits with error, a new ISEScan job on the next fasta file (e.g. 5th fasta file) in **test.fna.list** is spawned. So, the command line will keep 4 ISEScan computing jobs (one fasta file per ISEScan job) running on your computer, and each job utilizes two CPU cores by default. It means all of 8 CPU cores on your computer have been utilized by your 4 ISEScan computing jobs till the last fasta file is processed by ISEScan.
+  - **> log.txt** tells your computer to write the screen messages output by ISEScan to the file **log.txt**.
   - **&** tells your computer to run jobs in the background without interrupting you on the current terminal (e.g. xterm), in order that you can work on other things on the same terminal.
-  You can check your job status by the command `top -c -u qiime2` (assuming your user name is `qiime2`). 
+  You can check your job status by the command `top -c -u qiime2` (assuming your user name is **qiime2**). 
 
   It might take several days or weeks for 200 genomes to complete. It depends on how many CPU cores you have on your computer and how fast each CPU core is. Please do not load too many ISEScan jobs because each ISEScan job will consume part of your RAM on your computer. However, you can always test and estimate how many GB RAM and how many hours are required for a genome.
 
