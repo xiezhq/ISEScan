@@ -151,7 +151,7 @@ Let's try an example, NC_012624.fna.
 	```
 	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm
 	```
-	 where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. 
+	where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. 
 	```
 	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm --nthread 2
 	```
@@ -166,13 +166,13 @@ Let's try an example, NC_012624.fna.
 
   In the command line, 
   * **test.fna.list** is a text file which includes 200 fasta files, one fasta file per row, for example:
-  ```
-  /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS014235.scaffolds.fa
-  /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS049959.scaffolds.fa
-  /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS020233.scaffolds.fa
-  /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS022609.scaffolds.fa
-  /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS024132.scaffolds.fa
-  ``` 
+	```
+	/N/dc2/scratch/zhiqxie/hmp/HMASM/SRS014235.scaffolds.fa
+	/N/dc2/scratch/zhiqxie/hmp/HMASM/SRS049959.scaffolds.fa
+	/N/dc2/scratch/zhiqxie/hmp/HMASM/SRS020233.scaffolds.fa
+	/N/dc2/scratch/zhiqxie/hmp/HMASM/SRS022609.scaffolds.fa
+	/N/dc2/scratch/zhiqxie/hmp/HMASM/SRS024132.scaffolds.fa
+	``` 
   * **-n 1** tells your computer to pick only one fasta file from **test.fna.list** for each ISEScan computing job.
   * **-P 4** tells your computer to spawn 4 processes at the same time (run 4 ISEScan jobs in parallel, namely, run 4 genomes at the same time). When one job completes with success or exits with error, a new ISEScan job on the next fasta file (e.g. 5th fasta file) in **test.fna.list** is spawned. So, the command line will keep 4 ISEScan computing jobs (one fasta file per ISEScan job) running on your computer, and each job utilizes two CPU cores by default. It means all of 8 CPU cores on your computer have been utilized by your 4 ISEScan computing jobs till the last fasta file is processed by ISEScan.
   * **> log.txt** tells your computer to write the screen messages output by ISEScan to the file **log.txt**.
