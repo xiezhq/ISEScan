@@ -147,7 +147,7 @@ Let's try an example, NC_012624.fna.
 <a name="lots-of-genomes"></a>
 ### How to run a set of genomes in a row
   Sometimes, we want to run hundres of genomes in one line of command and then wait for all computing jobs to complete. Before doing it, we assume:
-  - You can successfully run ISEScan on one genome by executing 
+  * You can successfully run ISEScan on one genome by executing 
 	```
 	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm
 	```
@@ -155,9 +155,9 @@ Let's try an example, NC_012624.fna.
 	```
 	python3 /home/qiime2/ISEScan-1.7/isescan.py genome1.fa proteome hmm --nthread 2
 	```
-  - You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
-  - Your Linux computer has **nproc** (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
-  - You want to run ISEScan on ngenome (ngenome could be 1 or 2 or 3, ...) fasta file(s) (genome) in parallel on your Linux computer.
+  * You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
+  * Your Linux computer has **nproc** (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
+  * You want to run ISEScan on ngenome (ngenome could be 1 or 2 or 3, ...) fasta file(s) (genome) in parallel on your Linux computer.
 
   Now, let's run 200 genomes in one line of command and then wait for all computing jobs to complete (probably several days or weeks, depending on how many hours are required for each of your 200 genomes in average). If your computer has 8 CPU cores and You can execute the command below:
   ```
@@ -165,7 +165,7 @@ Let's try an example, NC_012624.fna.
   ```
 
   In the command line, 
-  - **test.fna.list** is a text file which includes 200 fasta files, one fasta file per row, for example:
+  * **test.fna.list** is a text file which includes 200 fasta files, one fasta file per row, for example:
   ```
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS014235.scaffolds.fa
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS049959.scaffolds.fa
@@ -173,18 +173,18 @@ Let's try an example, NC_012624.fna.
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS022609.scaffolds.fa
   /N/dc2/scratch/zhiqxie/hmp/HMASM/SRS024132.scaffolds.fa
   ``` 
-  - **-n 1** tells your computer to pick only one fasta file from **test.fna.list** for each ISEScan computing job.
-  - **-P 4** tells your computer to spawn 4 processes at the same time (run 4 ISEScan jobs in parallel, namely, run 4 genomes at the same time). When one job completes with success or exits with error, a new ISEScan job on the next fasta file (e.g. 5th fasta file) in **test.fna.list** is spawned. So, the command line will keep 4 ISEScan computing jobs (one fasta file per ISEScan job) running on your computer, and each job utilizes two CPU cores by default. It means all of 8 CPU cores on your computer have been utilized by your 4 ISEScan computing jobs till the last fasta file is processed by ISEScan.
-  - **> log.txt** tells your computer to write the screen messages output by ISEScan to the file **log.txt**.
-  - **&** tells your computer to run jobs in the background without interrupting you on the current terminal (e.g. xterm), in order that you can work on other things on the same terminal.
+  * **-n 1** tells your computer to pick only one fasta file from **test.fna.list** for each ISEScan computing job.
+  * **-P 4** tells your computer to spawn 4 processes at the same time (run 4 ISEScan jobs in parallel, namely, run 4 genomes at the same time). When one job completes with success or exits with error, a new ISEScan job on the next fasta file (e.g. 5th fasta file) in **test.fna.list** is spawned. So, the command line will keep 4 ISEScan computing jobs (one fasta file per ISEScan job) running on your computer, and each job utilizes two CPU cores by default. It means all of 8 CPU cores on your computer have been utilized by your 4 ISEScan computing jobs till the last fasta file is processed by ISEScan.
+  * **> log.txt** tells your computer to write the screen messages output by ISEScan to the file **log.txt**.
+  * **&** tells your computer to run jobs in the background without interrupting you on the current terminal (e.g. xterm), in order that you can work on other things on the same terminal.
   You can check your job status by the command `top -c -u qiime2` (assuming your user name is **qiime2**). 
 
   It might take several days or weeks for 200 genomes to complete. It depends on how many CPU cores you have on your computer and how fast each CPU core is. Please do not load too many ISEScan jobs because each ISEScan job will consume part of your RAM on your computer. However, you can always test and estimate how many GB RAM and how many hours are required for a genome.
 
 <a name="Re-run"></a>
 ### Re-run ISEScan without gene/protein prediction and HMMER searching
-	ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
-* If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:  
+	* ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
+	* If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:  
 	```
 	python3 isescan.py NC_012624.fna proteome hmm
 	```
