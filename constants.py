@@ -22,12 +22,10 @@ path2isescan = os.path.dirname(sys.argv[0])
 # Set the path variables pointing to the profile HMM files (clusters.single.faa and clusters.faa.hmm).
 #
 # The peptide sequences of single-member clusters, which is used by phmmer in hmmer
-#file4clusterSeqFile4phmmer = os.path.join(path2isescan, 'pHMMs', 'clusters.single.faa')
-file4clusterSeqFile4phmmer = '/home/xiezhq/projects/isescan/pHMMs/clusters.single.faa'
+file4clusterSeqFile4phmmer = os.path.join(path2isescan, 'pHMMs', 'clusters.single.faa')
 #
 # The profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
-#file4clusterHMM = os.path.join(path2isescan, 'pHMMs', 'clusters.faa.hmm')
-file4clusterHMM = '/home/xiezhq/projects/isescan/pHMMs/clusters.faa.hmm'
+file4clusterHMM = os.path.join(path2isescan, 'pHMMs', 'clusters.faa.hmm')
 #
 ## Config packages
 
