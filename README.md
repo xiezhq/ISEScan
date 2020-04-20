@@ -191,6 +191,8 @@ Let's try an example, NC_012624.fna.
 
 <a name="Release"></a>
 ## Release History 
+* 1.7.2.1
+  * modify constants.py to remove the hard coded path poiting to the profile HMM files (clusters.single.faa and clusters.faa.hmm)
 * 1.7.2.
   * Add command options `--removeShortIS` and `--no-FragGeneScan`, and remove `removeShortIS` and `translateGenome` from constants.py. (Thanks EricDeveaud for his suggestion and codes)
   * Add command option `--nthread` to isescan.py, and remove `nthread` and `nproc` from constants.py.
