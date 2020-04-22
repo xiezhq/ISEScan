@@ -113,7 +113,7 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		```
 	- Configure ISEScan
 		- In ISEScan folder, open `constants.py` and find two lines marked with **Config packages**
-		- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb, file4clusterSeqFile4phmmer and file4clusterHMM) to specify the correct paths of the required packages and data files on your computer.
+		- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb) to specify the correct paths of the required packages and data files on your computer.
 		- Save and close `constants.py`
 
 <a name="Usage"></a>
@@ -221,6 +221,7 @@ Let's try an example, NC_012624.fna.
 ## Release History 
 - 1.7.2.1
   - modify constants.py to remove the hard coded path poiting to the profile HMM files (clusters.single.faa and clusters.faa.hmm)
+  - update readme to add an introduction for installing ISEScan package via bioconda (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) make it available!)
 - 1.7.2.
   - Add command options `--removeShortIS` and `--no-FragGeneScan`, and remove `removeShortIS` and `translateGenome` from constants.py. (Thanks EricDeveaud for his suggestion and codes)
   - Add command option `--nthread` to isescan.py, and remove `nthread` and `nproc` from constants.py.
