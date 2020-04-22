@@ -1,6 +1,6 @@
 ### ISEScan
 
-### Table of Contents
+#### Table of Contents
 - [Overview](#Overview)
 - [Citation](#Citation)
 - [Installation](#Installation)
