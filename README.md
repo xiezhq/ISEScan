@@ -13,6 +13,7 @@
 	- [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
 - [Release History](#Release)
 - [License](#License)
+- [Contact](#Contact)
 
 <a name="Overview"></a>
 ## Overview
@@ -263,5 +264,6 @@ Let's try an example, NC_012624.fna.
 
 Distributed under the GNU General Public License.
 
+<a name="Contact"></a>
 ## Contact
 xiezhq@hotmail.com
