@@ -213,7 +213,7 @@ Let's try an example, NC_012624.fna.
 ## Release History 
 - 1.7.2.1
   - modify constants.py to remove the hard coded path poiting to the profile HMM files (clusters.single.faa and clusters.faa.hmm)
-  - update readme to add an introduction for installing ISEScan package via bioconda (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) make it available!)
+  - update readme to add an introduction for installing ISEScan package via bioconda (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) for making it available!)
 - 1.7.2.
   - Add command options `--removeShortIS` and `--no-FragGeneScan`, and remove `removeShortIS` and `translateGenome` from constants.py. (Thanks EricDeveaud for his suggestion and codes)
   - Add command option `--nthread` to isescan.py, and remove `nthread` and `nproc` from constants.py.
