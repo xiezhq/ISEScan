@@ -112,9 +112,9 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		cd ISEScan-1.7.2.1
 		```
 	- Configure ISEScan
-	- In ISEScan folder, open `constants.py` and find two lines marked with ***Config packages***
-	- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb, file4clusterSeqFile4phmmer and file4clusterHMM) to specify the correct paths of the required packages and data files on your computer.
-	- Save and close `constants.py`
+		- In ISEScan folder, open `constants.py` and find two lines marked with ***Config packages***
+		- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb, file4clusterSeqFile4phmmer and file4clusterHMM) to specify the correct paths of the required packages and data files on your computer.
+		- Save and close `constants.py`
 
 <a name="Usage"></a>
 ## Usage example
