@@ -1,5 +1,4 @@
 ## ISEScan
-Contact: xiezhq@hotmail.com
 
 ### Table of Contents
 - [Overview](#Overview)
@@ -263,3 +262,6 @@ Let's try an example, NC_012624.fna.
 ## License
 
 Distributed under the GNU General Public License.
+
+## Contact
+xiezhq@hotmail.com
