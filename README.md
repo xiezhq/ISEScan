@@ -36,7 +36,7 @@ Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [Supplemen
 
 <a name="Bioconda-install"></a>
 #### Automated install by Bioconda (recommended!)
-The listed steps below will install ISEScan package via bioconda to your home directory. Visit [Bioconda recipe for ISEScan](https://bioconda.github.io/recipes/isescan/README.html) for more details (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) make it available!). 
+The listed steps below will install ISEScan package via bioconda to your home directory. Visit [Bioconda recipe for ISEScan](https://bioconda.github.io/recipes/isescan/README.html) for more details (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) for making it available!). 
 - Install [Bioconda](https://bioconda.github.io/user/install.html). To minimize the install time and size, we [install miniconda](https://docs.conda.io/en/latest/miniconda.html#linux-installers)
 	- Download [Linux installers] (https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh)
 	```
