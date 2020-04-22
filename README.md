@@ -82,7 +82,7 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		```
 		cd ISEScan-1.7.2.1
 		```
-- Install dependencies 
+- Install dependencies before you run ISEScan
 	- Python 3.3.3 or later
 	- numpy-1.8.0 or later
 	- scipy-0.13.1 or later
@@ -104,7 +104,7 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
   		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 	- biopython 1.62 or later (required by SSW library)
 
-- Configure ISEScan
+- Configure ISEScan before you run ISEScan
 	- In ISEScan folder, open `constants.py` and find two lines marked with **Config packages**
 	- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb) to specify the correct paths of the required packages and data files on your computer.
 	- Save and close `constants.py`
