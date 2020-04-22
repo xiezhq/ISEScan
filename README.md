@@ -1,6 +1,4 @@
 ## ISEScan
-**Automated identification of Insertion Sequence Elements in prokaryotic genomes and metagenomes**
-
 Contact: xiezhq@hotmail.com
 
 ### Table of Contents
