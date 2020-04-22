@@ -1,11 +1,11 @@
 # ISEScan
 
-## The Automated Identification of Insertion Sequence Elements in Genomes
+### The Automated Identification of Insertion Sequence Elements in Genomes
 
 Contact:
 - Zhiqun Xie: xiezhq@hotmail.com
 
-# Table of Contents
+### Table of Contents
 - [Overview](#Overview)
 - [Citation](#Citation)
 - [Installation](#Installation)
@@ -45,7 +45,6 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 ### Linux:
 
 <a name="Bioconda-install"></a>
-Automated install by Bioconda (recommended!)
 #### Automated install by Bioconda (recommended!)
 The listed steps below will install ISEScan package via bioconda to your home directory. Visit [Bioconda recipe for ISEScan](https://bioconda.github.io/recipes/isescan/README.html) for more details (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) make it available!). 
 - Install [Bioconda](https://bioconda.github.io/user/install.html). To minimize the install time and size, we [install miniconda](https://docs.conda.io/en/latest/miniconda.html#linux-installers)
@@ -73,10 +72,7 @@ conda update isescan
 cp ~/miniconda3/test/NC_012624.fna ./
 isescan.py --nthread 2 NC_012624.fna proteome hmm
 ```
-	- You can find the available command options:
-	```
-	isescan.py -h
-	```
+	You can find the available command options `isescan.py -h`.
 
 <a name="Manual-install"></a>
 #### Manual install (install from source code)
