@@ -67,12 +67,11 @@ The listed steps below will install ISEScan package via bioconda to your home di
 conda install isescan
 conda update isescan
 ```
-- Try ISEScan
+- Try ISEScan (You can find the available command options `isescan.py -h`).
 ```
 cp ~/miniconda3/test/NC_012624.fna ./
 isescan.py --nthread 2 NC_012624.fna proteome hmm
 ```
-You can find the available command options `isescan.py -h`.
 
 <a name="Manual-install"></a>
 #### Manual install (install from source code)
