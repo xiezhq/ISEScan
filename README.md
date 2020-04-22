@@ -6,7 +6,7 @@ Contact: xiezhq@hotmail.com
 - [Overview](#Overview)
 - [Citation](#Citation)
 - [Installation](#Installation)
-	- [Linux](#Installation-Linux)
+	- [Install on Linux](#Installation-Linux)
 		- [Automated install by Bioconda (recommended!)](#Bioconda-install)
 		- [Manual install (install from source code)](#Manual-install)
 - [Usage example](#Usage)
@@ -37,7 +37,7 @@ Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/Supplem
 
 
 <a name="Installation-Linux"></a>
-### Linux:
+### Install on Linux:
 
 <a name="Bioconda-install"></a>
 #### Automated install by Bioconda (recommended!)
