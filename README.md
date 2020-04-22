@@ -266,6 +266,4 @@ Distributed under the GNU General Public License.
 
 <a name="Contact"></a>
 ## Contact
-```remove hyper link
-xiezhq@hotmail.com
-```
+`xiezhq@hotmail.com`
