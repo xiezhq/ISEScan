@@ -2,8 +2,7 @@
 
 ### The Automated Identification of Insertion Sequence Elements in Genomes
 
-Contact:
-- Zhiqun Xie: xiezhq@hotmail.com
+Contact xiezhq@hotmail.com
 
 ### Table of Contents
 - [Overview](#Overview)
