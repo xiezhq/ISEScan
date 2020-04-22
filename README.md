@@ -72,7 +72,7 @@ conda update isescan
 cp ~/miniconda3/test/NC_012624.fna ./
 isescan.py --nthread 2 NC_012624.fna proteome hmm
 ```
-	You can find the available command options `isescan.py -h`.
+You can find the available command options `isescan.py -h`.
 
 <a name="Manual-install"></a>
 #### Manual install (install from source code)
