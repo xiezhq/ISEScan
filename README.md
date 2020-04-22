@@ -13,9 +13,9 @@
 	- [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
 - [Release History](#Release)
 - [License](#License)
-<a name="Overview"></a>
 - [Contact](#Contact)
 
+<a name="Overview"></a>
 ## Overview
 
 ISEScan is a python pipeline to identify IS (Insertion Sequence) elements in genome. It includes an option to report either complete IS elements or both complete and partial IS elements. It might be a good idea to try reporting both complete and partial IS elements when it is used to identify the IS elements in the assemblies of metegenome. ISEScan reports both complete and partial IS elements by default.
@@ -28,7 +28,6 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 Zhiqun Xie, Haixu Tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. 
 
 URL: [https://doi.org/10.1093/bioinformatics/btx433](https://doi.org/10.1093/bioinformatics/btx433). 
-
 Download: [publication/btx433.pdf](publication/btx433.pdf), [publication/SupplementaryMaterials.docx](publication/SupplementaryMaterials.docx), [publication/SupplementaryMaterials.xlsx](publication/SupplementaryMaterials.xlsx).
 
 <a name="Installation"></a>
