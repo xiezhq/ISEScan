@@ -1,4 +1,5 @@
 # ISEScan
+A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome 
 
 ## Table of Contents
 - [Overview](#Overview)
