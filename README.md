@@ -66,27 +66,6 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 
 <a name="Manual-install"></a>
 #### Manual install (install from source code)
-- Install pre-required packages and libraries
-	- Python 3.3.3 or later
-	- numpy-1.8.0 or later
-	- scipy-0.13.1 or later
-	- fastcluster, latest version recommended, https://pypi.python.org/pypi/fastcluster
-	- FragGeneScan1.30 or earlier, (The .faa file output by version1.31 is not compatible with ISEScan!), http://omics.informatics.indiana.edu/FragGeneScan
-	- HMMER-3.1b2 or later, http://hmmer.org/download.html
-	- BLAST 2.2.31 or later
-	- SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
-		- To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
-  		```
-		gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
-		```
-		- And then copy libssw.so libssw.so and set search path:   
-		```
-		cp libssw.so ../
-	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan/libssw.so:$LD_LIBRARY_PATH
-		```
-  		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
-	- biopython 1.62 or later (required by SSW library)
-
 - Install ISEScan
 	- Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases, e.g. **Source code (tar.gz)**.
 
@@ -103,10 +82,32 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		```
 		cd ISEScan-1.7.2.1
 		```
-	- Configure ISEScan
-		- In ISEScan folder, open `constants.py` and find two lines marked with **Config packages**
-		- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb) to specify the correct paths of the required packages and data files on your computer.
-		- Save and close `constants.py`
+- Install dependencies 
+	- Python 3.3.3 or later
+	- numpy-1.8.0 or later
+	- scipy-0.13.1 or later
+	- fastcluster, latest version recommended, https://pypi.python.org/pypi/fastcluster
+	- FragGeneScan1.30 or earlier, (The .faa file output by version1.31 is not compatible with ISEScan!), http://omics.informatics.indiana.edu/FragGeneScan
+	- HMMER-3.1b2 or later, http://hmmer.org/download.html
+	- BLAST 2.2.31 or later
+	- SSW Library, the latest version is not tested with ISEScan and the tested version of SSW library is shipped with ISEScan, please find it at ssw201507 subdirectory.
+		- To use the shipped SSW library in ISEScan, please go to ssw201507 and then compile the codes by gcc:  
+  		```
+		cd ssw201507
+		gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
+		```
+		- And then copy libssw.so libssw.so and set search path:   
+		```
+		cp libssw.so ../
+	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/isescan/libssw.so:$LD_LIBRARY_PATH
+		```
+  		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
+	- biopython 1.62 or later (required by SSW library)
+
+- Configure ISEScan
+	- In ISEScan folder, open `constants.py` and find two lines marked with **Config packages**
+	- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb) to specify the correct paths of the required packages and data files on your computer.
+	- Save and close `constants.py`
 
 <a name="Usage"></a>
 ## Usage example
