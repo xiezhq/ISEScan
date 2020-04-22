@@ -12,8 +12,6 @@ Contact:
 	- [Linux](#Installation-Linux)
 	- [Automated install by Bioconda (recommended!)](#Bioconda-install)
 	- [Manual install (install from source code)](#Manual-install)
-		- [Pre-required packages and libraries](#Installation-dependency)
-		- [Configure ISEScan](#Installation-Configure)
 - [Usage example](#Usage)
 - [Tips to run ISEScan efficiently](#Tips)
 	- [How to run a set of genomes in a row](#lots-of-genomes)
@@ -75,7 +73,6 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 
 <a name="Manual-install"></a>
 #### Manual install (install from source code)
-<a name="Installation-dependency"></a>
 - Install pre-required packages and libraries
 	- Python 3.3.3 or later
 	- numpy-1.8.0 or later
@@ -98,9 +95,8 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
   		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 	- biopython 1.62 or later (required by SSW library)
 
-<a name="Install-ISEScan"></a>
 - Install ISEScan
-	- Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases, e.g. Source code (tar.gz).
+	- Download the latest ISEScan from https://github.com/xiezhq/ISEScan/releases, e.g. **Source code (tar.gz)**.
 
 	- Uncompress the .zip (or .tar.gz) file.
 		- Use unzip command to uncompress the zip file:  
@@ -116,13 +112,12 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		cd ISEScan-1.7.2.1
 		```
 	- Configure ISEScan
-	1. In ISEScan folder, open constants.py and find two lines marked with 'Config packages'
+	1. In ISEScan folder, open `constants.py` and find two lines marked with ***Config packages***
 	2. Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb, file4clusterSeqFile4phmmer and file4clusterHMM) to specify the correct paths of the required packages and data files on your computer.
-	3. Save and close constants.py
+	3. Save and close `constants.py`
 
 <a name="Usage"></a>
 ## Usage example
-
 Let's try an example, NC_012624.fna.
 
 - The command below scans NC_012624.fna (genome sequence of Sulfolobus_islandicus_Y_N_15_51, ~42 kb), and outputs all results in `prediction` directory:   
