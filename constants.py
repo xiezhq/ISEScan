@@ -14,6 +14,8 @@ hmmsearch = '/apps/inst/hmmer-3.3/bin/hmmsearch'
 blastn = '/apps/inst/ncbi-blast-2.10.0+/bin/blastn'
 blastp = '/apps/inst/ncbi-blast-2.10.0+/bin/blastp'
 makeblastdb = '/apps/inst/ncbi-blast-2.10.0+/bin/makeblastdb'
+#
+## Config packages
 
 # get path where isescan.py is
 import sys
@@ -27,7 +29,6 @@ file4clusterSeqFile4phmmer = os.path.join(path2isescan, 'pHMMs', 'clusters.singl
 # The profile HMMs of multiple-member clusters, which is used by hmmsearch in hmmer
 file4clusterHMM = os.path.join(path2isescan, 'pHMMs', 'clusters.faa.hmm')
 #
-## Config packages
 
 
 # for local linux machine
