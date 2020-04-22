@@ -266,4 +266,4 @@ Distributed under the GNU General Public License.
 
 <a name="Contact"></a>
 ## Contact
-xiezhq\@hotmail.com
+<span>xiezhq@hotmail.com</span>
