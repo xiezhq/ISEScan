@@ -117,6 +117,7 @@ Let's try an example, NC_012624.fna.
 
 - The command below scans NC_012624.fna (genome sequence of Sulfolobus_islandicus_Y_N_15_51, ~42 kb), and outputs all results in `prediction` directory:   
 	```
+	cp /apps/inst/miniconda3/test/NC_012624.fna ./
 	isescan.py NC_012624.fna proteome hmm --nthread 2
 	```
 
