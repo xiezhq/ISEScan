@@ -44,8 +44,9 @@ The listed steps below will install ISEScan package via bioconda to your home di
 	```
 	- Install Miniconda3
 	```
-	sh Miniconda3-latest-Linux-x86_64.sh
+	bash Miniconda3-latest-Linux-x86_64.sh
 	rm Miniconda3-latest-Linux-x86_64.sh
+	source ~/.bashrc
 	```
 	- Add the bioconda channel as well as the other channels bioconda depends on. It is important to add them in this order so that the priority is set correctly (that is, conda-forge is highest priority).
 	```
