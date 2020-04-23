@@ -5,9 +5,8 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 - [Overview](#Overview)
 - [Citation](#Citation)
 - [Installation](#Installation)
-	- [Install on Linux](#Installation-Linux)
-		- [Automated install by Bioconda (recommended!)](#Bioconda-install)
-		- [Manual install (install from source code)](#Manual-install)
+	- [Automated install by Bioconda (recommended!)](#Bioconda-install)
+	- [Manual install (install from source code)](#Manual-install)
 - [Usage example](#Usage)
 - [Tips to run ISEScan efficiently](#Tips)
 	- [How to run a set of genomes in a row](#lots-of-genomes)
@@ -30,13 +29,11 @@ Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [Supplemen
 
 <a name="Installation"></a>
 ## Installation
-
-<a name="Installation-Linux"></a>
-### Install on Linux:
+ISEScan was tested on Linux only and can be installed from Bioconda packages or source code. Install from Bioconda is recommended as it is the simplest way for non-experienced users.
 
 <a name="Bioconda-install"></a>
 #### Automated install by Bioconda (recommended!)
-The listed steps below will install ISEScan package via bioconda to /apps/inst/miniconda3/. Visit [Bioconda recipe for ISEScan](https://bioconda.github.io/recipes/isescan/README.html) for more details (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) for making it available!). 
+The listed steps below will install ISEScan package via bioconda to /apps/inst/miniconda3/. You can install it to other place by changing the default miniconda3 install path in **Install Miniconda3** below. Visit [Bioconda recipe for ISEScan](https://bioconda.github.io/recipes/isescan/README.html) for more details (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) for making it available!). 
 - Install [Bioconda](https://bioconda.github.io/user/install.html). To minimize the install time and size, we [install miniconda](https://docs.conda.io/en/latest/miniconda.html#linux-installers)
 	- Download [Linux installers] (https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh)
 	```
@@ -97,12 +94,12 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		cd ssw201507
 		gcc -Wall -O3 -pipe -fPIC -shared -rdynamic -o libssw.so ssw.c ssw.h
 		```
-		- And then copy libssw.so libssw.so and set search path:   
+		- And then copy libssw.so and set search path:   
 		```
 		cp libssw.so ../
 	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1/libssw.so:$LD_LIBRARY_PATH
 		```
-		In the above `export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1/libssw.so:$LD_LIBRARY_PATH`, please replace `/home/xiezhq/projects/isescan/libssw.so` with the path of the libssw.so on your computer!
+		In command `export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1/libssw.so:$LD_LIBRARY_PATH`, please replace `/home/xiezhq/projects/isescan/libssw.so` with the actual path of libssw.so on your computer!
   		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 	- biopython 1.62 or later (required by SSW library)
 
