@@ -61,6 +61,15 @@ conda update isescan
 cp /apps/inst/miniconda3/test/NC_012624.fna ./
 isescan.py --nthread 2 NC_012624.fna proteome hmm
 ```
+Note: replace `/apps/inst/miniconda3` in `cp /apps/inst/miniconda3/test/NC_012624.fna ./` and the next command `export PATH=/apps/inst/miniconda3/bin/:$PATH` with your conda install path.
+if system reports `isescan.py: command not found...`, please add isescan package to your `PATH`:
+```
+export PATH=/apps/inst/miniconda3/bin/:$PATH
+```
+Then, try ISEScan again:
+```
+isescan.py --nthread 2 NC_012624.fna proteome hmm
+```
 
 <a name="Manual-install"></a>
 #### Manual install (install from source code)
