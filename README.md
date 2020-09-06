@@ -107,9 +107,9 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
 		- And then copy libssw.so and set search path:   
 		```
 		cp libssw.so ../
-	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1/libssw.so:$LD_LIBRARY_PATH
+	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1:$LD_LIBRARY_PATH
 		```
-		In command `export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1/libssw.so:$LD_LIBRARY_PATH`, please replace `/home/xiezhq/projects/isescan/libssw.so` with the actual path of libssw.so on your computer!
+		In command `export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1:$LD_LIBRARY_PATH`, please replace `/home/xiezhq/projects/ISEScan-1.7.2.1` with the actual path of libssw.so on your computer!
   		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 	- biopython 1.62 or later (required by SSW library)
 
