@@ -1804,7 +1804,7 @@ def clusterIntersect4orf(orfhits, ids):
 		strand = orf[3]
 		# build the representative orfhit but replacing ov with ncopy4tpase
 		orfhit = ((seqid, bd[0], bd[1], strand), clusterName, evalue4domain, evalue4fullseq, ncopy4tpase,
-				raworfhits)
+				raworfhits4bestEvalue)
 
 		# Add the multi-copy orfhit to the orfhitsNew
 		orfhitsNew.append(orfhit)
