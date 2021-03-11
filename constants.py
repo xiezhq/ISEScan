@@ -6,14 +6,14 @@ import os.path
 # on your computer.
 # 
 # FragGeneScan
-FragGeneScan = '/apps/inst/FragGeneScan1.30/run_FragGeneScan.pl'
+FragGeneScan = 'run_FragGeneScan.pl'
 # Hmmer
-phmmer = '/apps/inst/hmmer-3.3/bin/phmmer'
-hmmsearch = '/apps/inst/hmmer-3.3/bin/hmmsearch'
+phmmer = 'phmmer'
+hmmsearch = 'hmmsearch'
 # Blast
-blastn = '/apps/inst/ncbi-blast-2.10.0+/bin/blastn'
-blastp = '/apps/inst/ncbi-blast-2.10.0+/bin/blastp'
-makeblastdb = '/apps/inst/ncbi-blast-2.10.0+/bin/makeblastdb'
+blastn = 'blastn'
+blastp = 'blastp'
+makeblastdb = 'makeblastdb'
 #
 ## Config packages
 
@@ -32,15 +32,9 @@ file4clusterHMM = os.path.join(path2isescan, 'pHMMs', 'clusters.faa.hmm')
 
 
 # for local linux machine
-path2results = ''
-# for HPC system
-#path2results = '/N/dc2/scratch/zhiqxie/insertion_sequence/results4hmp'
+#path2results = ''
+#dir4prediction = os.path.join(path2results, 'prediction')
 
-dir4prediction = os.path.join(path2results, 'prediction')
-#dir4prediction = os.path.join(path2results, 'prediction.ncbi')
-
-# blast database will be put here
-dir4blastout = os.path.join(path2results, 'blastout')
 
 # Optimal values for SSW to find TIR in database
 # (gapopen, gapextend, match, mismatch)

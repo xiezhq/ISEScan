@@ -376,7 +376,7 @@ def removeOverlappedHits(mhits):
 # isScore: {'evalue': score4evalue, 'tir': score4tir, 'dr': score4dr, 'occurence': score4occurence, 
 #		'score': isScore, 'ncopy4orf': ncopy4orf, 'ncopy4is': ncopy4is, 'irSim': irSim}
 #
-def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
+def outputIndividual(mhits, mDNA, proteomes, morfsMerged, output):
 	#fmtStrPrediction = '{:<30} # NCBI sequence ID
 	#		{:<11} # family
 	#		{:<59} # subgroup (cluster) ID
@@ -423,7 +423,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 			orfsMerged = set()
 
 
-		dir4output = os.path.join(constants.dir4prediction, org)
+		dir4output = os.path.join(output, org)
 		tools.makedir(dir4output)
 		outFile = os.path.join(dir4output, '.'.join([fileid, 'out']))
 		sumFile = os.path.join(dir4output, '.'.join([fileid, 'sum']))
@@ -670,7 +670,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged):
 # isType: 'c' or 'p'
 #
 # orgfileid: org/fileid, character string, e.g. HMASM/SRS078176.scaffolds.fa
-def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
+def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid, output):
 	fmt4seqID = '{:<60}' # NCBI sequence ID
 	fmt4family = '{:<11}' # family
 	fmt4cluster = '{:<59}' # subgroup (cluster) ID
@@ -821,7 +821,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fmtStrTitleSum = '{:<60} {:<11} {:>6} {:>7} {:>15} {:>15}'
 	fmtStrSum = '{:<60} {:<11} {:>6} {:>7.2f} {:>15} {:>15}'
 
-	common4output = os.path.join(constants.dir4prediction, orgfileid)
+	common4output = os.path.join(output, orgfileid)
 	outFile = '.'.join([common4output, 'out'])
 	outFile4raw = '.'.join([common4output, 'raw'])
 	sumFile = '.'.join([common4output, 'sum'])
@@ -854,6 +854,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fp4orffaa = open(outFile4orffaa, 'w')
 
 
+	rows4raw = [titleLine4raw]
 	# sort keys of dictionary
 	for seqid in sorted(mhits.keys()):
 		hits = mhits[seqid]
@@ -1005,6 +1006,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 			args4raw.extend(args4out[-2:])
 			print(fmtStrPrediction.format(*args4out), file = fp)
 			print(fmtStrPrediction4raw.format(*args4raw), file = fp4raw)
+			rows4raw.append(args4raw)
 
 			# summarize
 			if family in familySumBySeq.keys():
@@ -1121,6 +1123,12 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid):
 	fp4gff.close()
 	fp.close()
 	fp4sum.close()
+
+	# write .csv and .tsv files which contains same IS element copies as those in .raw file
+	csvfile = outFile4raw.replace(".raw", ".csv")
+	tools.writeCsvFile(csvfile, rows4raw, delimiter=',')
+	tsvfile = outFile4raw.replace(".raw", ".tsv")
+	tools.writeCsvFile(tsvfile, rows4raw, delimiter='\t')
 
 
 # mtblout_hits:		[(accid, hits_sorted_refined), ..., (accid, hits_sorted_refined)]
@@ -1402,61 +1410,6 @@ def writeDNA2fileOnStream(seqid, seq):
 	headline = '>' + seqid
 	return '\n'.join([headline, fastaSeq])
 
-def getFullIS4seq(args):
-	seqid, orfhits, dna = args
-	org, fileid, seq = dna
-
-	# replace non-standard base with 'N'
-	#seq = tools.cleanDNA(seq)
-
-	# write the extended sequences of ORFs into a file
-	#orfExtSeqFile = os.path.join(constants.dir4blastout, org, fileid+'.orfext.fna')
-	orfExtSeqFile = os.path.join(constants.dir4blastout, org, '.'.join([fileid,seqid,'orfext.fna']))
-	tools.makedir(os.path.dirname(orfExtSeqFile))
-	writeOrfExt2file(orfExtSeqFile, orfhits, seq)
-
-	# write full-length dna sequence into a temporary file to be called by makeblastdb
-	fp = tempfile.NamedTemporaryFile(mode='w', delete=False)
-	writeDNA2file(fp, seqid, seq)
-	fp.close()
-	# make blast database
-	#blastdb = os.path.join(constants.dir4blastout, org, fileid+'.fna')
-	blastdb = os.path.join(constants.dir4blastout, org, '.'.join([fileid,seqid,'fna']))
-	tools.seq2blastdb(fp.name, blastdb)
-	os.remove(fp.name)
-
-	# blastn(megablast) searches ORF extended sequences against genome dna sequence
-	# Note: each ORF extended sequence must be longer than the corresponding IS element with 
-	# 	ORF as transposase in order that the local alignment resulted from blastn can be
-	#	defined as the alignment between multiple full-length IS element copies.
-	#blastOut4orfExt = os.path.join(constants.dir4blastout, org, os.path.basename(blastdb)+'.out')
-	blastOut4orfExt = blastdb+'.out'
-	tools.blastnSearch(orfExtSeqFile, blastdb, blastOut4orfExt, strand='both', task='megablast')
-	os.remove(orfExtSeqFile)
-	for ext in ('.nhr', '.nin', '.nsq'):
-		os.remove(blastdb+ext)
-
-	# get copy number of ORF extended sequence
-	ispairs = {}
-	for k, g in itertools.groupby(
-			sorted(tools.getBlastResult4dna(blastOut4orfExt), key=lambda x: x['qseqid']), 
-			key=lambda x: x['qseqid']):
-		ispairs[k] = list(g)
-		ispairs[k].sort(key = lambda x: x['length'], reverse = True)
-	os.remove(blastOut4orfExt)
-	
-	# orfhits: [orfhit, ..., orfhit]
-	# orfhit: (orf, familyName, best_1_domain_E-value, full_sequence_E-value, overlap_number)
-	# orf: (accid, begin, end, strand), example, ('NC_000915.1', 20, 303, '+')
-	for qseqid, g in ispairs.items():
-		orfstr4is = '_'.join(qseqid.rsplit('_', maxsplit=3)[1:])
-		for orfhit in orfhits:
-			orfstr = '_'.join([str(item) for item in orfhit[0][1:]])
-			if orfstr == orfstr4is:
-				break
-		for ispair in g:
-			ispair['orfhit'] = orfhit
-	return ispairs
 
 def getFullIS4seqOnStream(args):
 	seqid, orfhits, dna, nthread = args
@@ -1473,29 +1426,12 @@ def getFullIS4seqOnStream(args):
 	fp = tempfile.NamedTemporaryFile(mode='w', delete=False)
 	writeDNA2file(fp, seqid, seq)
 	fp.close()
-	'''
-	# make blast database
-	#blastdb = os.path.join(constants.dir4blastout, org, fileid+'.fna')
-	blastdb = os.path.join(constants.dir4blastout, org, '.'.join([fileid,seqid,'fna']))
-	tools.makedir(os.path.dirname(blastdb))
-	tools.seq2blastdb(fp.name, blastdb)
-	os.remove(fp.name)
-	'''
 
 	# blastn(megablast) searches ORF extended sequences against genome dna sequence
 	# Note: each ORF extended sequence must be longer than the corresponding IS element with 
 	# 	ORF as transposase in order that the local alignment resulted from blastn can be
 	#	defined as the alignment between multiple full-length IS element copies.
-	#blastOut4orfExt = os.path.join(constants.dir4blastout, org, os.path.basename(blastdb)+'.out')
-	'''
-	blastOut4orfExt = blastdb+'.out'
-	tools.blastnSearch(orfExtSeqFile, blastdb, blastOut4orfExt, strand='both', task='megablast')
-	os.remove(orfExtSeqFile)
-	for ext in ('.nhr', '.nin', '.nsq'):
-		os.remove(blastdb+ext)
-	'''
 	query = orfExtSeqFile
-	#blastOut4orfExt, err = tools.doBlastnOnStream(query, blastdb, strand='both', task='megablast', 
 	blastOut4orfExt, err = tools.doBlastn2seqOnStream(nthread, query, fp.name, strand='both', task='megablast', 
 			perc_ident=constants.SIM4ISO)
 	if len(err) > 0:
@@ -1804,7 +1740,7 @@ def clusterIntersect4orf(orfhits, ids):
 		strand = orf[3]
 		# build the representative orfhit but replacing ov with ncopy4tpase
 		orfhit = ((seqid, bd[0], bd[1], strand), clusterName, evalue4domain, evalue4fullseq, ncopy4tpase,
-				raworfhits4bestEvalue)
+				raworfhits)
 
 		# Add the multi-copy orfhit to the orfhitsNew
 		orfhitsNew.append(orfhit)
@@ -2778,12 +2714,14 @@ def pred(args):
 		print('End in pred', datetime.datetime.now().ctime())
 		return 0
 
+	output = args['output']
 	if norgfiles > 1:
-		outputIndividual(mHits, mDNA, proteomes, morfsMerged)
+		outputIndividual(mHits, mDNA, proteomes, morfsMerged, output)
 	elif norgfiles == 1:
 		# output ISs in all sequences into one file
+		print("Write IS elements from all sequences in one fasta file into one result file")
 		if len(mHits) > 0:
-			outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop())
+			outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop(), output)
 		else:
 			print('No IS element was found for {}'.format(mHits.keys()))
 	else:

@@ -235,6 +235,16 @@ def output_csv(csvfile, genome_is):
 		writer.writerows(genome_is)
 
 
+# Input
+# csvfile:      character string, full-path file name pointing to a csv file
+# rowList:      [row, ...]
+#  row:         (item, ...) or [item, ...]
+def writeCsvFile(csvfile, rowList, delimiter=','):
+	with open(csvfile, 'w', newline='') as fp:
+		spamwriter = csv.writer(fp, delimiter=delimiter, lineterminator='\n')
+		spamwriter.writerows(rowList)
+
+
 # get isfinder genome annotation from csv files
 def isfinder_IS_in_genome(isfinder_genome_file):
 	isfinder_genome = []
@@ -1581,89 +1591,6 @@ def getSumByOrg4hmp(sumFileByOrg, org):
 	else:
 		return []
 
-# file4orgs: {org: files, ..., org: files}
-# files: [file4fileid, ..., file4fileid]
-def sum4org4hmp(file4orgs, dir4prediction=constants.dir4prediction):
-	for org in sorted(file4orgs.keys()):
-		# Get summarization from .sum file of each seqid
-		# sum4is: {fileid: sum4file, ..., fileid: sum4file}
-		# sum4file: [] or [nis, %genome, bps4is, len4DNA, familySum]
-		# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-		sum4is = {}
-		sum4is4genome = {}
-		sum4is4plasmid = {}
-		sum4is4phage = {}
-		path = os.path.join(dir4prediction, org)
-		makedir(path)
-		for file4fileid in file4orgs[org]:
-			fileid = os.path.basename(file4fileid)
-			file = os.path.join(path, '.'.join([fileid, 'sum']))
-			sum4is4all = getSumByOrg4hmp(file, fileid)
-			# sum4is4all: [] or [nis, %genome, bps4is, dnaLen4is, familySum, dnaLen]
-			# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-			if len(sum4is4all) == 0:
-				dnaLen = 0
-			else:
-				dnaLen = sum4is4all[5]
-			dnaType = 2 # chromosome DNA
-
-			genome = 0
-			genome4is = 0
-			plasmid = 0
-			plasmid4is = 0
-			phage = 0
-			phage4is = 0
-			dnaLen4phage, dnaLen4plasmid, dnaLen4genome = 0, 0, 0
-			if dnaType == 0:
-				phage = 1
-				dnaLen4phage = dnaLen
-			elif dnaType == 1:
-				plasmid = 1
-				dnaLen4plasmid = dnaLen
-			else:
-				genome = 1
-				dnaLen4genome = dnaLen
-			
-			# set values for DNA without IS element
-			if len(sum4is4all) == 0:
-				marker4is = 0
-				# nis, %genome, bps4is, dnaLen4is, familySum = 0, 0, 0, dnaLen4is, {}
-				sum4is4all = [0, 0, 0, 0, {}]
-			else:
-				marker4is = 1
-
-			sum4is4all2ext = [genome4is, genome, plasmid4is, plasmid, phage4is, phage]
-			sum4is4genome[fileid] = [0, 0, 0, 0, {}, dnaLen4genome] + sum4is4all2ext
-			sum4is4plasmid[fileid] = [0, 0, 0, 0, {}, dnaLen4plasmid] + sum4is4all2ext
-			sum4is4phage[fileid] = [0, 0, 0, 0, {}, dnaLen4phage] + sum4is4all2ext
-
-			if marker4is == 1:
-				if dnaType == 0:
-					phage4is = 1
-					sum4is4phage[fileid][:5] = sum4is4all
-					sum4is4phage[fileid][5+5] = phage4is
-				elif dnaType == 1:
-					plasmid4is = 1
-					sum4is4plasmid[fileid][:5] = sum4is4all
-					sum4is4plasmid[fileid][5+3] = plasmid4is
-				else:
-					genome4is = 1
-					sum4is4genome[fileid][:5] = sum4is4all
-					sum4is4genome[fileid][5+1] = genome4is
-			sum4is[fileid] = sum4is4all[:5] + [dnaLen, genome4is, genome, plasmid4is, plasmid, phage4is, phage]
-
-		# output summarization for all DNAs from organism even there is no IS element found 
-		# in the organism.
-		sumfile4org = os.path.join(path, 'organism.sum')
-		output4sumFull(sum4is, sumfile4org)
-		'''
-		sumfile4org = os.path.join(path, 'organism4genome.sum')
-		output4sumFull(sum4is4genome, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4plasmid.sum')
-		output4sumFull(sum4is4plasmid, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4phage.sum')
-		output4sumFull(sum4is4phage, sumfile4org)
-		'''
 
 familyNames = [
 		'IS1',
@@ -2000,110 +1927,6 @@ def fnaFileList2mDNA(filelist):
 	dir4data = os.path.dirname(os.path.dirname(dnafile))
 	return [mDNA, dir4data]
 
-
-def sum4org(mDNA, dir4data, dir4prediction=constants.dir4prediction):
-	orgid = {}
-	for seqid in sorted(mDNA.keys()):
-		org, fileid, seq = mDNA[seqid]
-		if org not in orgid.keys():
-			orgid[org] = []
-
-		# Get meta info from  .fna file.
-		# Here we simply look for info for genome type.
-		# metainfo: {'dnaType': a}, a can be 0,1,2 to represent phage or plasmid or genome DNA
-		metainfo = meta4genome(dir4data, org, fileid)
-
-		orgid[org].append([fileid, seqid, metainfo['dnaType'], metainfo['dnaLen']])
-
-	for org in sorted(orgid.keys()):
-		# Get summarization from .sum file of each seqid
-		# sum4is: {seqid: sum4seq, ..., seqid: sum4seq}
-		# sum4seq: [] or [nis, %genome, bps4is, len4DNA, familySum]
-		# familySum: {family: [nis, %genome, bps4is], ..., family: [nis, %genome, bps4is]}
-		sum4is = {}
-		sum4is4genome = {}
-		sum4is4plasmid = {}
-		sum4is4phage = {}
-		path = os.path.join(dir4prediction, org)
-		makedir(path)
-		for item in orgid[org]:
-			fileid, seqid, dnaType, dnaLen = item
-			file = os.path.join(path, '.'.join([fileid, 'sum']))
-
-			# process file created by outputIndividual() in pred.py
-			sum4is4all = getSumByOrg(file, seqid)
-			# if sum4is4all is created from the new fileid.sum format (the format requested by hmp),
-			# we only use the first five items in sum4is4all. The sum4is4all created from the old 
-			# seqid.sum format requested by bacteria contains only five items which are the same
-			# for either fileid.sum or seqid.sum. The 4th item in the sum4is4all created from fileid.sum
-			# format is the total length of all sequences with IS elments in the fasta file named by 
-			# fileid, and the 6th item is the total length of all sequences in the fasta file, and the
-			# fasta file contains one or more sequences. So, the 4th item is same as 6th item in 
-			# sum4is4all for the fasta file with one sequence, for example, the fasta file for bactieral 
-			# complete genome sequence. The fasta file for whole genome shotgun sequence usually contains
-			# more than one contig sequences, for example, the fasta file for HMP metagenome data.
-			if len(sum4is4all) == 1:
-				# process file created by outputIS4multipleSeqOneFile() in pred.py
-				print(file, 'is created by outputIS4multipleSeqOneFile and we hence use getSumByOrg4hmp() to process.')
-				sum4is4all = getSumByOrg4hmp(file, seqid)
-				sum4is4all = sum4is4all[:5]
-
-			genome = 0
-			genome4is = 0
-			plasmid = 0
-			plasmid4is = 0
-			phage = 0
-			phage4is = 0
-			dnaLen4phage, dnaLen4plasmid, dnaLen4genome = 0, 0, 0
-			if dnaType == 0:
-				phage = 1
-				dnaLen4phage = dnaLen
-			elif dnaType == 1:
-				plasmid = 1
-				dnaLen4plasmid = dnaLen
-			else:
-				genome = 1
-				dnaLen4genome = dnaLen
-			
-			# set values for DNA without IS element
-			if len(sum4is4all) == 0:
-				marker4is = 0
-				# nis, %genome, bps4is, dnaLen4is, familySum = 0, 0, 0, dnaLen4is, {}
-				sum4is4all = [0, 0, 0, 0, {}]
-			else:
-				marker4is = 1
-
-			sum4is4all2ext = [genome4is, genome, plasmid4is, plasmid, phage4is, phage]
-			sum4is4genome[seqid] = [0, 0, 0, 0, {}, dnaLen4genome] + sum4is4all2ext
-			sum4is4plasmid[seqid] = [0, 0, 0, 0, {}, dnaLen4plasmid] + sum4is4all2ext
-			sum4is4phage[seqid] = [0, 0, 0, 0, {}, dnaLen4phage] + sum4is4all2ext
-
-			if marker4is == 1:
-				if dnaType == 0:
-					phage4is = 1
-					sum4is4phage[seqid][:5] = sum4is4all
-					sum4is4phage[seqid][5+5] = phage4is
-				elif dnaType == 1:
-					plasmid4is = 1
-					sum4is4plasmid[seqid][:5] = sum4is4all
-					sum4is4plasmid[seqid][5+3] = plasmid4is
-				else:
-					genome4is = 1
-					sum4is4genome[seqid][:5] = sum4is4all
-					sum4is4genome[seqid][5+1] = genome4is
-			sum4is[seqid] = sum4is4all + [dnaLen, genome4is, genome, plasmid4is, plasmid, phage4is, phage]
-
-		# output summarization for all DNAs from organism even there is no IS element found 
-		# in the organism.
-		sumfile4org = os.path.join(path, 'organism.sum')
-		output4sumFull(sum4is, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4genome.sum')
-		output4sumFull(sum4is4genome, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4plasmid.sum')
-		output4sumFull(sum4is4plasmid, sumfile4org)
-		sumfile4org = os.path.join(path, 'organism4phage.sum')
-		output4sumFull(sum4is4phage, sumfile4org)
-	
 
 # compute distance between vectors u and v
 def distFunction(u, v):

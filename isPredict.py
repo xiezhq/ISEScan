@@ -196,11 +196,12 @@ def proteinFromNCBI(dnaFiles, dir2proteome):
 	return proteome_files
 
 #def isPredict(args):
-def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShortIS, translateGenome,
+def isPredict(dna_list, output, removeShortIS, translateGenome,
 		nthread=1):
 	print('isPredict begins at', datetime.datetime.now().ctime())
 
 	dnaFiles = tools.rdDNAlist(dna_list)
+	path_to_proteome = os.path.join(output, 'proteome')
 	if translateGenome == True:
 		print ("predict and translate genes from genome sequence into protein database using FragGeneScan program")
 		proteome_files = translateGenomeByFGS_v2(dnaFiles, path_to_proteome, nthread)
@@ -213,6 +214,7 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShort
 
 	# HMM searches against protein database
 	#
+	path_to_hmmsearch_results = os.path.join(output, 'hmm')
 	if os.path.isfile(clusterSeqFile4phmmer) and os.stat(clusterSeqFile4phmmer).st_size > 0:
 		args2concurrent4phmmer, outFiles4phmmer = prepare4phmmer(clusterSeqFile4phmmer, 
 				proteome_files, path_to_hmmsearch_results, nthread)
@@ -236,7 +238,9 @@ def isPredict(dna_list, path_to_proteome, path_to_hmmsearch_results, removeShort
 	# Select significant ones (predictions) from hits returned by HMM search
 	hitsFile = outFiles4phmmer + outFiles4hmmsearch
 	if len(hitsFile) > 0:
-		args4pred = {'dna_list': dna_list,
+		args4pred = {
+			'dna_list': dna_list,
+			'output': output,
 			'path_to_proteome': path_to_proteome,
 			'path_to_hmmsearch_results': path_to_hmmsearch_results,
 			'hitsFile': hitsFile,

@@ -74,7 +74,7 @@ conda update isescan
 - Try ISEScan (You can find the available command options `isescan.py -h`).
 ```
 cp /apps/inst/miniconda3/test/NC_012624.fna ./
-isescan.py --nthread 2 NC_012624.fna proteome hmm
+isescan.py --seqfile NC_012624.fna --output results --nthread 2
 ```
 Note: replace `/apps/inst/miniconda3` in commands with your conda install path.
 
@@ -84,7 +84,7 @@ export PATH=/apps/inst/miniconda3/bin/:$PATH
 ```
 Then, try ISEScan again:
 ```
-isescan.py --nthread 2 NC_012624.fna proteome hmm
+isescan.py --seqfile NC_012624.fna --output results --nthread 2
 ```
 
 <a name="Manual-install"></a>
@@ -128,9 +128,11 @@ isescan.py --nthread 2 NC_012624.fna proteome hmm
   		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 	- biopython 1.62 or later (required by SSW library)
 
-- Configure ISEScan before you run ISEScan
-	- In ISEScan folder, open `constants.py` and find two lines marked with **Config packages**
-	- Modify the path variables (FragGeneScan, phmmer, hmmsearch, blastn, blastp, makeblastdb) to specify the correct paths of the required packages and data files on your computer.
+- Add the required packages to your $PATH before you run ISEScan
+	- Add to $PATH the paths pointing to run_FragGeneScan.pl, phmmer, hmmsearch, blastn, blastp, makeblastdb
+	```
+	export PATH=$PATH:/apps/inst/FragGeneScan1.30:/apps/inst/hmmer-3.3/bin:/apps/inst/ncbi-blast-2.10.0+/bin
+	```
 
 <a name="Usage"></a>
 ## Usage example
@@ -139,7 +141,7 @@ Let's try an example, NC_012624.fna.
 - The command below scans NC_012624.fna (genome sequence of Sulfolobus_islandicus_Y_N_15_51, ~42 kb), and outputs all results in `prediction` directory:   
 	```
 	cp /apps/inst/miniconda3/test/NC_012624.fna ./
-	isescan.py NC_012624.fna proteome hmm --nthread 2
+	isescan.py --seqfile NC_012624.fna --output results --nthread 2
 	```
 
 - Wait for its finishing. It may take a while (~40 seconds) as ISEScan uses the HMMER to scan the genome sequences and it will use 621 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs. The running time for larger genome will increase quickly, e.g. about 20 minutes for NC_000913.fna (genome sequence of Escherichia coli str. K-12 substr. MG1655, ~4.6 Mb) with two cpu cores on my virtual machine.
@@ -196,23 +198,23 @@ Let's try an example, NC_012624.fna.
 	- run commands as the following if you installed ISEScan via Bioconda.
 	```
 	conda activate base
-	isescan.py genome1.fa proteome hmm
+	isescan.py --seqfile NC_012624.fna --output results
 	```
 	- run the commands as the following if you installed ISEScan manually.
 	```
-	python3 /home/xiezhq/projects/ISEScan-1.7.2.1/isescan.py genome1.fa proteome hmm
+	python3 /home/xiezhq/projects/ISEScan-1.7.2.2/isescan.py --seqfile genome1.fa --output results
 	```
 	where genome1.fa is your genome sequence file in fasta format. By default, ISEScan will use one CPU core but you can change it using command option `--nthread NTHREAD`, e.g. 
 	```
-	isescan.py genome1.fa proteome hmm --nthread 2
+	isescan.py --seqfile genome1.fa --output results --nthread 2
 	```
   - You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
-  - Your Linux computer has **nproc** (nproc could be 2 or 4 or 6 or 8 or ....) CPU cores.
+  - Your Linux computer has **nproc** (nproc could be 1 or 2 or 4 or 6 or 8 or ....) CPU cores.
   - You want to run ISEScan on ngenome (ngenome could be 1 or 2 or 3, ...) fasta file(s) (genome) in parallel on your Linux computer.
 
   Now, let's run 200 genomes in one line of command and then wait for all computing jobs to complete (probably several days or weeks, depending on how many hours are required for each of your 200 genomes in average). If your computer has 8 CPU cores and You can execute the command below:
   ```
-  nohup cat test.fna.list | xargs -n 1 -P 4 -I{} isescan.py {} proteome hmm --nthread 2 > log.txt &
+  nohup cat test.fna.list | xargs -n 1 -P 4 -I{} isescan.py --seqfile {} --output results --nthread 2 > log.txt &
   ```
 
   In the command line, 
@@ -235,13 +237,18 @@ Let's try an example, NC_012624.fna.
 <a name="Re-run"></a>
 ### Re-run ISEScan without gene/protein prediction and HMMER searching
 - ISEScan will run much faster if you run it on the same genome sequence more than once (e.g., trying different optimal parameters of near and far regions (see our paper [...] for the definitions of near and far regions)) to search for IS elements in your genome). The reason is that it skips either FragGeneScan or both FragGeneScan and phmer/hmmsearch steps which are most time-consuming steps in ISEScan pipeline.
-- If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in proteome directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in hmm directory, and then rerun it:  
+- If you prefer ISEScan recalculating the the results, you can simply remove the proteome file and HMMER search results which are related to your genome sequence file name. For example, you can delete NC_012624.fna.faa in `results/proteome` directory and clusters.faa.hmm.NC_012624.fna.faa and clusters.single.faa.NC_012624.fna.faa in `results/hmm` directory, and then rerun it:  
 	```
-	isescan.py NC_012624.fna proteome hmm
+	isescan.py --seqfile NC_012624.fna --output results
 	```
 
 <a name="Release"></a>
 ## Release History 
+- 1.7.2.2
+  - ISEScan can output .csv (columns are separated by `,`) and .tsv (columns are separated by `tab`) result files, which are much easier for users to parse the results (Thanks oschwengers for his suggestion)
+  - add command options `--seqfile` and `--output` to remove the positional parmater `seqfile`, `proteome` and `hmm` (Thanks oschwengers for his suggestion)
+  - modify constants.py to remove the hard coded paths pointing to the third party dependencies and the output directory `dir4prediction` (Thanks oschwengers for his suggestion)
+  - add tips for installing ISEScan from source codes on Mac (Thanks [Ania Gorska] (https://github.com/gvalchca) for her suggestion)
 - 1.7.2.1
   - modify constants.py to remove the hard coded path poiting to the profile HMM files (clusters.single.faa and clusters.faa.hmm)
   - update readme to add an introduction for installing ISEScan package via bioconda (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) for making it available!)
