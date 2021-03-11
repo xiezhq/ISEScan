@@ -95,15 +95,15 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 	- Uncompress the .zip (or .tar.gz) file.
 		- Use unzip command to uncompress the zip file:  
 		```
-		unzip v1.7.2.1.zip
+		unzip v1.7.2.2.zip
 		```
 		- Use tar command to uncompress the tar.gz file:  
 		```
-		tar -zvxf v1.7.2.1.tar.gz
+		tar -zvxf v1.7.2.2.tar.gz
 		```
-		This will create a ISEScan folder, e.g. ISEScan-1.7.2.1. You need to go to ISEScan folder to configure and run it.
+		This will create a ISEScan folder, e.g. ISEScan-1.7.2.2. You need to go to ISEScan folder to configure and run it.
 		```
-		cd ISEScan-1.7.2.1
+		cd ISEScan-1.7.2.2
 		```
 - Install dependencies before you run ISEScan
 	- Python 3.3.3 or later
@@ -122,9 +122,9 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 		- And then copy libssw.so and set search path:   
 		```
 		cp libssw.so ../
-	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1:$LD_LIBRARY_PATH
+	 	export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.2:$LD_LIBRARY_PATH
 		```
-		In command `export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.1:$LD_LIBRARY_PATH`, please replace `/home/xiezhq/projects/ISEScan-1.7.2.1` with the actual path of libssw.so on your computer!
+		In command `export LD_LIBRARY_PATH=/home/xiezhq/projects/ISEScan-1.7.2.2:$LD_LIBRARY_PATH`, please replace `/home/xiezhq/projects/ISEScan-1.7.2.2` with the actual path of libssw.so on your computer!
   		- The latest SSW library can be found at https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library.
 	- biopython 1.62 or later (required by SSW library)
 
