@@ -5,6 +5,7 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 - [Overview](#Overview)
 - [Citation](#Citation)
 - [Installation](#Installation)
+	- [ISEScan on mac](#install-on-mac)
 	- [Automated install by Bioconda (recommended!)](#Bioconda-install)
 	- [Manual install (install from source code)](#Manual-install)
 - [Usage example](#Usage)
@@ -30,6 +31,7 @@ Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [Supplemen
 <a name="Installation"></a>
 ## Installation
 ISEScan was tested on Linux only and can be installed from Bioconda packages and source code. Install from Bioconda is recommended as it is the simplest way for non-experienced users. 
+<a name="install-on-mac"></a>
 #### ISEScan on mac
 I have no idea about ISEScan on mac as I only fully tested it on Linux. If you cannot install ISEScan on mac from Bioconda, you can try installing ISEScan from source codes. For installing ISEScan from source codes, I knew there was an issue to compile FragGensScan on Mac but I once solved it. To solve the problem of running FragGeneScan on Mac, please modify two source files in FragGeneScan source codes: 1) open util_lib.c and comment out ‘#include <malloc.h>’ on line3; 2) open hmm_lib.c and comment out ‘‘#include <malloc.h>’ on line6 and replace values.h with limits.h on line4. The modified FragGeneScan can run on Mac and Linux without problem according to my test result.
 
