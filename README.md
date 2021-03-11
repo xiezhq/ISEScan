@@ -29,7 +29,7 @@ Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [Supplemen
 
 <a name="Installation"></a>
 ## Installation
-ISEScan was tested on Linux only and can be installed from Bioconda packages and source code. Install from Bioconda is recommended as it is the simplest way for non-experienced users.
+ISEScan was tested on Linux only and can be installed from Bioconda packages and source code. Install from Bioconda is recommended as it is the simplest way for non-experienced users. I have no idea about ISEScan on mac as I only fully tested it on Linux. I knew there was compling issue for FragGensScan on Mac but I once solved it. To solve the problem of running FragGeneScan on Mac, please modify two source files in FragGeneScan source codes: 1) open util_lib.c and comment out ‘#include <malloc.h>’ on line3; 2) open hmm_lib.c and comment out ‘‘#include <malloc.h>’ on line6 and replace values.h with limits.h on line4. The modified FragGeneScan can run on Mac and Linux without problem according to my test result.
 
 <a name="Bioconda-install"></a>
 #### Automated install by Bioconda (recommended!)
