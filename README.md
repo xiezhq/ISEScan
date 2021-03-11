@@ -148,6 +148,8 @@ Let's try an example, NC_012624.fna.
 
 - After ISEScan finish running, you can find the output files in prediction directory: 
   - NC_012624.fna.sum: the summarization of IS copies for each IS family
+  - NC_012624.fna.csv: details about IS copies in NC_012624, one copy per line, comma-separated tabular table
+  - NC_012624.fna.tsv: details about IS copies in NC_012624, one copy per line, tab-separated tabular table
   - NC_012624.fna.raw: details about IS copies in NC_012624, one copy per line
   - NC_012624.fna.gff: listing each IS copy and its TIR, gff3 format
   - NC_012624.fna.is.fna: the nucleic acid sequence of each IS copy, fasta format
@@ -164,10 +166,10 @@ Let's try an example, NC_012624.fna.
     - bps4IS: length of sequence segments spaned by IS elements in a sequence
     - dnaLen: length of the specific sequence
 
-- Details about NC_012624.fna.raw:
-  - The first line is title line with the column identifier for each column.
-  - The lines following the 2nd line are the main content of NC_012624.fna.raw file, one IS copy per line.
-  - Columns in NC_012624.fna.raw:
+- Details about NC_012624.fna.csv (NC_012624.fna.tsv, NC_012624.fna.raw):
+  - The first row is header line listing column names.
+  - The rows after the first row are the main content of NC_012624.fna.csv file, one IS copy per line.
+  - Columns in NC_012624.fna.csv (NC_012624.fna.tsv, NC_012624.fna.raw):
     - seqID: sequence identifier
     - family: family name of IS element
     - cluster: Tpase cluster
