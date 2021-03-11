@@ -5,6 +5,7 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 - [Overview](#Overview)
 - [Citation](#Citation)
 - [Installation](#Installation)
+	- [ISEScan on linux](#install-on-linux)
 	- [ISEScan on mac](#install-on-mac)
 	- [Automated install by Bioconda (recommended!)](#Bioconda-install)
 	- [Manual install (install from source code)](#Manual-install)
@@ -30,6 +31,8 @@ Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [Supplemen
 
 <a name="Installation"></a>
 ## Installation
+<a name="install-on-linux"></a>
+#### ISEScan on linux
 ISEScan was tested on Linux only and can be installed from Bioconda packages and source code. Install from Bioconda is recommended as it is the simplest way for non-experienced users. 
 <a name="install-on-mac"></a>
 #### ISEScan on mac
