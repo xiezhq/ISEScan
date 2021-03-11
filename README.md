@@ -41,7 +41,12 @@ The listed steps below will install ISEScan package via bioconda to /apps/inst/m
 	```
 	- Install Miniconda3
 	```
-	sh Miniconda3-latest-Linux-x86_64.sh
+	sh Miniconda3-latest-Linux-x86_64.sh # please answer yes (see my screen shot below) for the last question if you have no idea about it.
+	```
+	Do you wish the installer to initialize Miniconda3
+	by running conda init? [yes|no]
+	[no] >>> yes
+	```
 	rm Miniconda3-latest-Linux-x86_64.sh
 	source ~/.bashrc
 	```
