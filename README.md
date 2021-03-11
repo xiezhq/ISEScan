@@ -49,6 +49,7 @@ The listed steps below will install ISEScan package via bioconda to /apps/inst/m
 	by running conda init? [yes|no]
 	[no] >>> yes
 	```
+	```
 	rm Miniconda3-latest-Linux-x86_64.sh
 	source ~/.bashrc
 	```
