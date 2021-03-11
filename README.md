@@ -248,7 +248,7 @@ Let's try an example, NC_012624.fna.
   - ISEScan can output .csv (columns are separated by `,`) and .tsv (columns are separated by `tab`) result files, which are much easier for users to parse the results (Thanks oschwengers for his suggestion)
   - add command options `--seqfile` and `--output` to remove the positional parmater `seqfile`, `proteome` and `hmm` (Thanks oschwengers for his suggestion)
   - modify constants.py to remove the hard coded paths pointing to the third party dependencies and the output directory `dir4prediction` (Thanks oschwengers for his suggestion)
-  - add tips for installing ISEScan from source codes on Mac (Thanks [Ania Gorska] (https://github.com/gvalchca) for her suggestion)
+  - add tips for installing ISEScan from source codes on Mac (Thanks [Ania Gorska](https://github.com/gvalchca) for her suggestion)
 - 1.7.2.1
   - modify constants.py to remove the hard coded path poiting to the profile HMM files (clusters.single.faa and clusters.faa.hmm)
   - update readme to add an introduction for installing ISEScan package via bioconda (Thanks both [pbasting](https://github.com/pbasting) and [tseemann](https://github.com/tseemann) for making it available!)
