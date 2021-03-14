@@ -24,7 +24,8 @@ def genome2proteome(args2concurrent):
 		if outs == 0:
 			print('Translating genome into proteome for', dna_file, ', return ', outs)
 		else:
-			print('Translating genome into proteome for', dna_file, ', return error!')
+			e = "Translating genome into proteome for {}, return error!".format(dna_file)
+			raise RuntimeError(e)
 
 	print("\nFinish translating genome into proteome.", datetime.datetime.now().ctime())
 
