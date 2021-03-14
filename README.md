@@ -133,6 +133,7 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 	```
 	export PATH=$PATH:/apps/inst/FragGeneScan1.30:/apps/inst/hmmer-3.3/bin:/apps/inst/ncbi-blast-2.10.0+/bin
 	```
+	In command export above, please replace /apps/inst/FragGeneScan1.30, /apps/inst/hmmer-3.3/bin and /apps/inst/ncbi-blast-2.10.0+/bin with the actual paths of FragGeneScan, HMMER and BLAST on your computer!
 
 <a name="Usage"></a>
 ## Usage example
