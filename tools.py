@@ -864,6 +864,15 @@ def seq2blastdb(seqFile, db):
 	do_cmd = shlex.split(' '.join(cmdline))
 	subprocess.check_call(do_cmd, shell=False, universal_newlines=False, stdout=subprocess.DEVNULL)
 
+# delete the file pointing by full path f.
+# f: /path/to/file, a character string
+def deleteFile(f):
+	cmd = 'rm'
+	cmdline = [cmd, f]
+	do_cmd = shlex.split(' '.join(cmdline))
+	subprocess.check_call(do_cmd, shell=False, universal_newlines=False, stdout=subprocess.DEVNULL)
+	
+
 # Search all IS elements (Tpase) ORFs against IS element (Tpase ORF) database.
 # command: blastn -query /home/data/insertion_sequence/output4FragGeneScan1.19_illumina_5/NC_002754.1.fna.ffn \
 #		-db /home/data/insertion_sequence/blastdb/NC_002754.1.fna.ffn -out blast.6 \

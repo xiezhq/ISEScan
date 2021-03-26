@@ -1434,6 +1434,8 @@ def getFullIS4seqOnStream(args):
 	query = orfExtSeqFile
 	blastOut4orfExt, err = tools.doBlastn2seqOnStream(nthread, query, fp.name, strand='both', task='megablast', 
 			perc_ident=constants.SIM4ISO)
+	tools.deleteFile(fp.name)
+
 	if len(err) > 0:
 		#e = 'Blastn ISs in {} against {}: {}'.format(seqid, db, err)
 		e = 'Blastn ISs in {} against {}: {}'.format(seqid, seqid, err)

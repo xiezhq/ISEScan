@@ -247,6 +247,8 @@ Let's try an example, NC_012624.fna.
 
 <a name="Release"></a>
 ## Release History 
+- 1.7.2.2.2
+  - add code to remove temporary files (created by tempfile.NamedTemporaryFile()) once blastn search completes in case that large amounts of temporary files consume too much space. (Thanks Biancamaria for the suggestion)
 - 1.7.2.2
   - ISEScan can output .csv (columns are separated by `,`) and .tsv (columns are separated by `tab`) result files, which are much easier for users to parse the results (Thanks oschwengers for his suggestion)
   - add command options `--seqfile` and `--output` to remove the positional parmater `seqfile`, `proteome` and `hmm` (Thanks oschwengers for his suggestion)
