@@ -9,7 +9,7 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 	- [ISEScan on mac](#install-on-mac)
 	- [Automated install by Bioconda (recommended!)](#Bioconda-install)
 	- [Manual install (install from source code)](#Manual-install)
-- [Upgrade](#Upgrade)
+- [Upgrade ISEScan to the latest version](#Upgrade)
 - [Usage example](#Usage)
 - [Tips to run ISEScan efficiently](#Tips)
 	- [How to run a set of genomes in a row](#lots-of-genomes)
@@ -138,14 +138,14 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 
 
 <a name="Upgrade"></a>
-## Upgrade
-If your existing ISEScan works well, upgrading the existing ISEScan is very easy: copy all .py files from the latest ISEScan to the existing ISEScan. 
-- Locate the existing ISEscan. If you don't know where isescan.py is installed, you can run `which isescan.py` to help find where it is on your system. 
+## Upgrade ISEScan to the latest version
+It is quite easy to upgrade the existing ISEScan to the latest version: copy all .py files from the latest version to the ISEScan install directory. 
+- Locate the existing ISEscan (ISEScan install directory). If you don't know where isescan.py is installed, you can run `which isescan.py` to help find where it is on your system. 
 	```
 	which isescan.py
 	/apps/inst/miniconda3/bin/isescan.py
 	```
-- Get the latest ISEScan source codes and then copy the latest `*.py` files to ISEScan install directory to overwrite the existing ISEScan. Please check [Manual install (install from source code)](#Manual-install) on how to get the latest ISEScan source codes. I assume you already downlaoded the latest ISEScan, v1.7.2.2.2.tar.gz.
+- Get the latest ISEScan source codes and then copy the all .py files to ISEScan install directory. Please check [Manual install (install from source code)](#Manual-install) on how to get the latest ISEScan source codes. For example, you downlaoded the latest ISEScan, v1.7.2.2.2.tar.gz.
 	```
 	tar -zxf v1.7.2.2.2.tar.gz
 	cd ISEScan-1.7.2.2.2/
