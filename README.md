@@ -9,6 +9,7 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 	- [ISEScan on mac](#install-on-mac)
 	- [Automated install by Bioconda (recommended!)](#Bioconda-install)
 	- [Manual install (install from source code)](#Manual-install)
+- [Upgrade](#Upgrade)
 - [Usage example](#Usage)
 - [Tips to run ISEScan efficiently](#Tips)
 	- [How to run a set of genomes in a row](#lots-of-genomes)
@@ -134,6 +135,34 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 	export PATH=$PATH:/apps/inst/FragGeneScan1.30:/apps/inst/hmmer-3.3/bin:/apps/inst/ncbi-blast-2.10.0+/bin
 	```
 	In command export above, please replace `/apps/inst/FragGeneScan1.30`, `/apps/inst/hmmer-3.3/bin` and `/apps/inst/ncbi-blast-2.10.0+/bin` with the actual paths of FragGeneScan, HMMER and BLAST on your computer!
+
+
+<a name="Upgrade"></a>
+## Upgrade
+If your existing ISEScan works well, upgrading the existing ISEScan is very easy: copy all .py files from the latest ISEScan to the existing ISEScan. 
+- Locate the existing ISEscan. If you don't know where isescan.py is installed, you can run `which isescan.py` to help find where it is on your system. 
+	```
+	which isescan.py
+	/apps/inst/miniconda3/bin/isescan.py
+	```
+- Get the latest ISEScan source codes and then copy the latest `*.py` files to ISEScan install directory to overwrite the existing ISEScan. Please check [Manual install (install from source code)](#Manual-install) on how to get the latest ISEScan source codes. I assume you already downlaoded the latest ISEScan, v1.7.2.2.2.tar.gz.
+	```
+	tar -zxf v1.7.2.2.2.tar.gz
+	cd ISEScan-1.7.2.2.2/
+	cp *.py /apps/inst/miniconda3/bin/
+	```
+- Check the version of the upgraded ISEScan.
+	```
+	python3 isescan.py --version
+	```
+	or 
+	```
+	isescan.py --version
+	```
+- Test the upgraded ISEScan.
+	```
+	python3 isescan.py --seqfile /apps/inst/miniconda3/test/NC_012624.fna --output /home/xiezhq/results --nthread 2
+	```
 
 <a name="Usage"></a>
 ## Usage example
