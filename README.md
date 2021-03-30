@@ -3,7 +3,7 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 
 ## Table of Contents
 - [Overview](#Overview)
-- [!Citation](#Citation)
+- [Citation](#Citation)
 - [Installation](#Installation)
 	- [ISEScan on linux](#install-on-linux)
 	- [ISEScan on mac](#install-on-mac)
