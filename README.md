@@ -15,7 +15,6 @@ A python pipeline to identify IS (Insertion Sequence) elements in genome and met
 	- [How to run a set of genomes in a row](#lots-of-genomes)
 	- [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
 - [Release History](#Release)
-- [License](#License)
 - [Contact](#Contact)
 
 <a name="Overview"></a>
@@ -326,11 +325,6 @@ Let's try an example, NC_012624.fna.
   - Add option in `constants.py` to report either complete IS elements or both complete and partial IS elements
 - 1.0
   - The first proper release
-
-<a name="License"></a>
-## License
-
-Distributed under the GNU General Public License.
 
 <a name="Contact"></a>
 ## Contact
