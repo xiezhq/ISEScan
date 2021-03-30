@@ -1,5 +1,4 @@
-# ISEScan
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html)
+# ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html)
 A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome 
 
 ## Table of Contents
