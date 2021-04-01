@@ -239,11 +239,11 @@ Let's try an example, NC_012624.fna.
 	```
 	isescan.py --seqfile genome1.fa --output results --nthread 2
 	```
-  - You are working and running ISEScan jobs on a Linux computer instead of a Linux cluster system.
+  - You are running ISEScan jobs on a Linux computer instead of a Linux cluster system.
   - Your Linux computer has **nproc** (nproc could be 1 or 2 or 4 or 6 or 8 or ....) CPU cores.
   - You want to run ISEScan on ngenome (ngenome could be 1 or 2 or 3, ...) fasta file(s) (genome) in parallel on your Linux computer.
 
-  Now, let's run 200 genomes in one line of command and then wait for all computing jobs to complete (probably several days or weeks, depending on how many hours are required for each of your 200 genomes in average). If your computer has 8 CPU cores and You can execute the command below:
+  Now, let's run 200 genomes in one line of command and then wait for all computing jobs to complete (probably several days or weeks, depending on how many hours are required for each of your 200 genomes on average). If your computer has 8 CPU cores, you can execute the command below:
   ```
   nohup cat test.fna.list | xargs -n 1 -P 4 -I{} isescan.py --seqfile {} --output results --nthread 2 > log.txt &
   ```
@@ -263,7 +263,7 @@ Let's try an example, NC_012624.fna.
   - **&** tells your computer to run jobs in the background without interrupting you on the current terminal (e.g. xterm), in order that you can work on other things on the same terminal.
   You can check your job status by the command `top -c -u xiezhq` (assuming your user name is **xiezhq**). 
 
-  It might take several days or weeks for 200 genomes to complete. It depends on how many CPU cores you have on your computer and how fast each CPU core is. Please do not load too many ISEScan jobs because each ISEScan job will consume part of your RAM on your computer. However, you can always test and estimate how many GB RAM and how many hours are required for a genome.
+  It might take several days or weeks for 200 genomes to complete. It depends on how many CPU cores you have on your computer and how fast each CPU core is. Please do not load too many ISEScan jobs because each ISEScan job will consume part of your RAM on your computer. However, you can always test and estimate how many GB RAM and how many hours are required for one genome.
 
 <a name="Re-run"></a>
 ### Re-run ISEScan without gene/protein prediction and HMMER searching
