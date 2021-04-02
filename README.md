@@ -69,7 +69,6 @@ The steps below will install ISEScan package via bioconda to /apps/inst/minicond
 - Install and update ISEScan
 ```
 conda install isescan
-conda update isescan
 ```
 - Try ISEScan (You can find the available command options `isescan.py -h`).
 ```
@@ -138,6 +137,12 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 
 <a name="Upgrade"></a>
 ## Upgrade ISEScan to the latest version
+### Automated upgrade from Bioconda (easy and recommended)
+You can run the command below to upgrade the existing ISEScan if the existing ISEScan was installed by Bioconda.
+```
+conda update isescan
+```
+### Manual upgrade from existing ISEScan (easy)
 It is quite easy to upgrade the existing ISEScan to the latest version: copy all .py files from the latest version to the ISEScan install directory. 
 - Locate the existing ISEscan (ISEScan install directory). If you don't know where isescan.py is installed, you can run `which isescan.py` to help find where it is on your system. 
 	```
@@ -150,6 +155,7 @@ It is quite easy to upgrade the existing ISEScan to the latest version: copy all
 	cd ISEScan-1.7.2.2.2/
 	cp *.py /apps/inst/miniconda3/bin/
 	```
+### Check and test the upgraded ISEScan
 - Check the version of the upgraded ISEScan.
 	```
 	python3 isescan.py --version
