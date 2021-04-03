@@ -1,6 +1,6 @@
 # ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html)
 
-#app > div.index-container > div.content > div > div > div > div.ivu-tabs-content.ivu-tabs-content-animated > div:nth-child(1) > div > div.ivu-col.ivu-col-span-16 > div:nth-child(1) > div:nth-child(4) > img:nth-child(2)
+https://img.shields.io/badge/install%20with-docker-important.svg?style=flat-square&logo=docker
 
 A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome 
 
