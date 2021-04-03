@@ -137,12 +137,12 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 
 <a name="Upgrade"></a>
 ## Upgrade ISEScan to the latest version
-### Automated upgrade from Bioconda (easy and recommended)
+### Automated upgrade from Bioconda (easy but probably a little lagging after https://github.com/xiezhq/ISEScan)
 You can run the command below to upgrade the existing ISEScan if the existing ISEScan was installed by Bioconda.
 ```
 conda update isescan
 ```
-### Manual upgrade from existing ISEScan (easy)
+### Manual upgrade from existing ISEScan (easy and keep updated with https://github.com/xiezhq/ISEScan)
 It is quite easy to upgrade the existing ISEScan to the latest version: copy all .py files from the latest version to the ISEScan install directory. 
 - Locate the existing ISEscan (ISEScan install directory). If you don't know where isescan.py is installed, you can run `which isescan.py` to help find where it is on your system. 
 	```
