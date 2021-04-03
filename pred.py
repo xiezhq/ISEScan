@@ -1129,6 +1129,8 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid, 
 	tools.writeCsvFile(csvfile, rows4raw, delimiter=',')
 	tsvfile = outFile4raw.replace(".raw", ".tsv")
 	tools.writeCsvFile(tsvfile, rows4raw, delimiter='\t')
+	print("Write {} IS copies to {} and {} and {}".format(len(rows4raw)-1, csvfile, tsvfile, outFile4raw))
+	print("Write summarized result to", sumFile)
 
 
 # mtblout_hits:		[(accid, hits_sorted_refined), ..., (accid, hits_sorted_refined)]
@@ -1710,6 +1712,7 @@ def clusterIntersect4orf(orfhits, ids):
 			orfhit = orfhits[idsList[id]]
 			orf = orfhit[0]
 			bds.append(orf[1:3])
+			"""
 			# Get the raw Tpase orfhit for the IS copy defined by the representative bds.
 			#
 			# raworfhits4tpase == [] for the additional IS copies captured by Blast querying extended 
@@ -1719,6 +1722,7 @@ def clusterIntersect4orf(orfhits, ids):
 			if raworf == False and len(orfhit[5]['orfhits4tpase']) > 0:
 				raworfhits = orfhit[5]
 				raworf = True
+			"""
 		# get representative boundary for the overlapped orfhits
 		if len(bds) > 1:
 			bd = tools.consensusBoundaryByCutoffBySeparated(bds)
@@ -1742,7 +1746,7 @@ def clusterIntersect4orf(orfhits, ids):
 		strand = orf[3]
 		# build the representative orfhit but replacing ov with ncopy4tpase
 		orfhit = ((seqid, bd[0], bd[1], strand), clusterName, evalue4domain, evalue4fullseq, ncopy4tpase,
-				raworfhits)
+				raworfhits4bestEvalue)
 
 		# Add the multi-copy orfhit to the orfhitsNew
 		orfhitsNew.append(orfhit)
@@ -2712,7 +2716,7 @@ def pred(args):
 	# mHits: {accid: hits, ..., accid: hits}
 	# hits: [hit, ..., hit]
 	if sum([len(hits) for hits in mHits.values()]) == 0:
-		print('No IS element was identified for', sorted(mHits.keys()))
+		print('No IS element was found for', sorted(orgfiles))
 		print('End in pred', datetime.datetime.now().ctime())
 		return 0
 
@@ -2720,14 +2724,17 @@ def pred(args):
 	if norgfiles > 1:
 		outputIndividual(mHits, mDNA, proteomes, morfsMerged, output)
 	elif norgfiles == 1:
-		# output ISs in all sequences into one file
-		print("Write IS elements from all sequences in one fasta file into one result file")
+		orgfileid = orgfiles.pop()
+		# output ISs in all sequences in single fasta file into single output file
 		if len(mHits) > 0:
-			outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfiles.pop(), output)
+			print("Write IS elements from all sequences in {} into one result file under {}".format(
+				orgfileid, output))
+			outputIS4multipleSeqOneFile(mHits, mDNA, proteomes, morfsMerged, orgfileid, output)
 		else:
-			print('No IS element was found for {}'.format(mHits.keys()))
+			print('No IS element was found for {}'.format(orgfileid))
 	else:
-		e = 'Error: cannot get organism name (directory name holding genome sequence FASTA file) and FASTA sequence file name!'
+		e = "Error: cannot get organism name (directory name holding genome sequence FASTA file) \
+			and FASTA sequence file name for genome {}!".format(orgfileid)
 		raise RuntimeError(e)
 
 	# Output predictions, mHits

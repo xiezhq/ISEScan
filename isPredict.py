@@ -196,11 +196,8 @@ def proteinFromNCBI(dnaFiles, dir2proteome):
 		proteome_files.append((fgsFile, org, update))
 	return proteome_files
 
-#def isPredict(args):
 def isPredict(dna_list, output, removeShortIS, translateGenome,
 		nthread=1):
-	print('isPredict begins at', datetime.datetime.now().ctime())
-
 	dnaFiles = tools.rdDNAlist(dna_list)
 	path_to_proteome = os.path.join(output, 'proteome')
 	if translateGenome == True:
@@ -256,5 +253,3 @@ def isPredict(dna_list, output, removeShortIS, translateGenome,
 	else:
 		e = 'No hit was returned by HMM search against protein database. ' + datetime.datetime.now().ctime()
 		print(e)
-
-	print('isPredict ends at', datetime.datetime.now().ctime())

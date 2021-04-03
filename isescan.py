@@ -7,10 +7,13 @@ version = '1.7.2.2.2'
 import argparse
 import os
 import sys
+import datetime
 
 import isPredict
 
 def isPredictSingle(args):
+	print('ISEScan starts at', datetime.datetime.now().ctime())
+
 	seqfile = args['seqfile']
 	output = args['output']
 	seqfilename = os.path.basename(seqfile)
@@ -22,6 +25,7 @@ def isPredictSingle(args):
 	isPredict.isPredict(filelist, args['output'], args['removeShortIS'], args['translateGenome'],
 			args['nthread'])
 	os.remove(filelist)
+	print('ISEScan ends at', datetime.datetime.now().ctime())
 
 if __name__ == "__main__":
 	import textwrap
