@@ -281,6 +281,8 @@ Let's try an example, NC_012624.fna.
 
 <a name="Release"></a>
 ## Release History 
+- 1.7.2.3
+  - remove the bug in pred.py, which cuases the issue 'UnboundLocalError: local variable raworfhits referenced before assignment' in rare cases.
 - 1.7.2.2.2
   - add code to remove temporary files (created by tempfile.NamedTemporaryFile()) once blastn search completes in case that large amounts of temporary files consume too much space. (Thanks Biancamaria for the suggestion)
 - 1.7.2.2
