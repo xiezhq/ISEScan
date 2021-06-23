@@ -1,7 +1,7 @@
 # ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html) [![install with docker](https://img.shields.io/badge/install%20with-docker-important.svg?style=flat-square&logo=docker)](https://biocontainers.pro/tools/isescan)
 
 ## A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome
-- Note: the input genome or meta-genome can be any number of sequences in a FASTA file, you just need put your sequences in a FASTA file and run ISEScan (see [Usage example](#Usage)).
+- Note: the input genome or meta-genome can be any number of sequences in a FASTA file, you just need put your sequences in a FASTA file and run ISEScan on it (see [Usage example](#Usage)).
 
 ## Table of Contents
 - [Overview](#Overview)
