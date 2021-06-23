@@ -2,7 +2,7 @@
 
 ## A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome
 - Note1: input genome or meta-genome can be any number of sequences in a FASTA file (e.g. complete genome with one or more sequences, draft genome with many contigs, draft meta-genome with many contigs).
-- Note2: unknown bases are allowed in the sequences, e.g. ACACGCCCGTTGTTTT*NNNNNNNNN*, GGGTCAGGTCATCAACTTTAGCGTAACGC**NNNNN**GGG.
+- Note2: unknown bases are allowed in the sequences, e.g. ACACGCCCGTTGTTTT**NNNNNNNNN**, GGGTCAGGTCATCAACTTTAGCGTAACGC**NNNNN**GGG.
 
 ## Table of Contents
 - [Overview](#Overview)
