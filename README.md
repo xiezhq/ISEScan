@@ -78,7 +78,7 @@ isescan.py --seqfile NC_012624.fna --output results --nthread 2
 ```
 Note: replace `/apps/inst/miniconda3` in commands with your conda install path.
 
-If system reports `isescan.py: command not found...`, please add ISEScan package to your `PATH` (replace `/apps/inst/miniconda3` in commands with your conda install path):
+If system reports `isescan.py: command not found...`, please add ISEScan package to your `PATH` (replace `/apps/inst/miniconda3` in the command below with your conda install path):
 ```
 export PATH=/apps/inst/miniconda3/bin/:$PATH
 ```
