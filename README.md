@@ -7,6 +7,7 @@
 ## Table of Contents
 - [Overview](#Overview)
 - [Citation](#Citation)
+- [Contact](#Contact)
 - [Installation](#Installation)
 	- [ISEScan on linux](#install-on-linux)
 	- [ISEScan on mac](#install-on-mac)
@@ -18,7 +19,6 @@
 	- [How to run a set of genomes in a row](#lots-of-genomes)
 	- [Re-run ISEScan without gene/protein prediction and HMMER searching](#Re-run)
 - [Release History](#Release)
-- [Contact](#Contact)
 
 <a name="Overview"></a>
 ## Overview
@@ -31,6 +31,10 @@ ISEScan was developed using Python3. It 1) scanes genome (or metagenome) in fast
 Zhiqun Xie, Haixu Tang. ISEScan: automated identification of Insertion Sequence Elements in prokaryotic genomes. *Bioinformatics*, 2017, 33(21): 3340-3347. 
 
 Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [SupplementaryMaterials.docx](publication/SupplementaryMaterials.docx), [SupplementaryMaterials.xlsx](publication/SupplementaryMaterials.xlsx).
+
+<a name="Contact"></a>
+## Contact
+Zhiqun Xie: `xiezhq@hotmail.com`
 
 <a name="Installation"></a>
 ## Installation
@@ -336,7 +340,3 @@ Let's try an example, NC_012624.fna.
   - Add option in `constants.py` to report either complete IS elements or both complete and partial IS elements
 - 1.0
   - The first proper release
-
-<a name="Contact"></a>
-## Contact
-Zhiqun Xie: `xiezhq@hotmail.com`
