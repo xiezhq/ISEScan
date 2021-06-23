@@ -34,7 +34,7 @@ Download: [full text](https://doi.org/10.1093/bioinformatics/btx433), [Supplemen
 
 <a name="Contact"></a>
 ## Contact
-Zhiqun Xie: `xiezhq@hotmail.com`, `zhiqun.xie@utsouthwestern.edu`
+Zhiqun Xie: `xiezhq@hotmail.com`
 
 <a name="Installation"></a>
 ## Installation
