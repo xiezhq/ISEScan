@@ -337,4 +337,4 @@ Let's try an example, NC_012624.fna.
 
 <a name="Contact"></a>
 ## Contact
-`xiezhq@hotmail.com`
+Zhiqun Xie: `xiezhq@hotmail.com`
