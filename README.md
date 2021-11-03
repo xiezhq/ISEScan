@@ -1,7 +1,7 @@
 # ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html) [![install with docker](https://img.shields.io/badge/install%20with-docker-important.svg?style=flat-square&logo=docker)](https://quay.io/repository/biocontainers/isescan)
 
 ## A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome
-- ISEScan can be used to identify/annotate full-length or non-full-length IS elements in any DNA sequence but ISEScan was only tested on prokarytoic genome including draft genome and meta-genome. [Usage example](#Usage)
+- ISEScan can be used to identify/annotate full-length or non-full-length IS elements in any DNA sequence but ISEScan was only tested on prokarytoic genome including draft genome and meta-genome.
 - The input sequence file (namely, genome or meta-genome) of ISEScan can contain one or more sequences and there is no limit on the length of each sequence, though ISEScan was only tested on complete genome with one or more sequences, draft genome with many contigs, assembled meta-genome with many contigs. 
 - The only requirment for the input sequence file is: the sequence file must be in **FASTA** format. When ISEScan is started, it first scans the sequences in the FASTA file one by one, then identify/annotate the IS elements in each sequence idenpendently, finally output all identified/annotated IS elements for each sequence and the statistics of identified/annotated IS elements from all sequences from the input FASTA file. 
 - Unknown bases are allowed in the sequences, e.g. ACACGCCCGTTGTTTT**NNNNNNNNN**, GGGTCAGGTCATCAACTTTAGCGTAACGC**NNNNN**GGG.
@@ -85,7 +85,7 @@ conda install isescan
 cp /apps/inst/miniconda3/test/NC_012624.fna ./
 isescan.py --seqfile NC_012624.fna --output results --nthread 2
 ```
-Note: replace `/apps/inst/miniconda3` in commands with your conda install path.
+Note: replace `/apps/inst/miniconda3` in commands with your conda install path, and run `isescan.py -h` to get help.
 
 If system reports `isescan.py: command not found...`, please add ISEScan package to your `PATH` (replace `/apps/inst/miniconda3` in the command below with your conda install path):
 ```
@@ -188,7 +188,7 @@ Let's try an example, NC_012624.fna.
 	cp /apps/inst/miniconda3/test/NC_012624.fna ./
 	isescan.py --seqfile NC_012624.fna --output results --nthread 2
 	```
-
+Note: run `isescan.py -h` or `isescan.py --help` to get help.
 - Wait for its finishing. It may take a while (~40 seconds) as ISEScan uses the HMMER to scan the genome sequences and it will use 621 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs. The running time for larger genome will increase quickly, e.g. about 20 minutes for NC_000913.fna (genome sequence of Escherichia coli str. K-12 substr. MG1655, ~4.6 Mb) with two cpu cores on my virtual machine.
 
 - After ISEScan finish running, you can find the output files in results directory: 
