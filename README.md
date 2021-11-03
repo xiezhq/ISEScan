@@ -1,10 +1,11 @@
 # ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html) [![install with docker](https://img.shields.io/badge/install%20with-docker-important.svg?style=flat-square&logo=docker)](https://quay.io/repository/biocontainers/isescan)
 
 ## A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome
-- You can use ISEScan pipeline to identify/annotate full-length or non-full-length IS elements in any number and any length of DNA sequences in **FASTA** format.
+- You can use ISEScan pipeline to identify/annotate full-length or non-full-length IS elements in any DNA sequence but ISEScan was only tested on prokarytoic genome including draft genome and meta-genome (See below for details).
+- The input sequence file (namely, genome or meta-genome) of ISEScan can contain one or more sequences and there is no limit on the length of each sequence, though ISEScan was only tested on complete genome with one or more sequences, draft genome with many contigs, assembled meta-genome with many contigs. 
+- The only requirment for the input sequence file is: the sequence file must be in **FASTA** format. When ISEScan is started, it first scans the sequences in the FASTA file one by one, then identify/annotate the IS elements in each sequence idenpendently, finally output all identified/annotated IS elements for each sequence and the statistics of identified/annotated IS elements from all sequences from the input FASTA file. 
 - Unknown bases are allowed in the sequences, e.g. ACACGCCCGTTGTTTT**NNNNNNNNN**, GGGTCAGGTCATCAACTTTAGCGTAACGC**NNNNN**GGG.
 - You can also download transposase models from ISEScan subdirectory `pHMMs` and use `HMMER` (version 3.1b2 or later) to search transposases in your sequences.
-- The input sequence file (namely, genome or meta-genome) of ISEScan can contains any numbers of sequences, any length of sequence (namely, even short reads from NGS sequencing), though only ccomplete genome with one or more sequences, draft genome with many contigs, assembled meta-genome with many contigs were tested during the development of ISEScan. The only requirment for the input sequence file is: the sequence file must be in **FASTA** format. When ISEScan is started, it first scans the sequences in the FASTA file one by one, then identify/annotate the IS elements in each sequence idenpendently, finally output all identified/annotated IS elements for each sequence and the statistics of identified/annotated IS elements from all sequences from the input FASTA file. 
 
 ## Table of Contents
 - [Overview](#Overview)
