@@ -188,7 +188,7 @@ Let's try an example, NC_012624.fna.
 	cp /apps/inst/miniconda3/test/NC_012624.fna ./
 	isescan.py --seqfile NC_012624.fna --output results --nthread 2
 	```
-Note: run `isescan.py -h` or `isescan.py --help` to get help.
+  - Note: run `isescan.py -h` or `isescan.py --help` to get help.
 - Wait for its finishing. It may take a while (~40 seconds) as ISEScan uses the HMMER to scan the genome sequences and it will use 621 profile HMM models to scan each protein sequence (predicted by FragGeneScan) in the genome sequence. HMMER searching is usually more sensitive but slower than the regular BLAST searching for remote homologs. The running time for larger genome will increase quickly, e.g. about 20 minutes for NC_000913.fna (genome sequence of Escherichia coli str. K-12 substr. MG1655, ~4.6 Mb) with two cpu cores on my virtual machine.
 
 - After ISEScan finish running, you can find the output files in results directory: 
