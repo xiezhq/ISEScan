@@ -1,4 +1,4 @@
-# ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/isescan/README.html) [![install with docker](https://img.shields.io/badge/install%20with-docker-important.svg?style=flat-square&logo=docker)](https://quay.io/repository/biocontainers/isescan)
+# ISEScan [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](https://bioconda.github.io/recipes/isescan/README.html) [![install with docker](https://img.shields.io/badge/install%20with-docker-important.svg?style=flat-square&logo=docker)](https://quay.io/repository/biocontainers/isescan)
 
 ## A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome
 - ISEScan can be used to identify/annotate full-length or non-full-length IS elements in any DNA sequence but ISEScan was only tested on prokarytoic genome including draft genome and meta-genome.
