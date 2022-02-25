@@ -3,7 +3,7 @@
 ## A python pipeline to identify IS (Insertion Sequence) elements in genome and metagenome
 - ISEScan can be used to identify/annotate full-length or non-full-length IS elements in any DNA sequence but ISEScan was only tested on prokarytoic genome including draft genome and meta-genome.
 - The input sequence file (namely, genome or meta-genome) of ISEScan can contain one or more sequences and there is no limit on the length of each sequence, though ISEScan was only tested on complete genome with one or more sequences, draft genome with many contigs, assembled meta-genome with many contigs. 
-- The only requirment for the input sequence file is: the sequence file must be in **FASTA** format. When ISEScan is started, it first scans the sequences in the FASTA file one by one, then identify/annotate the IS elements in each sequence independently, finally output all identified/annotated IS elements for each sequence and the statistics of identified/annotated IS elements from all sequences from the input FASTA file. 
+- The only requirment for the input sequence file is: the sequence file must be in **FASTA** format. When ISEScan is started, it first scans the sequences in the FASTA file one by one, then identify/annotate the IS elements in each sequence independently, finally output all identified/annotated IS elements for each sequence and the statistics of identified/annotated IS elements from all sequences in the input FASTA file. 
 - Unknown bases are allowed in the sequences, e.g. ACACGCCCGTTGTTTT**NNNNNNNNN**, GGGTCAGGTCATCAACTTTAGCGTAACGC**NNNNN**GGG.
 - You can also download transposase models from ISEScan subdirectory `pHMMs` and use `HMMER` (version 3.1b2 or later) to search transposases in your sequences.
 
