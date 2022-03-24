@@ -7,6 +7,7 @@
 - The only requirment for the input sequence file is: the sequence file must be in **FASTA** format. When ISEScan is started, it first scans the sequences in the FASTA file one by one, then identify/annotate the IS elements in each sequence independently, finally output all identified/annotated IS elements for each sequence and the statistics of identified/annotated IS elements from all sequences in the input FASTA file. 
 - Unknown bases are allowed in the sequences, e.g. ACACGCCCGTTGTTTT**NNNNNNNNN**, GGGTCAGGTCATCAACTTTAGCGTAACGC**NNNNN**GGG.
 - If you just want to identify potential transposases (not FULL or partial IS elements) in your sequences and don't like to install ISEScan, you can do so by following two steps: 1) download the transposase models (clusters.faa.hmm and clusters.single.fa) from ISEScan subdirectory [pHMMs](https://github.com/xiezhq/ISEScan/tree/master/pHMMs), 2) install and use software HMMER (version 3.1b2 or later) to search transposases in your sequences.
+- ISEScan users asked many good questions which have been answered by the developer of ISEScan, [issues](https://github.com/xiezhq/ISEScan/issues). If you didn't find the answers you want, please do not hasitate to ask your new questions there (you can also send me email if prefer to do so.).  
 
 ## Table of Contents
 - [Overview](#Overview)
