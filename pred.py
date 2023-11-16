@@ -516,7 +516,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged, output):
 					#'.', # IS element is DNA transposon and not stranded.
 					strand, # IS element is DNA transposon and not stranded but usually labeled by strand of Tpase main ORF.
 					'.',
-					';'.join(['ID=tir'+ID, 'parent=is'+ID])
+					';'.join(['ID=tir'+ID, 'Parent=is'+ID])
 					), file = fp4gff)
 				# the second part of TIR
 				print('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
@@ -528,7 +528,7 @@ def outputIndividual(mhits, mDNA, proteomes, morfsMerged, output):
 					#'.', # IS element is DNA transposon and not stranded.
 					strand, # IS element is DNA transposon and not stranded but usually labeled by strand of Tpase main ORF.
 					'.',
-					';'.join(['ID=tir'+ID, 'parent=is'+ID])
+					';'.join(['ID=tir'+ID, 'Parent=is'+ID])
 					), file = fp4gff)
 
 			# output .out file
@@ -960,7 +960,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid, 
 					#'.', # IS element is DNA transposon and not stranded.
 					strand, # IS element is DNA transposon and not stranded but usually labeled by strand of Tpase main ORF.
 					'.',
-					';'.join(['ID='+tirid, 'parent='+isid])
+					';'.join(['ID='+tirid, 'Parent='+isid])
 					), file = fp4gff)
 				# the second part of TIR
 				print('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}'.format(
@@ -972,7 +972,7 @@ def outputIS4multipleSeqOneFile(mhits, mDNA, proteomes, morfsMerged, orgfileid, 
 					#'.', # IS element is DNA transposon and not stranded.
 					strand, # IS element is DNA transposon and not stranded but usually labeled by strand of Tpase main ORF.
 					'.',
-					';'.join(['ID='+tirid, 'parent='+isid])
+					';'.join(['ID='+tirid, 'Parent='+isid])
 					), file = fp4gff)
 
 			# output .out file
