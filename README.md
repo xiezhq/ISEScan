@@ -295,7 +295,7 @@ Let's try an example, NC_012624.fna.
 <a name="Release"></a>
 ## Release History 
 - 1.7.3
-  - fix the bug reported referenced by issue59-60 and increase version number from 1.7.2.3 to 1.7.3. (Thanks lxsteiner, adriludwig, the-reese, ChristophKnapp and SRooke for reporting the issue and suggested solution)
+  - fix the bug reported referenced by issue59-60 and increase version number from 1.7.2.3 to 1.7.3. (Thanks lxsteiner, adriludwig, the-reese, ChristophKnapp and SRooke for reporting the issue)
 - 1.7.2.3
   - remove the bug in pred.py, which cuases the issue 'UnboundLocalError: local variable raworfhits referenced before assignment' in rare cases.
 - 1.7.2.2.2
