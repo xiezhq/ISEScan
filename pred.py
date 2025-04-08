@@ -266,7 +266,7 @@ def clusterIntersect(hits, ids):
 	#print('distMatrix: {}\n{}'.format(distMatrix.shape, distMatrix))
 
 	# fastcluster requires the dissimilarity matrix instead of similarity matrix!
-	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input=False)
 	del distMatrix
 	#cophenet = scipy.cluster.hierarchy.cophenet(hclusters, distMatrix)
 	#print('cophenetCorrelation = {}'.format(cophenet[0]))
@@ -1635,7 +1635,7 @@ def clusterIntersect4orf(orfhits, ids):
 	Y = numpy.array(data, int)
 	#print('data in clusterIntersect4orf: {}\n{}'.format(Y.shape, Y))
 	distMatrix = scipy.spatial.distance.pdist(Y, tools.distFunctionByoverlap_min)
-	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input='False')
+	hclusters = fastcluster.linkage(distMatrix, method='average', preserve_input=False)
 	del distMatrix
 	#for i, id in enumerate(idsList):
 	#	print('intersected orfhits', i, orfhits[id])

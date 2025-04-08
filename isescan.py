@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # ISEScan version
-version = '1.7.2.3'
+version = '1.7.3'
 
 import argparse
 import os
